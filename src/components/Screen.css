@@ -1,0 +1,11 @@
+.screen {
+  font-family: 'ti-83-plus-large';
+  position: absolute;
+}
+
+.screen-char {
+  display: inline-block;
+  overflow: hidden;
+  border: 1px dotted transparent;
+  box-sizing: border-box;
+}
