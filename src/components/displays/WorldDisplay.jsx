@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import useLocation from '../../hooks/useLocation';
 import useInteraction from '../../hooks/useInteraction';
 import ScreenStack from './ScreenStack';
@@ -7,15 +9,15 @@ const START_Y = 17;
 const START_X = 35;
 
 export default function WorldDisplay({ width, height, magnification=1 }) {
-  const { layers, local, facing, interactions } = useLocation({
+  const { layers, bump, local, interactions } = useLocation({
     world: START_WORLD,
     x: START_X,
     y: START_Y,
     w: width,
     h: height,
   });
-  const { interactionBuffer } = useInteraction({
-    facing,
+  const { interaction, interactionBuffer } = useInteraction({
+    bump,
     interactions,
     x: local.x,
     y: local.y,
@@ -23,11 +25,16 @@ export default function WorldDisplay({ width, height, magnification=1 }) {
     h: height,
   });
 
+  useEffect(() => {
+    const event = new CustomEvent('interaction', { detail: interaction });
+    window.dispatchEvent(event);
+  }, [interaction]);
+
   const buffers = [
     { fg: '#555', buffer: layers.solid },
     { fg: '#888', buffer: layers.passable },
-    { bg: '#00ff0050', fg: '#00ff00', buffer: interactionBuffer },
-    { fg: 'black', buffer: layers.objects },
+    { fg: '#f70', buffer: interactionBuffer },
+    { fg: '#000', buffer: layers.objects },
   ];
 
   return (

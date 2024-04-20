@@ -5,7 +5,7 @@ import useWorld from './useWorld';
 
 export default function useLocation({ world, x, y, w, h }) {
   const { map, walls, interactions } = useWorld({ defaultWorld: world });
-  const { marker, facing, x: posX, y: posY } = usePosition({
+  const { marker, bump, x: posX, y: posY } = usePosition({
     defaultX: x, defaultY: y,
     map, walls, interactions,
   });
@@ -23,7 +23,7 @@ export default function useLocation({ world, x, y, w, h }) {
 
   const objects = Array.from({ length: h }, () => ' '.repeat(w).split(''));
   objects[localY][localX] = marker;
-  Object.entries(interactions).forEach(([location, label]) => {
+  Object.entries(interactions).forEach(([location]) => {
     let [ly, lx] = location.split(',').map(Number);
     ly--; lx--;
     if (lx >= originX && lx < originX + w && ly >= originY && ly < originY + h) {
@@ -37,7 +37,7 @@ export default function useLocation({ world, x, y, w, h }) {
       passable,
       objects,
     },
-    facing,
+    bump,
     interactions,
     position: { x: posX, y: posY },
     local: { x: localX, y: localY },

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import useWorker from './hooks/useWorker';
 import Analysis from './components/Analysis';
@@ -10,7 +10,9 @@ import './App.css';
 const VIEWPORT_WIDTH = 16;
 const VIEWPORT_HEIGHT = 8;
 
-export default function App({ magnification=3 }) {
+export default function App({ magnification=2 }) {
+  const [interaction, setInteraction] = useState(null);
+  const [menuChoice, setMenuChoice] = useState(null);
   // const [input, setInput] = useState('I love walking my dog.');
 
   // const [blocks, setBlocks] = useState(DEFAULT_BLOCKS);
@@ -37,6 +39,26 @@ export default function App({ magnification=3 }) {
   //     .forEach((block) => request({ text: input, ...block }));
   // };
 
+  useEffect(() => {
+    const interactionHandler = (e) => {
+      setInteraction(e.detail);
+    };
+    window.addEventListener('interaction', interactionHandler);
+    return () => window.removeEventListener('interaction', interactionHandler);
+  }, []);
+
+  useEffect(() => {
+    const menuChoiceHandler = (e) => {
+      setMenuChoice(e.detail);
+    };
+    window.addEventListener('menuChoice', menuChoiceHandler);
+    return () => window.removeEventListener('menuChoice', menuChoiceHandler);
+  }, []);
+
+  // useEffect(() => {
+  //   console.log(menuChoice, interaction);
+  // }, [interaction, menuChoice]);
+
   return (
     <>
       <h1>FM</h1>
@@ -56,19 +78,13 @@ export default function App({ magnification=3 }) {
           width={VIEWPORT_WIDTH}
           height={VIEWPORT_HEIGHT}
           magnification={magnification}
+          target={interaction}
           options={[
-            "New Game",
-            "Load Game",
-            "Settings",
-            "Exit",
-            "Help",
-            "About",
-            "Quit",
-            "Save Game",
-            "Resume",
-            "Options",
-            "Continue",
-            "Restart",
+            "Greet",
+            "Intimidate",
+            "Bribe",
+            "Trade",
+            "Fight",
           ]}
         />
       </div>

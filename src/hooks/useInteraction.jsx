@@ -1,45 +1,41 @@
 import { useState, useEffect } from 'react';
 
-export default function useInteraction({ x, y, w, h, facing, interactions }) {
-  const [enabled, setEnabled] = useState(false);
-
-  const interactionBuffer = Array.from({ length: h }, () => 'ˣ'.repeat(w).split(''));
-  if (enabled) {
-    if (facing[0]) {
-      interactionBuffer[y + facing[0]][x] = '▒';
-      interactionBuffer[y + facing[0] * 2][x] = '▒';
-    }
-    if (facing[1]) {
-      interactionBuffer[y][x + facing[1]] = '▒';
-      interactionBuffer[y][x + facing[1] * 2] = '▒';
-    }
-  }
+export default function useInteraction({ x, y, w, h, bump, interactions }) {
+  const [interaction, setInteraction] = useState(null);
+  const [interactionBuffer, setInteractionBuffer] = useState([[]]);
 
   useEffect(() => {
-    const keydown = (e) => {
-      switch (e.key) {
-        case ' ':
-          setEnabled((enabled) => !enabled);
-          break;
-        case 'Enter':
-          // check if any interactions keys are in the facing direction
-          const [dy, dx] = facing;
-          for (const [location, label] of Object.entries(interactions)) {
-            let [ly, lx] = location.split(',').map(Number);
-            if (interactionBuffer[(ly - 1) % h][(lx - 1) % w] === '▒') {
-              console.log(label);
-              break;
-            }
-          }
-          break;
-      }
-    };
+    const buffer = Array.from({ length: h }, () => 'ˣ'.repeat(w).split(''));
+    if (bump) {
+      const [by, bx] = bump;
 
-    window.addEventListener('keydown', keydown);
-    return () => window.removeEventListener('keydown', keydown);
-  }, [x, y]);
+      // fixme: shouldn't wrap on the current screen, should check next screen
+      const lbx = bx % w;
+      const lby = by % h;
+
+      let interaction = interactions[`${by + 1},${bx + 1}`];
+      buffer[lby][lbx] = interaction ? '▒' : '⬚';
+      if (!interaction) {
+        const xDiff = lbx - x;
+        const yDiff = lby - y;
+        interaction = interactions[`${by + yDiff + 1},${bx + xDiff + 1}`];
+        if (interaction) {
+          buffer[lby + yDiff][lbx + xDiff] = '▒';
+          setInteraction(interaction);
+        } else {
+          setInteraction(null);
+        }
+      } else {
+        setInteraction(interaction);
+      }
+    } else {
+      setInteraction(null);
+    }
+    setInteractionBuffer(buffer);
+  }, [bump]);
 
   return {
+    interaction,
     interactionBuffer,
   };
 }
