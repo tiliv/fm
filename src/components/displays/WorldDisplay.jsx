@@ -1,12 +1,12 @@
 import useLocation from '../../hooks/useLocation';
 import useInteraction from '../../hooks/useInteraction';
-import ScreenStack from '../../components/ScreenStack';
+import ScreenStack from './ScreenStack';
 
 const START_WORLD = 'overworld.txt'
 const START_Y = 17;
 const START_X = 35;
 
-export default function WorldDisplay({ width, height }) {
+export default function WorldDisplay({ width, height, magnification=1 }) {
   const { layers, local, facing, interactions } = useLocation({
     world: START_WORLD,
     x: START_X,
@@ -28,7 +28,6 @@ export default function WorldDisplay({ width, height }) {
     { fg: '#888', buffer: layers.passable },
     { bg: '#00ff0050', fg: '#00ff00', buffer: interactionBuffer },
     { fg: 'black', buffer: layers.objects },
-    // { fg: 'red', buffer: [] },
   ];
 
   return (
@@ -37,7 +36,7 @@ export default function WorldDisplay({ width, height }) {
       defaultFg="black"
       width={width}
       height={height}
-      magnification={2}
+      magnification={magnification}
       buffers={buffers}
     />
   );

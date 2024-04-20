@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 
-// import useWorker from './hooks/useWorker';
-// import Analysis from './components/Analysis';
+import useWorker from './hooks/useWorker';
+import Analysis from './components/Analysis';
 import WorldDisplay from './components/displays/WorldDisplay';
 import MenuDisplay from './components/displays/MenuDisplay';
 import { DEFAULT_BLOCKS } from './constants';
@@ -10,7 +10,7 @@ import './App.css';
 const VIEWPORT_WIDTH = 16;
 const VIEWPORT_HEIGHT = 8;
 
-export default function App() {
+export default function App({ magnification=3 }) {
   // const [input, setInput] = useState('I love walking my dog.');
 
   // const [blocks, setBlocks] = useState(DEFAULT_BLOCKS);
@@ -47,8 +47,30 @@ export default function App() {
           <textarea value={input} rows={3} onChange={e => setInput(e.target.value)}></textarea>
           <button onClick={analyze}>Analyze</button>
         </div> */}
-        <WorldDisplay width={VIEWPORT_WIDTH} height={VIEWPORT_HEIGHT} />
-        <MenuDisplay width={VIEWPORT_WIDTH} height={VIEWPORT_HEIGHT} />
+        <WorldDisplay
+          width={VIEWPORT_WIDTH}
+          height={VIEWPORT_HEIGHT}
+          magnification={magnification}
+        />
+        <MenuDisplay
+          width={VIEWPORT_WIDTH}
+          height={VIEWPORT_HEIGHT}
+          magnification={magnification}
+          options={[
+            "New Game",
+            "Load Game",
+            "Settings",
+            "Exit",
+            "Help",
+            "About",
+            "Quit",
+            "Save Game",
+            "Resume",
+            "Options",
+            "Continue",
+            "Restart",
+          ]}
+        />
       </div>
 
       {/* Horizontal row of cards */}

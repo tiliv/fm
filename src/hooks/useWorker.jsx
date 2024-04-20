@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-const WORKER = new URL('./worker.js', import.meta.url);
+const WORKER = new URL('../worker.js', import.meta.url);
 
 export default function useWorker({ onResult }) {
   const worker = useRef(null);
