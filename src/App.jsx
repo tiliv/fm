@@ -9,7 +9,7 @@ import './App.css';
 const VIEWPORT_WIDTH = 16;
 const VIEWPORT_HEIGHT = 8;
 
-export default function App({ magnification=2 }) {
+export default function App({ magnification=3 }) {
   const [input, setInput] = useState('I love walking my dog.');
   // const { ready, analyze, blocks } = useAnalyzer();
 
