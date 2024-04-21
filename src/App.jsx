@@ -60,7 +60,7 @@ export default function App({ magnification=2 }) {
           ]}
         />
       </div>
-      <div style={{display: 'flex', flexDirection: 'row', alignItems: 'stretch', width: '100%'}}>
+      <div style={{display: 'flex', flexDirection: 'row', alignItems: 'stretch'}}>
         <input
           className="ti large"
           style={{flexGrow: 1}}
