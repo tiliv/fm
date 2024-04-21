@@ -12,12 +12,13 @@ export default function useInteraction({
   x, y, w, h,
   bump, interactions,
   marker='▒', emptyMarker='⬚',
+  invisibleMarker='ˣ',  // this glyph is mapped to a blank character in the font
 }) {
   const [interaction, setInteraction] = useState(null);
   const [interactionBuffer, setInteractionBuffer] = useState([[]]);
 
   useEffect(() => {
-    const buffer = Array.from({ length: h }, () => 'ˣ'.repeat(w).split(''));
+    const buffer = Array.from({ length: h }, () => invisibleMarker.repeat(w).split(''));
     let foundInteraction = null;
     if (bump) {
       const [by, bx] = bump;
