@@ -18,12 +18,14 @@ export default function useWorld({ defaultWorld='overworld.txt' }) {
         setWalls(zoneKey.split('\n').map((line) => line[0]));
         setInteractions(Object.fromEntries(
           objects.split('\n').map((line) => {
-            const [location, label] = line.split(':');
+            const [location, info] = line.split(':');
+            const [label, dataFile] = info.split('/');
             const [coordinate, destination] = location.split('=');
             const [r, c] = coordinate.split(',').map(Number);
             const [dr, dc] = !destination ? [] : destination.split(',').map(Number);
             return [coordinate, {
               label,
+              dataFile,
               sprite: rows[r - 1][c - 1],
               destination: dr === undefined ? null : [dr, dc],
             }];

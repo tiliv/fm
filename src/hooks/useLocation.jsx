@@ -1,13 +1,12 @@
-import { useState, useEffect } from 'react';
-
 import usePosition from './usePosition';
 import useWorld from './useWorld';
 
-export default function useLocation({ world, x, y, w, h }) {
+export default function useLocation({ world, x, y, w, h, keyMap={} }) {
   const { map, walls, interactions } = useWorld({ defaultWorld: world });
   const { marker, bump, x: posX, y: posY } = usePosition({
     defaultX: x, defaultY: y,
     map, walls, interactions,
+    keyMap,
   });
 
   const localX = posX % w;
@@ -20,7 +19,6 @@ export default function useLocation({ world, x, y, w, h }) {
   );
   const solid = area.map((row) => row.map((cell) => walls.includes(cell) ? cell : ' '));
   const passable = area.map((row) => row.map((cell) => walls.includes(cell) ? ' ' : cell));
-
   const objects = Array.from({ length: h }, () => ' '.repeat(w).split(''));
   Object.entries(interactions).forEach(([location]) => {
     let [ly, lx] = location.split(',').map(Number);

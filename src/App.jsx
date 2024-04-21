@@ -45,12 +45,20 @@ export default function App({ magnification=3 }) {
           width={VIEWPORT_WIDTH}
           height={VIEWPORT_HEIGHT}
           magnification={magnification}
+          keyMap={{
+            up: 'ArrowUp',
+            down: 'ArrowDown',
+            left: 'ArrowLeft',
+            right: 'ArrowRight',
+            use: 'Enter',
+          }}
         />
         <MenuDisplay
           width={VIEWPORT_WIDTH}
           height={VIEWPORT_HEIGHT}
           magnification={magnification}
           target={interaction}
+          activeChoice={menuChoice}
           options={[
             "Greet",
             "Intimidate",
@@ -58,6 +66,14 @@ export default function App({ magnification=3 }) {
             "Trade",
             "Fight",
           ]}
+          keyMap={{
+            down: 'j',
+            up: 'k',
+            pageDown: '=',
+            pageUp: '-',
+            use: 'Enter',
+            cancel: 'Backspace',
+          }}
         />
       </div>
       <div style={{display: 'flex', flexDirection: 'row', alignItems: 'stretch'}}>

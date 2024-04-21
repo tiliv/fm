@@ -7,7 +7,14 @@ export default function usePosition({
   map,
   walls,
   interactions,
+  keyMap={
+    up: 'ArrowUp',
+    down: 'ArrowDown',
+    left: 'ArrowLeft',
+    right: 'ArrowRight',
+  },
 }) {
+
   const [x, setX] = useState(defaultX);
   const [y, setY] = useState(defaultY);
   const [bump, setBump] = useState(null);
@@ -17,10 +24,11 @@ export default function usePosition({
       let newX = x;
       let newY = y;
       switch (e.key) {
-        case 'ArrowUp': newY--; break;
-        case 'ArrowDown': newY++; break;
-        case 'ArrowLeft': newX--; break;
-        case 'ArrowRight': newX++; break;
+        case keyMap.up: newY--; break;
+        case keyMap.down: newY++; break;
+        case keyMap.left: newX--; break;
+        case keyMap.right: newX++; break;
+        default: return;
       }
       if (!walls.includes(map[newY]?.[newX])) {
         setX(newX);
@@ -42,7 +50,7 @@ export default function usePosition({
 
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [map, x, y, bump]);
+  }, [map, x, y, bump, keyMap]);
 
   return { marker, bump, x, y };
 }

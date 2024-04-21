@@ -4,24 +4,41 @@ import ScreenStack from './ScreenStack';
 
 const optionKeys = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-export default function MenuDisplay({ width, height, target, options, magnification=1 }) {
+export default function MenuDisplay({
+  width, height,
+  target, activeChoice,
+  options,
+  magnification=1,
+  locked=false,
+  keyMap={
+    down: 'j',
+    up: 'k',
+    pageDown: '=',
+    pageUp: '-',
+    use: 'Enter',
+    cancel: 'Backspace',
+  },
+}) {
   const [page, setPage] = useState(0);
   const [selected, setSelected] = useState(0);
+  const [started, setStarted] = useState(null);
 
   const pageLength = height - 1;
 
   useEffect(() => {
+    if (locked) return;
+
     const keydown = (e) => {
-      if (e.key === 'j' || e.key === 'k') {
+      if ([keyMap.down, keyMap.up].includes(e.key)) {
         setSelected((selected) => {
-          const delta = (e.key === 'j' ? 1 : -1);
+          const delta = (e.key === keyMap.down ? 1 : -1);
           const newSelected = (selected + delta) % options.length;
           if (newSelected < 0) {
             return options.length - 1;
           }
           return newSelected;
         });
-      } else if (e.key === '-' || e.key === '=') {
+      } else if ([keyMap.pageDown, keyMap.pageUp].includes(e.key)) {
         setPage((page) => {
           const maxPage = Math.ceil(options.length / pageLength);
           const delta = (e.key === '-' ? -1 : 1);
@@ -31,6 +48,7 @@ export default function MenuDisplay({ width, height, target, options, magnificat
           return newPage;
         });
       } else {
+        // numbers, shift+letters
         let i = optionKeys.indexOf(e.key.toUpperCase());
         if (e.shiftKey && (!isNaN(e.key) || i === -1)) {
           return;
@@ -43,14 +61,33 @@ export default function MenuDisplay({ width, height, target, options, magnificat
 
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, []);
+  }, [locked, target]);
 
   useEffect(() => {
-    setPage(Math.floor(selected / pageLength));
+    const keydown = (e) => {
+      if (e.key === keyMap.cancel) {
+        setStarted(null);
+      } else if (target && e.key === keyMap.use) {
+        setStarted(selected);
+      }
+    };
 
-    const event = new CustomEvent('menuChoice', { detail: options[selected] });
+    window.addEventListener('keydown', keydown);
+    return () => window.removeEventListener('keydown', keydown);
+  }, [target, selected]);
+
+  useEffect(() => {
+    if (!target) {
+      setStarted(null);
+    }
+
+    setPage(Math.floor((started || selected) / pageLength));
+
+    const event = new CustomEvent('menuChoice', {
+      detail: target ? options[started] : null,
+    });
     window.dispatchEvent(event);
-  }, [selected]);
+  }, [started, target]);
 
   const prefixedOptions = options.map((option, i) => `${optionKeys[i]}:${option}`);
   const optionsViewport = prefixedOptions.slice(page * (height - 1), (page + 1) * (height - 1));
@@ -64,19 +101,33 @@ export default function MenuDisplay({ width, height, target, options, magnificat
       width={width}
       height={height}
       magnification={magnification}
+      hints={[
+        `(${keyMap.up}/${keyMap.down}, `,
+        `${keyMap.pageUp}/${keyMap.pageDown}, 1-9/0/A-Z) to navigate, `,
+        `(${keyMap.use}) to use, `,
+        `(${keyMap.cancel}) to end`,
+      ].join('')}
       buffers={[
         { bg: 'black', fg: '#c7c7c7', buffer: [
           title || '(No target)',
-          ...optionsViewport.map((option) => {
+          // if no active choice, we build a slim buffer for the highlighted
+          // option prefix.
+          ...(activeChoice ? [] : optionsViewport.map((option) => {
             const i = prefixedOptions.indexOf(option);
             return i === selected ? `${optionKeys[i]}:` : '';
-          }),
+          })),
         ]},
-        { fg: 'black', buffer: ['', ...optionsViewport.map((option) => {
+        activeChoice && (
+          { bg: 'black', fg: '#c7c7c7', buffer: [
+            '',
+            `${optionKeys[options.indexOf(activeChoice)]}:${activeChoice}`,
+          ]}
+        ),
+        !activeChoice && { fg: 'black', buffer: ['', ...optionsViewport.map((option) => {
           const i = prefixedOptions.indexOf(option);
           return i === selected ? `  ${option.split(':')[1]}` : option;
         })]},
-      ]}
+      ].filter(b => !!b)}
     />
   );
 }
