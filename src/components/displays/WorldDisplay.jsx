@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 import useLocation from '../../hooks/useLocation';
 import useInteraction from '../../hooks/useInteraction';
@@ -17,6 +17,7 @@ const KEY_ALIASES = {
 
 export default function WorldDisplay({
   width, height,
+  target,
   magnification=1,
   keyMap={
     up: 'ArrowUp',
@@ -25,7 +26,9 @@ export default function WorldDisplay({
     right: 'ArrowRight',
   },
 }) {
-  const { layers, bump, position, interactions } = useLocation({
+  const [activeBuffer, setActiveBuffer] = useState(null);
+
+  const { marker, layers, bump, local, position, interactions } = useLocation({
     world: START_WORLD,
     x: START_X,
     y: START_Y,
@@ -47,12 +50,25 @@ export default function WorldDisplay({
     window.dispatchEvent(event);
   }, [interaction]);
 
+  useEffect(() => {
+    if (!target) {
+      setActiveBuffer(null);
+      return;
+    }
+    const buffer = Array.from({ length: height }, () => Array.from({ length: width }, () => ' '));
+    const [r, c] = target.coordinates;
+    buffer[local.y][local.x] = marker;
+    buffer[(r - 1) % height][(c - 1) % width] = target.sprite;
+    setActiveBuffer(buffer);
+  }, [target]);
+
   const buffers = [
     { fg: '#555', buffer: layers.solid },
     { fg: '#888', buffer: layers.passable },
     { fg: '#f50', buffer: interactionBuffer },
     { fg: '#000', buffer: layers.objects },
-  ];
+    activeBuffer && { bg: '#ccc7', fg: '#000', buffer: activeBuffer },
+  ].filter(b => !!b);
 
   return (
     <ScreenStack

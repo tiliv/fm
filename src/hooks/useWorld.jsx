@@ -26,6 +26,7 @@ export default function useWorld({ defaultWorld='overworld.txt' }) {
             return [coordinate, {
               label,
               dataFile,
+              coordinates: [r, c],
               sprite: rows[r - 1][c - 1],
               destination: dr === undefined ? null : [dr, dc],
             }];

@@ -38,12 +38,12 @@ export default function App({ magnification=3 }) {
     <>
       <h1>FM</h1>
 
-      {/* Side-by-side divs */}
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
         <WorldDisplay
           width={VIEWPORT_WIDTH}
           height={VIEWPORT_HEIGHT}
           magnification={magnification}
+          target={menuChoice ? interaction : null}
           keyMap={{
             up: 'ArrowUp',
             down: 'ArrowDown',
@@ -88,7 +88,6 @@ export default function App({ magnification=3 }) {
         >Analyze</button>
       </div>
 
-      {/* Horizontal row of cards */}
       {/* <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
         {ready && (
           blocks.map((block, i) => (

@@ -35,6 +35,7 @@ export default function useLocation({ world, x, y, w, h, keyMap={} }) {
       passable,
       objects,
     },
+    marker,
     bump,
     interactions,
     position: { x: posX, y: posY },
