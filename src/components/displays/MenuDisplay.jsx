@@ -4,12 +4,35 @@ import ScreenStack from './ScreenStack';
 
 const optionKeys = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
+function bufferize(topMargin, text, width, height, scrollOffset) {
+  const buffer = [];
+  const words = text.split(' ');
+  let currentLine = [];
+
+  words.forEach(word => {
+    if (currentLine.join(' ').length + word.length + 1 > width) {
+      buffer.push(currentLine);
+      currentLine = [];
+    }
+    currentLine.push(word);
+  });
+
+  if (currentLine.length > 0) {
+    buffer.push(currentLine);
+  }
+
+  const scrolledBuffer = buffer
+    .slice(scrollOffset, scrollOffset + height - topMargin)
+    .map(line => line.join(' '));
+  scrolledBuffer.unshift(...Array(topMargin).fill(''));
+  return scrolledBuffer;
+}
+
 export default function MenuDisplay({
   width, height,
-  target, activeChoice,
+  target, targetData, activeChoice,
   options,
   magnification=1,
-  locked=false,
   keyMap={
     down: 'j',
     up: 'k',
@@ -22,46 +45,77 @@ export default function MenuDisplay({
   const [page, setPage] = useState(0);
   const [selected, setSelected] = useState(0);
   const [started, setStarted] = useState(null);
+  const [scrollOffset, setScrollOffset] = useState(0);
+  const [scrollBuffer, setScrollBuffer] = useState(null);
 
   const pageLength = height - 1;
 
   useEffect(() => {
-    if (locked) return;
+    if (started === null || !activeChoice || !targetData) {
+      setScrollOffset(0);
+      setScrollBuffer(null);
+      return;
+    }
+    setScrollBuffer(bufferize(2, targetData[activeChoice], width, height, scrollOffset));
+  }, [started, targetData, scrollOffset]);
 
+  useEffect(() => {
     const keydown = (e) => {
       if ([keyMap.down, keyMap.up].includes(e.key)) {
-        setSelected((selected) => {
-          const delta = (e.key === keyMap.down ? 1 : -1);
-          const newSelected = (selected + delta) % options.length;
-          if (newSelected < 0) {
-            return options.length - 1;
-          }
-          return newSelected;
-        });
-      } else if ([keyMap.pageDown, keyMap.pageUp].includes(e.key)) {
-        setPage((page) => {
-          const maxPage = Math.ceil(options.length / pageLength);
-          const delta = (e.key === '-' ? -1 : 1);
-          const newPage = page + delta;
-          if (newPage >= maxPage) return maxPage - 1;
-          if (newPage < 0) return 0;
-          return newPage;
-        });
-      } else {
-        // numbers, shift+letters
-        let i = optionKeys.indexOf(e.key.toUpperCase());
-        if (e.shiftKey && (!isNaN(e.key) || i === -1)) {
-          return;
+        if (scrollBuffer === null) {
+          setSelected((selected) => {
+            const delta = (e.key === keyMap.down ? 1 : -1);
+            const newSelected = (selected + delta) % options.length;
+            if (newSelected < 0) {
+              return options.length - 1;
+            }
+            return newSelected;
+          });
+        } else {
+          setScrollOffset((scrollOffset) => {
+            const delta = (e.key === keyMap.down ? 1 : -1);
+            const newOffset = scrollOffset + delta;
+            if (newOffset < 0) return 0;
+            if (delta > 0 && scrollBuffer.length < height) return scrollOffset;
+            return newOffset;
+          });
         }
-        if (i > -1 && i < options.length) {
-          setSelected(i);
+      } else if ([keyMap.pageDown, keyMap.pageUp].includes(e.key)) {
+        if (scrollBuffer === null) {
+          setPage((page) => {
+            const maxPage = Math.ceil(options.length / pageLength);
+            const delta = (e.key === '-' ? -1 : 1);
+            const newPage = page + delta;
+            if (newPage >= maxPage) return maxPage - 1;
+            if (newPage < 0) return 0;
+            return newPage;
+          });
+        } else {
+          setScrollOffset((scrollOffset) => {
+            const delta = (e.key === keyMap.pageDown ? 1 : -1) * (height - 2);
+            const newOffset = scrollOffset + delta;
+            if (newOffset < 0) return 0;
+            if (delta > 0 && scrollBuffer.length < height) return scrollOffset;
+            return newOffset;
+          });
+        }
+      } else {
+        if (scrollBuffer === null) {
+          // numbers, shift+letters
+          let i = optionKeys.indexOf(e.key.toUpperCase());
+          if (e.shiftKey && (!isNaN(e.key) || i === -1)) {
+            return;
+          }
+          if (i > -1 && i < options.length) {
+            setSelected(i);
+          }
         }
       }
     };
 
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [locked, target]);
+  }, [target, targetData, scrollBuffer]);
 
   useEffect(() => {
     const keydown = (e) => {
@@ -87,12 +141,11 @@ export default function MenuDisplay({
       detail: target ? options[started] : null,
     });
     window.dispatchEvent(event);
-  }, [started, target]);
-
-  const prefixedOptions = options.map((option, i) => `${optionKeys[i]}:${option}`);
-  const optionsViewport = prefixedOptions.slice(page * (height - 1), (page + 1) * (height - 1));
+  }, [target, started]);
 
   const title = target ? `→${target.sprite} ${target.label}` : null;
+  const prefixedOptions = options.map((option, i) => `${optionKeys[i]}:${option}`);
+  const optionsViewport = prefixedOptions.slice(page * (height - 1), (page + 1) * (height - 1));
 
   return (
     <ScreenStack
@@ -108,10 +161,10 @@ export default function MenuDisplay({
         `(${keyMap.cancel}) to end`,
       ].join('')}
       buffers={[
+        // Title stuff locked up top
         { bg: 'black', fg: '#c7c7c7', buffer: [
           title || '(No target)',
-          // if no active choice, we build a slim buffer for the highlighted
-          // option prefix.
+          // if no active choice, build a minimal buffer for just the highlighted option prefix
           ...(activeChoice ? [] : optionsViewport.map((option) => {
             const i = prefixedOptions.indexOf(option);
             return i === selected ? `${optionKeys[i]}:` : '';
@@ -123,10 +176,15 @@ export default function MenuDisplay({
             `${optionKeys[options.indexOf(activeChoice)]}:${activeChoice}`,
           ]}
         ),
-        !activeChoice && { fg: 'black', buffer: ['', ...optionsViewport.map((option) => {
-          const i = prefixedOptions.indexOf(option);
-          return i === selected ? `  ${option.split(':')[1]}` : option;
-        })]},
+
+        // Content
+        !activeChoice && (
+          { fg: 'black', buffer: ['', ...optionsViewport.map((option) => {
+            const i = prefixedOptions.indexOf(option);
+            return i === selected ? `  ${option.split(':')[1]}` : option;
+          })]}
+        ),
+        (activeChoice && scrollBuffer) && { fg: 'black', buffer: scrollBuffer},
       ].filter(b => !!b)}
     />
   );

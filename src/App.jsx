@@ -14,6 +14,7 @@ export default function App({ magnification=3 }) {
 
   const [interaction, setInteraction] = useState(null);
   const [menuChoice, setMenuChoice] = useState(null);
+  const [targetData, setTargetData] = useState(null);
   useEffect(() => {
     const interactionHandler = (e) => {
       setInteraction(e.detail);
@@ -30,9 +31,22 @@ export default function App({ magnification=3 }) {
     return () => window.removeEventListener('menuChoice', menuChoiceHandler);
   }, []);
 
-  // useEffect(() => {
-  //   console.log(menuChoice, interaction);
-  // }, [interaction, menuChoice]);
+  useEffect(() => {
+    if (!interaction || !menuChoice) return;
+    const { label, dataFile } = interaction;
+    if (!label || !dataFile) return;
+    fetch(`${label}/${dataFile}`)
+      .then((res) => res.text())
+      .then((text) => {
+        const items = text.split('---');
+        const actions = {};
+        items.forEach((item) => {
+          const [category] = item.trim().split('\n', 1);
+          actions[category] = item.slice(category.length + 1).trim();
+        });
+        setTargetData(actions);
+      });
+  }, [interaction, menuChoice]);
 
   return (
     <>
@@ -57,8 +71,10 @@ export default function App({ magnification=3 }) {
           height={VIEWPORT_HEIGHT}
           magnification={magnification}
           target={interaction}
+          targetData={targetData}
           activeChoice={menuChoice}
           options={[
+            "Look",
             "Greet",
             "Intimidate",
             "Bribe",
