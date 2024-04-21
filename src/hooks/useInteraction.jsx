@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 
-export default function useInteraction({ x, y, w, h, bump, interactions }) {
+export default function useInteraction({
+  x, y, w, h,
+  bump, interactions,
+  marker='▒', emptyMarker='⬚',
+}) {
   const [interaction, setInteraction] = useState(null);
   const [interactionBuffer, setInteractionBuffer] = useState([[]]);
 
@@ -14,13 +18,13 @@ export default function useInteraction({ x, y, w, h, bump, interactions }) {
       const lby = by % h;
 
       let interaction = interactions[`${by + 1},${bx + 1}`];
-      buffer[lby][lbx] = interaction ? '▒' : '⬚';
+      buffer[lby][lbx] = interaction ? marker : emptyMarker;
       if (!interaction) {
         const xDiff = lbx - x;
         const yDiff = lby - y;
         interaction = interactions[`${by + yDiff + 1},${bx + xDiff + 1}`];
         if (interaction) {
-          buffer[lby + yDiff][lbx + xDiff] = '▒';
+          buffer[lby + yDiff][lbx + xDiff] = marker;
           setInteraction(interaction);
         } else {
           setInteraction(null);

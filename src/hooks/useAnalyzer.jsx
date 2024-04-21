@@ -36,10 +36,11 @@ export default function useAnalyzer() {
 
 const DEFAULT_BLOCKS = [
   { name: "Costs", version: 0, output: {},
-    hypothesis: "Compared to a price of $5, this cost is {}",
+    hypothesis: "This person is {}",
     labels: [
-      "less",
-      "more",
+      "forgiving",
+      "charitable",
+      "greedy",
     ]},
   { name: "Occupation", version: 0, output: {},
     hypothesis: "This person {}",

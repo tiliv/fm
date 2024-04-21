@@ -6,6 +6,7 @@ export default function usePosition({
   defaultY=0,
   map,
   walls,
+  interactions,
 }) {
   const [x, setX] = useState(defaultX);
   const [y, setY] = useState(defaultY);
@@ -26,13 +27,22 @@ export default function usePosition({
         setY(newY);
         setBump(null);
       } else {
-        setBump([newY, newX]);
+        if (`${bump}` === `${newY},${newX}`) {
+          const { destination } = interactions[`${newY + 1},${newX + 1}`] || {};
+          if (destination) {
+            setY(destination[0] - 1);
+            setX(destination[1] - 1);
+            setBump(null);
+          }
+        } else {
+          setBump([newY, newX]);
+        }
       }
     };
 
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [map, x, y]);
+  }, [map, x, y, bump]);
 
   return { marker, bump, x, y };
 }

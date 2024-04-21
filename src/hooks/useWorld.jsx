@@ -11,17 +11,22 @@ export default function useWorld({ defaultWorld='overworld.txt' }) {
     fetch(`/world/${world}`)
       .then((res) => res.text())
       .then((text) => {
-        const lines = text.split('\n');
-        const divIndex = lines.findIndex((row) => row === '---');
-        const loadedMap = lines.slice(0, divIndex);
-        setMap(loadedMap.map((row) => row.split('')));
-        setSize({ width: loadedMap[0].length, height: loadedMap.length });
-        setWalls(lines[divIndex + 1].split(''));
+        const [loadedMap, zoneKey, objects] = text.trim().split('---\n');
+        const rows = loadedMap.trim().split('\n');
+        setMap(rows.map((row) => row.split('')));
+        setSize({ width: rows[0].length, height: rows.length });
+        setWalls(zoneKey.split('\n').map((line) => line[0]));
         setInteractions(Object.fromEntries(
-          lines.slice(divIndex + 2, -1).map((line) => {
+          objects.split('\n').map((line) => {
             const [location, label] = line.split(':');
-            const [r, c] = location.split(',').map(Number);
-            return [location, { label, sprite: loadedMap[r - 1][c - 1] }];
+            const [coordinate, destination] = location.split('=');
+            const [r, c] = coordinate.split(',').map(Number);
+            const [dr, dc] = !destination ? [] : destination.split(',').map(Number);
+            return [coordinate, {
+              label,
+              sprite: rows[r - 1][c - 1],
+              destination: dr === undefined ? null : [dr, dc],
+            }];
           })
         ));
       });

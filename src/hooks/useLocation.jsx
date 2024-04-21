@@ -22,7 +22,6 @@ export default function useLocation({ world, x, y, w, h }) {
   const passable = area.map((row) => row.map((cell) => walls.includes(cell) ? ' ' : cell));
 
   const objects = Array.from({ length: h }, () => ' '.repeat(w).split(''));
-  objects[localY][localX] = marker;
   Object.entries(interactions).forEach(([location]) => {
     let [ly, lx] = location.split(',').map(Number);
     ly--; lx--;
@@ -30,6 +29,7 @@ export default function useLocation({ world, x, y, w, h }) {
       objects[ly - originY][lx - originX] = map[ly][lx];
     }
   });
+  objects[localY][localX] = marker;
 
   return {
     layers: {
