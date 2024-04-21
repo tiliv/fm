@@ -9,7 +9,7 @@ const START_Y = 17;
 const START_X = 35;
 
 export default function WorldDisplay({ width, height, magnification=1 }) {
-  const { layers, bump, local, interactions } = useLocation({
+  const { layers, bump, local, position, interactions } = useLocation({
     world: START_WORLD,
     x: START_X,
     y: START_Y,
@@ -19,8 +19,8 @@ export default function WorldDisplay({ width, height, magnification=1 }) {
   const { interaction, interactionBuffer } = useInteraction({
     bump,
     interactions,
-    x: local.x,
-    y: local.y,
+    x: position.x,
+    y: position.y,
     w: width,
     h: height,
   });
