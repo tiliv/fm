@@ -6,7 +6,7 @@ const optionKeys = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 export default function MenuDisplay({ width, height, target, options, magnification=1 }) {
   const [page, setPage] = useState(0);
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState(0);
 
   const pageLength = height - 1;
 
@@ -15,7 +15,7 @@ export default function MenuDisplay({ width, height, target, options, magnificat
       if (e.key === 'j' || e.key === 'k') {
         setSelected((selected) => {
           const delta = (e.key === 'j' ? 1 : -1);
-          const newSelected = ((selected === null ? -1 : selected) + delta) % options.length;
+          const newSelected = (selected + delta) % options.length;
           if (newSelected < 0) {
             return options.length - 1;
           }
