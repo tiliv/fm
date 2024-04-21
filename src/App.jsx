@@ -4,7 +4,6 @@ import WorldDisplay from './components/displays/WorldDisplay';
 import MenuDisplay from './components/displays/MenuDisplay';
 import Analysis from './components/Analysis';
 import useAnalyzer from './hooks/useAnalyzer';
-import './App.css';
 
 const VIEWPORT_WIDTH = 16;
 const VIEWPORT_HEIGHT = 8;
