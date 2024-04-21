@@ -11,7 +11,7 @@ const VIEWPORT_HEIGHT = 8;
 
 export default function App({ magnification=2 }) {
   const [input, setInput] = useState('I love walking my dog.');
-  const { ready, analyze, blocks } = useAnalyzer();
+  // const { ready, analyze, blocks } = useAnalyzer();
 
   const [interaction, setInteraction] = useState(null);
   const [menuChoice, setMenuChoice] = useState(null);
@@ -74,7 +74,7 @@ export default function App({ magnification=2 }) {
       </div>
 
       {/* Horizontal row of cards */}
-      <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
+      {/* <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
         {ready && (
           blocks.map((block, i) => (
             <div key={i} style={{width: 200, padding: 5}}>
@@ -82,7 +82,7 @@ export default function App({ magnification=2 }) {
             </div>
           ))
         )}
-      </div>
+      </div> */}
     </>
   )
 }
