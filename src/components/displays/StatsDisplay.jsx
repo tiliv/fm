@@ -3,7 +3,9 @@ import { useEffect, useState } from 'react';
 import ScreenStack from './ScreenStack';
 import useStats from '../../hooks/useStats';
 import useEquipment from '../../hooks/useEquipment';
+import useInventory from '../../hooks/useInventory';
 import { KEY_ALIASES } from '../../constants';
+import { bufferizeList } from '../../utils';
 
 const MINI_NUMBERS = '₀₁₂₃₄₅₆₇₈₉⏨'
 const ABBREVIATIONS = {
@@ -39,7 +41,6 @@ function farColumns(info1, info2) {
   );
 }
 
-
 export default function StatsDisplay({
   width, height, world,
   keyMap={
@@ -52,27 +53,18 @@ export default function StatsDisplay({
   },
   magnification=1,
 }) {
+  const { inventory, equipment, setEquipment } = useInventory();
   const { name, hp, maxHp, mp, strength, defense, speed } = useStats();
-  const {
-    hair, head, body, arms, waist, legs, feet, weapon, shield,
-    buffers,
-  } = useEquipment({
-    hair: { template: 'ponytail' },
-    head: { template: 'helmet', rarity: 2, name: "Iron helmet", stats: {D: 2} },
-    body: { template: 'jacket', rarity: 3, name: "Jacket", stats: {D: 3} },
-    arms: { template: 'straight', rarity: 0, name: "Arms" },
-    waist: { template: 'bag', rarity: 1, name: "Side bag", stats: {D: 0} },
-    legs: { template: 'shortskirt', rarity: 2, name: "Crooked skirt", stats: {D: 1} },
-    feet: { template: 'dainty', rarity: 0, name: "Paper bags", stats: {D: 2} },
-    weapon: { template: 'magicstaff', rarity: 4, name: "Arcane Staff", stats: {D: 1, A: 1} },
-    shield: { template: 'board', rarity: 1, name: "Driftwood", stats: {D: 2} },
-  });
+  const { buffers, ...slots } = useEquipment(equipment);
   const [equippedBuffer, setEquippedBuffer] = useState(null);
 
   const [menuChoice, setMenuChoice] = useState(0);
   const [subMenuChoice, setSubMenuChoice] = useState(null);
   const [subMenuChoiceBuffer, setSubMenuChoiceBuffer] = useState([]);
   const [equipChoice, setEquipChoice] = useState(null);
+  const [equipmentScrollBuffer, setEquipmentScrollBuffer] = useState(null);
+  const [equipmentScrollSelectionBuffer, setEquipmentScrollSelectionBuffer] = useState(null);
+  const [equipScrollOffset, setEquipScrollOffset] = useState(0);
 
   // Change horizontal menu category
   useEffect(() => {
@@ -99,6 +91,8 @@ export default function StatsDisplay({
           break;
         case keyMap.select:
           setEquipChoice(EQUIPMENT_ORDER[subMenuChoice]);
+          const currentItem = inventory[EQUIPMENT_ORDER[subMenuChoice]].findIndex(({ id }) => id === equipment[EQUIPMENT_ORDER[subMenuChoice]].id);
+          setEquipScrollOffset(currentItem);
           break;
       }
     }
@@ -137,12 +131,59 @@ export default function StatsDisplay({
   useEffect(() => {
     setEquippedBuffer({ fg: '#555', buffer: [
       '', '', '', '',
-      farColumns(weapon, head),
-      farColumns(body, arms),
-      farColumns(legs, shield),
-      farColumns(feet, waist),
+      farColumns(slots.weapon, slots.head),
+      farColumns(slots.body, slots.arms),
+      farColumns(slots.legs, slots.shield),
+      farColumns(slots.feet, slots.waist),
     ]});
-  }, [weapon, head, body, arms, legs, shield, feet, waist]);
+  }, [slots.weapon, slots.head, slots.body, slots.arms, slots.legs,
+      slots.shield, slots.feet, slots.waist]);
+
+  // Handle equip slot view scrolling
+  useEffect(() => {
+    if (!equipChoice) return;
+    const keydown = (e) => {
+      switch (e.key) {
+        case keyMap.up:
+          setEquipScrollOffset((offset) => {
+            if (offset === 0) return 0;
+            return offset - 1;
+          });
+          break;
+        case keyMap.down:
+          setEquipScrollOffset((offset) => {
+            if (offset >= inventory[equipChoice].length - 3 + 2) return offset;
+            return offset + 1;
+          });
+          break;
+        case keyMap.select:
+          // Equip item
+          setEquipment(equipChoice, inventory[equipChoice][equipScrollOffset].id);
+          setEquipChoice(null);
+          break;
+      }
+    }
+    window.addEventListener('keydown', keydown);
+    return () => window.removeEventListener('keydown', keydown);
+  }, [equipChoice, setEquipment]);
+
+  // Create equipment scroll buffer
+  useEffect(() => {
+    if (!equipChoice) return;
+    const list = inventory[equipChoice].map(({ id, name }) => {
+      let label = `  ${name}`;
+      if (id === equipment[equipChoice].id) {
+        label = `*${label.slice(1)}`;
+      }
+      label = label.padEnd(width, ' ');
+      return label;
+    });
+    const buffer = bufferizeList(5, [''].concat(list, ['']), width, height, equipScrollOffset);
+    setEquipmentScrollBuffer(buffer);
+    setEquipmentScrollSelectionBuffer(buffer.map(
+      (line, i) => i === height - 2 ? line : ''
+    ));
+  }, [equipChoice, equipScrollOffset]);
 
   return (
     <ScreenStack
@@ -189,13 +230,20 @@ export default function StatsDisplay({
             })),
             equippedBuffer,
             { bg: '#888', fg: 'black', buffer: subMenuChoiceBuffer },
-          )) : (
-            [{ fg: 'red', buffer: [
+          )) : ([
+            { bg: '#888', fg: 'black', buffer: [
               '', '', '', '',
-              equipChoice,
-
-            ] }]
-          )
+              `${equipChoice[0].toUpperCase() + equipChoice.slice(1)}:`.padEnd(width - 5, ' ')
+                +
+                  (inventory[equipChoice][equipScrollOffset]?.stats.A ? (
+                    `Atk ${MINI_NUMBERS[inventory[equipChoice][equipScrollOffset].stats.A]}`
+                  ) : (
+                    `Def ${MINI_NUMBERS[inventory[equipChoice][equipScrollOffset].stats.D]}`
+                  ))
+            ]},
+            equipmentScrollBuffer && { fg: '#c7c7c7', buffer: equipmentScrollBuffer },
+            equipmentScrollBuffer && { bg: '#aaa', fg: 'black', buffer: equipmentScrollSelectionBuffer },
+          ])
         ) : menuChoice === 1 ? (
           // Map
           [{fg: 'red', buffer: ['', '', '', '', "Map"]}]

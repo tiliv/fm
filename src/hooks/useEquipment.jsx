@@ -78,7 +78,9 @@ export default function useEquipment({
 
   // Flatten buffers into a single buffer
   useEffect(() => {
-    const buffers = Array.from({ length: RARITY_COLORS.length }, () => ({ fg: '#fff', buffer: [] }));
+    const buffers = Array.from({ length: RARITY_COLORS.length }, () => ({
+      fg: '#fff', buffer: [],
+    }));
     RARITY_COLORS.forEach((color, i) => {
       buffers[i].fg = color;
       buffers[i].buffer = Array.from({ length: 4 }, () => Array(6).fill(''));
@@ -92,7 +94,6 @@ export default function useEquipment({
           }
         });
       });
-      piece.template
     }
     [hairData, headData, armsData, bodyData, waistData, legsData, feetData,
       weaponData, shieldData].forEach(copy);
