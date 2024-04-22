@@ -6,7 +6,7 @@ import useEquipment from '../../hooks/useEquipment';
 import useInventory from '../../hooks/useInventory';
 import { keyAlias, minifyNumbers, bufferizeList } from '../../utils';
 
-const TABS = ['Equip', 'Map', 'Log']
+const TABS = ['Equip', 'Map', 'Log', 'GP']
 
 const ABBREVIATIONS = {
   weapon: 'Wp',
@@ -66,8 +66,8 @@ export default function StatsDisplay({
   useEffect(() => {
     const keydown = (e) => {
       switch (e.key) {
-        case keyMap.left: setMenuChoice((choice) => (choice + 2) % 3); break;
-        case keyMap.right: setMenuChoice((choice) => (choice + 1) % 3); break;
+        case keyMap.left: setMenuChoice((choice) => (choice + TABS.length - 1) % TABS.length); break;
+        case keyMap.right: setMenuChoice((choice) => (choice + 1) % TABS.length); break;
       }
     };
     window.addEventListener('keydown', keydown);
