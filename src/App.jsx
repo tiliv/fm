@@ -62,6 +62,13 @@ export default function App({ magnification=3 }) {
           width={VIEWPORT_WIDTH}
           height={VIEWPORT_HEIGHT}
           magnification={magnification}
+          keyMap={{
+            up: 'w',
+            down: 's',
+            left: 'a',
+            right: 'd',
+            select: ' ',
+          }}
         />
         <WorldDisplay
           width={VIEWPORT_WIDTH}
@@ -101,7 +108,7 @@ export default function App({ magnification=3 }) {
           }}
         />
       </div>
-      <div style={{display: 'flex', flexDirection: 'row', alignItems: 'stretch'}}>
+      {/* <div style={{display: 'flex', flexDirection: 'row', alignItems: 'stretch'}}>
         <input
           className="ti large"
           style={{flexGrow: 1}}
@@ -112,7 +119,7 @@ export default function App({ magnification=3 }) {
           className="ti inverted large"
           onClick={(e) => analyze(e, input)}
         >Analyze</button>
-      </div>
+      </div> */}
 
       {/* <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
         {ready && (

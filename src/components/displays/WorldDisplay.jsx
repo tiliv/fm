@@ -3,17 +3,11 @@ import { useState, useEffect } from 'react';
 import useLocation from '../../hooks/useLocation';
 import useInteraction from '../../hooks/useInteraction';
 import ScreenStack from './ScreenStack';
+import { KEY_ALIASES } from '../../constants';
 
 const START_WORLD = 'Terra Montans.txt'
 const START_Y = 17;
 const START_X = 35;
-
-const KEY_ALIASES = {
-  ArrowDown: '↓',
-  ArrowUp: '↑',
-  ArrowLeft: '←',
-  ArrowRight: '→',
-}
 
 export default function WorldDisplay({
   width, height,

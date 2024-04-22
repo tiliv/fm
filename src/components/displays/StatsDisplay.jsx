@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import ScreenStack from './ScreenStack';
 import useStats from '../../hooks/useStats';
 import useEquipment from '../../hooks/useEquipment';
+import { KEY_ALIASES } from '../../constants';
 
 const MINI_NUMBERS = '₀₁₂₃₄₅₆₇₈₉⏨'
 const ABBREVIATIONS = {
@@ -15,6 +16,10 @@ const ABBREVIATIONS = {
   legs: 'Lg',
   feet: 'Ft',
 };
+const EQUIPMENT_ORDER = [
+  'weapons', 'body', 'legs', 'feet',
+  'head', 'arms', 'shields', 'waist',
+];
 
 function minifyNumbers(str) {
   return `${str}`.replace(/\d/g, (match) => MINI_NUMBERS[match]);
@@ -61,11 +66,59 @@ export default function StatsDisplay({
     weapon: { template: 'magicstaff', rarity: 4, name: "Arcane Staff", stats: {D: 1, A: 1} },
     shield: { template: 'board', rarity: 1, name: "Driftwood", stats: {D: 2} },
   });
-
   const [equippedBuffer, setEquippedBuffer] = useState(null);
 
+  const [menuChoice, setMenuChoice] = useState(0);
+  const [subMenuChoice, setSubMenuChoice] = useState(null);
+  const [subMenuChoiceBuffer, setSubMenuChoiceBuffer] = useState([]);
+
+  // Change horizontal menu category
   useEffect(() => {
-    setEquippedBuffer({ fg: 'white', buffer: [
+    const keydown = (e) => {
+      switch (e.key) {
+        case keyMap.left: setMenuChoice((choice) => (choice + 2) % 3); break;
+        case keyMap.right: setMenuChoice((choice) => (choice + 1) % 3); break;
+      }
+    };
+    window.addEventListener('keydown', keydown);
+    return () => window.removeEventListener('keydown', keydown);
+
+  }, []);
+
+  // Change vertical menu choice during Equip
+  useEffect(() => {
+    if (menuChoice !== 0) {
+      setSubMenuChoice(null);
+      setSubMenuChoiceBuffer([]);
+      return;
+    }
+    const keydown = (e) => {
+      switch (e.key) {
+        case keyMap.up:
+          setSubMenuChoice((choice) => (choice + EQUIPMENT_ORDER.length - 1) % EQUIPMENT_ORDER.length);
+          break;
+        case keyMap.down:
+          setSubMenuChoice((choice) => ((choice === null ? -1 : choice) + 1) % EQUIPMENT_ORDER.length);
+          break;
+      }
+    }
+    window.addEventListener('keydown', keydown);
+    return () => window.removeEventListener('keydown', keydown);
+  }, [menuChoice]);
+
+  useEffect(() => {
+    if (subMenuChoice === null) return;
+    const buffer = [];
+    buffer.push('', '', '', '');
+    buffer.push(...Array.from({ length: subMenuChoice % (EQUIPMENT_ORDER.length / 2) }, () => ''));
+    buffer.push([...Array.from({ length: subMenuChoice >= (EQUIPMENT_ORDER.length / 2) ? 11 : 0 }, () => ''),
+      ...ABBREVIATIONS[EQUIPMENT_ORDER[subMenuChoice]].split('')
+    ]);
+    setSubMenuChoiceBuffer(buffer);
+  }, [subMenuChoice]);
+
+  useEffect(() => {
+    setEquippedBuffer({ fg: '#555', buffer: [
       '', '', '', '',
       farColumns(weapon, head),
       farColumns(body, arms),
@@ -78,11 +131,15 @@ export default function StatsDisplay({
     <ScreenStack
       width={width}
       height={height}
-      defaultBg='black'
-      defaultFg='red'
       magnification={magnification}
       gutter='black'
-      hints='Stats'
+      hints={[
+        `(${KEY_ALIASES[keyMap.up] || keyMap.up}/`,
+        `${KEY_ALIASES[keyMap.down] || keyMap.down}) to select,`,
+        ` (${KEY_ALIASES[keyMap.left] || keyMap.left}/`,
+        `${KEY_ALIASES[keyMap.right] || keyMap.right}) to change menu,`,
+        ` (${KEY_ALIASES[keyMap.select] || keyMap.select}) to select`,
+      ].join('')}
       buffers={[
         { fg: '#c7c7c7', buffer: [
           `➧${name}`,
@@ -97,17 +154,30 @@ export default function StatsDisplay({
         ]},
         { bg: '#c7c7c7', fg: 'black', buffer: [
           '', '', '',
-          'Equip',
+          [
+            'Equip'.split(''),
+            ['', '', '', '', '', '', ...'Map'.split('')],
+            ['', '', '', '', '', '', '', '', '', '', ...'Quests'.split('')],
+          ][menuChoice],
         ]},
-        // { fg: '#888', buffer: [
-        //   '', '', '', '',
-        // ]},
-        ...(buffers || []).map(({ fg, buffer }) => ({
-          fg: fg, buffer: [].concat(['', '', '', ''], buffer.map(
-            (line) => [].concat(['', '', '', ''], line)
-          ))
-        })),
-        equippedBuffer,
+        ...(
+          // Equipment
+          menuChoice === 0 ? (
+          [].concat((buffers || []).map(({ fg, buffer }) => ({
+            fg: fg, buffer: [].concat(['', '', '', ''], buffer.map(
+              (line) => [].concat(['', '', '', ''], line)
+            ))
+          })),
+          equippedBuffer,
+          { bg: '#888', fg: 'black', buffer: subMenuChoiceBuffer },
+        ))
+        : menuChoice === 1 ? (
+          // Map
+          [{fg: 'red', buffer: ['', '', '', '', "Map"]}]
+        ) : (
+          // Quests
+          [{fg: 'green', buffer: ['', '', '', '', "Quests"]}]
+        )),
       ].filter(Boolean)}
     />
   );
