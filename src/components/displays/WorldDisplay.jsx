@@ -4,7 +4,7 @@ import useLocation from '../../hooks/useLocation';
 import useInteraction from '../../hooks/useInteraction';
 import ScreenStack from './ScreenStack';
 
-const START_WORLD = 'overworld.txt'
+const START_WORLD = 'Terra Montans.txt'
 const START_Y = 17;
 const START_X = 35;
 

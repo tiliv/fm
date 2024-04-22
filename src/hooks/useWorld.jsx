@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export default function useWorld({ defaultWorld='overworld.txt' }) {
+export default function useWorld({ defaultWorld }) {
   const [world, setWorld] = useState(defaultWorld);
   const [walls, setWalls] = useState([]);
   const [size, setSize] = useState({ width: 0, height: 0 });

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 
+import StatsDisplay from './components/displays/StatsDisplay';
 import WorldDisplay from './components/displays/WorldDisplay';
 import MenuDisplay from './components/displays/MenuDisplay';
 import Analysis from './components/Analysis';
@@ -15,6 +16,8 @@ export default function App({ magnification=3 }) {
   const [interaction, setInteraction] = useState(null);
   const [menuChoice, setMenuChoice] = useState(null);
   const [targetData, setTargetData] = useState(null);
+
+  // Store activated target event
   useEffect(() => {
     const interactionHandler = (e) => {
       setInteraction(e.detail);
@@ -23,6 +26,7 @@ export default function App({ magnification=3 }) {
     return () => window.removeEventListener('interaction', interactionHandler);
   }, []);
 
+  // Store activated menu choice event
   useEffect(() => {
     const menuChoiceHandler = (e) => {
       setMenuChoice(e.detail);
@@ -31,6 +35,7 @@ export default function App({ magnification=3 }) {
     return () => window.removeEventListener('menuChoice', menuChoiceHandler);
   }, []);
 
+  // Load interaction data based on both the target and the menu choice
   useEffect(() => {
     if (!interaction || !menuChoice) return;
     const { label, dataFile } = interaction;
@@ -53,6 +58,11 @@ export default function App({ magnification=3 }) {
       <h1>FM</h1>
 
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
+        <StatsDisplay
+          width={VIEWPORT_WIDTH}
+          height={VIEWPORT_HEIGHT}
+          magnification={magnification}
+        />
         <WorldDisplay
           width={VIEWPORT_WIDTH}
           height={VIEWPORT_HEIGHT}
