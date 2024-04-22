@@ -68,6 +68,7 @@ export default function App({ magnification=3 }) {
             left: 'a',
             right: 'd',
             select: ' ',
+            cancel: 'Escape',
           }}
         />
         <WorldDisplay

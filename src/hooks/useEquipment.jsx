@@ -71,8 +71,8 @@ export default function useEquipment({
   const waistData = useEquipmentFile("waist", waist, [2, 2], [2, 4]);
   const legsData = useEquipmentFile("legs", legs, [2, 3]);
   const feetData = useEquipmentFile("feet", feet, [3, 2], [3, 4]);
-  const weaponsData = useEquipmentFile("weapons", weapon, [1, 0]);
-  const shieldsData = useEquipmentFile("shields", shield, [1, 5]);
+  const weaponData = useEquipmentFile("weapon", weapon, [1, 0]);
+  const shieldData = useEquipmentFile("shield", shield, [1, 5]);
 
   const [buffers, setBuffers] = useState(null);
 
@@ -95,9 +95,9 @@ export default function useEquipment({
       piece.template
     }
     [hairData, headData, armsData, bodyData, waistData, legsData, feetData,
-      weaponsData, shieldsData].forEach(copy);
+      weaponData, shieldData].forEach(copy);
     setBuffers(buffers);
-  }, [hairData, headData, armsData, bodyData, waistData, legsData, feetData, weaponsData, shieldsData]);
+  }, [hairData, headData, armsData, bodyData, waistData, legsData, feetData, weaponData, shieldData]);
 
   return {
     hair: hairData,
@@ -107,8 +107,8 @@ export default function useEquipment({
     waist: waistData,
     legs: legsData,
     feet: feetData,
-    weapon: weaponsData,
-    shield: shieldsData,
+    weapon: weaponData,
+    shield: shieldData,
     buffers,
   };
 }

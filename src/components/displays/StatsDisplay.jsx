@@ -7,8 +7,8 @@ import { KEY_ALIASES } from '../../constants';
 
 const MINI_NUMBERS = '₀₁₂₃₄₅₆₇₈₉⏨'
 const ABBREVIATIONS = {
-  weapons: 'Wp',
-  shields: 'Sh',
+  weapon: 'Wp',
+  shield: 'Sh',
   head: 'Hd',
   body: 'Bd',
   arms: 'Ar',
@@ -17,8 +17,8 @@ const ABBREVIATIONS = {
   feet: 'Ft',
 };
 const EQUIPMENT_ORDER = [
-  'weapons', 'body', 'legs', 'feet',
-  'head', 'arms', 'shields', 'waist',
+  'weapon', 'body', 'legs', 'feet',
+  'head', 'arms', 'shield', 'waist',
 ];
 
 function minifyNumbers(str) {
@@ -48,6 +48,7 @@ export default function StatsDisplay({
     left: 'a',
     right: 'd',
     select: ' ',
+    cancel: 'Escape',
   },
   magnification=1,
 }) {
@@ -71,6 +72,7 @@ export default function StatsDisplay({
   const [menuChoice, setMenuChoice] = useState(0);
   const [subMenuChoice, setSubMenuChoice] = useState(null);
   const [subMenuChoiceBuffer, setSubMenuChoiceBuffer] = useState([]);
+  const [equipChoice, setEquipChoice] = useState(null);
 
   // Change horizontal menu category
   useEffect(() => {
@@ -82,16 +84,11 @@ export default function StatsDisplay({
     };
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-
   }, []);
 
-  // Change vertical menu choice during Equip
+  // Change vertical menu choice during Equip (unbinds when not on main Equip view)
   useEffect(() => {
-    if (menuChoice !== 0) {
-      setSubMenuChoice(null);
-      setSubMenuChoiceBuffer([]);
-      return;
-    }
+    if (menuChoice !== 0 || equipChoice) return;
     const keydown = (e) => {
       switch (e.key) {
         case keyMap.up:
@@ -100,12 +97,31 @@ export default function StatsDisplay({
         case keyMap.down:
           setSubMenuChoice((choice) => ((choice === null ? -1 : choice) + 1) % EQUIPMENT_ORDER.length);
           break;
+        case keyMap.select:
+          setEquipChoice(EQUIPMENT_ORDER[subMenuChoice]);
+          break;
       }
     }
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [menuChoice]);
+  }, [menuChoice, subMenuChoice, equipChoice]);
 
+  // Handle equip slot selection view
+  useEffect(() => {
+    if (!equipChoice) return;
+
+    const keydown = (e) => {
+      switch (e.key) {
+        case keyMap.cancel:
+          setEquipChoice(null);
+          break;
+      }
+    }
+    window.addEventListener('keydown', keydown);
+    return () => window.removeEventListener('keydown', keydown);
+  }, [equipChoice]);
+
+  // Create equip menu subMenuChoice's highlight buffer
   useEffect(() => {
     if (subMenuChoice === null) return;
     const buffer = [];
@@ -117,6 +133,7 @@ export default function StatsDisplay({
     setSubMenuChoiceBuffer(buffer);
   }, [subMenuChoice]);
 
+  // Create equip menu display buffer
   useEffect(() => {
     setEquippedBuffer({ fg: '#555', buffer: [
       '', '', '', '',
@@ -139,6 +156,7 @@ export default function StatsDisplay({
         ` (${KEY_ALIASES[keyMap.left] || keyMap.left}/`,
         `${KEY_ALIASES[keyMap.right] || keyMap.right}) to change menu,`,
         ` (${KEY_ALIASES[keyMap.select] || keyMap.select}) to select`,
+        ` (${KEY_ALIASES[keyMap.cancel] || keyMap.cancel}) to cancel`,
       ].join('')}
       buffers={[
         { fg: '#c7c7c7', buffer: [
@@ -155,7 +173,7 @@ export default function StatsDisplay({
         { bg: '#c7c7c7', fg: 'black', buffer: [
           '', '', '',
           [
-            'Equip'.split(''),
+            'Equip',
             ['', '', '', '', '', '', ...'Map'.split('')],
             ['', '', '', '', '', '', '', '', '', '', ...'Quests'.split('')],
           ][menuChoice],
@@ -163,15 +181,22 @@ export default function StatsDisplay({
         ...(
           // Equipment
           menuChoice === 0 ? (
-          [].concat((buffers || []).map(({ fg, buffer }) => ({
-            fg: fg, buffer: [].concat(['', '', '', ''], buffer.map(
-              (line) => [].concat(['', '', '', ''], line)
-            ))
-          })),
-          equippedBuffer,
-          { bg: '#888', fg: 'black', buffer: subMenuChoiceBuffer },
-        ))
-        : menuChoice === 1 ? (
+            equipChoice === null ? (
+            [].concat((buffers || []).map(({ fg, buffer }) => ({
+              fg: fg, buffer: [].concat(['', '', '', ''], buffer.map(
+                (line) => [].concat(['', '', '', ''], line)
+              ))
+            })),
+            equippedBuffer,
+            { bg: '#888', fg: 'black', buffer: subMenuChoiceBuffer },
+          )) : (
+            [{ fg: 'red', buffer: [
+              '', '', '', '',
+              equipChoice,
+
+            ] }]
+          )
+        ) : menuChoice === 1 ? (
           // Map
           [{fg: 'red', buffer: ['', '', '', '', "Map"]}]
         ) : (
