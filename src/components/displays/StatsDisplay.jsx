@@ -4,10 +4,10 @@ import ScreenStack from './ScreenStack';
 import useStats from '../../hooks/useStats';
 import useEquipment from '../../hooks/useEquipment';
 import useInventory from '../../hooks/useInventory';
-import { KEY_ALIASES } from '../../constants';
-import { bufferizeList } from '../../utils';
+import { keyAlias, minifyNumbers, bufferizeList } from '../../utils';
 
-const MINI_NUMBERS = '₀₁₂₃₄₅₆₇₈₉⏨'
+const TABS = ['Equip', 'Map', 'Log']
+
 const ABBREVIATIONS = {
   weapon: 'Wp',
   shield: 'Sh',
@@ -22,10 +22,6 @@ const EQUIPMENT_ORDER = [
   'weapon', 'body', 'legs', 'feet',
   'head', 'arms', 'shield', 'waist',
 ];
-
-function minifyNumbers(str) {
-  return `${str}`.replace(/\d/g, (match) => MINI_NUMBERS[match]);
-}
 
 function farColumns(info1, info2) {
   function label(data) {
@@ -94,6 +90,9 @@ export default function StatsDisplay({
           const currentItem = inventory[EQUIPMENT_ORDER[subMenuChoice]].findIndex(({ id }) => id === equipment[EQUIPMENT_ORDER[subMenuChoice]].id);
           setEquipScrollOffset(currentItem);
           break;
+        // case keyMap.cancel:
+        //   setSubMenuChoice(null);
+        //   break;
       }
     }
     window.addEventListener('keydown', keydown);
@@ -192,12 +191,12 @@ export default function StatsDisplay({
       magnification={magnification}
       gutter='black'
       hints={[
-        `(${KEY_ALIASES[keyMap.up] || keyMap.up}/`,
-        `${KEY_ALIASES[keyMap.down] || keyMap.down}) to select,`,
-        ` (${KEY_ALIASES[keyMap.left] || keyMap.left}/`,
-        `${KEY_ALIASES[keyMap.right] || keyMap.right}) to change menu,`,
-        ` (${KEY_ALIASES[keyMap.select] || keyMap.select}) to select`,
-        ` (${KEY_ALIASES[keyMap.cancel] || keyMap.cancel}) to cancel`,
+        `(${keyAlias(keyMap.up)}/`,
+        `${keyAlias(keyMap.down)}) to select,`,
+        ` (${keyAlias(keyMap.left)}/`,
+        `${keyAlias(keyMap.right)}) to change menu,`,
+        ` (${keyAlias(keyMap.select)}) to select`,
+        ` (${keyAlias(keyMap.cancel)}) to cancel`,
       ].join('')}
       buffers={[
         { fg: '#c7c7c7', buffer: [
@@ -209,15 +208,11 @@ export default function StatsDisplay({
             '  D:', `${defense}`.padStart(2, ' '),
             '  S:', `${speed}`.padStart(2, ' '),
           ].join(''),
-          'Equip Map Quests',
+          TABS.join(' '),
         ]},
         { bg: '#c7c7c7', fg: 'black', buffer: [
           '', '', '',
-          [
-            'Equip',
-            ['', '', '', '', '', '', ...'Map'.split('')],
-            ['', '', '', '', '', '', '', '', '', '', ...'Quests'.split('')],
-          ][menuChoice],
+          [...Array.from(TABS.slice(0, menuChoice).join(' '), () => ''), ...(menuChoice ? [''] : []), ...TABS[menuChoice].split('')]
         ]},
         ...(
           // Equipment
@@ -236,9 +231,9 @@ export default function StatsDisplay({
               `${equipChoice[0].toUpperCase() + equipChoice.slice(1)}:`.padEnd(width - 5, ' ')
                 +
                   (inventory[equipChoice][equipScrollOffset]?.stats.A ? (
-                    `Atk ${MINI_NUMBERS[inventory[equipChoice][equipScrollOffset].stats.A]}`
+                    `Atk ${minifyNumbers(inventory[equipChoice][equipScrollOffset].stats.A)}`
                   ) : (
-                    `Def ${MINI_NUMBERS[inventory[equipChoice][equipScrollOffset].stats.D]}`
+                    `Def ${minifyNumbers(inventory[equipChoice][equipScrollOffset].stats.D)}`
                   ))
             ]},
             equipmentScrollBuffer && { fg: '#c7c7c7', buffer: equipmentScrollBuffer },

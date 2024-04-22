@@ -20,6 +20,12 @@ export default function usePosition({
   const [bump, setBump] = useState(null);
 
   useEffect(() => {
+    setBump(null);
+    setX(defaultX);
+    setY(defaultY);
+  }, [defaultX, defaultY]);
+
+  useEffect(() => {
     const keydown = (e) => {
       let newX = x;
       let newY = y;
@@ -36,11 +42,11 @@ export default function usePosition({
         setBump(null);
       } else {
         if (`${bump}` === `${newY},${newX}`) {
-          const { destination } = interactions[`${newY + 1},${newX + 1}`] || {};
-          if (destination) {
-            setY(destination[0] - 1);
-            setX(destination[1] - 1);
-            setBump(null);
+          const interaction = interactions[`${newY + 1},${newX + 1}`];
+
+          if (interaction?.destination) {
+            const event = new CustomEvent('destination', { detail: interaction });
+            window.dispatchEvent(event);
           }
         } else {
           setBump([newY, newX]);

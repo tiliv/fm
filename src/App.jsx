@@ -6,16 +6,35 @@ import MenuDisplay from './components/displays/MenuDisplay';
 import Analysis from './components/Analysis';
 import useAnalyzer from './hooks/useAnalyzer';
 
+const START_WORLD = 'Terra Montans.txt'
+const START_Y = 17;
+const START_X = 35;
+
 const VIEWPORT_WIDTH = 16;
 const VIEWPORT_HEIGHT = 8;
 
-export default function App({ magnification=3 }) {
-  const [input, setInput] = useState('I love walking my dog.');
+export default function App({ magnification=3, startWorld=START_WORLD, startX=START_X, startY=START_Y }) {
+  // const [input, setInput] = useState('I love walking my dog.');
   // const { ready, analyze, blocks } = useAnalyzer();
 
   const [interaction, setInteraction] = useState(null);
   const [menuChoice, setMenuChoice] = useState(null);
   const [targetData, setTargetData] = useState(null);
+
+  const [destination, setDestination] = useState({ startWorld, startX, startY });
+
+  // React to a destination event
+  useEffect(() => {
+    const destinationHandler = (e) => {
+      setDestination({
+        startWorld: e.detail.dataFile,
+        startY: e.detail.destination[0] - 1,
+        startX: e.detail.destination[1] - 1,
+      });
+    };
+    window.addEventListener('destination', destinationHandler);
+    return () => window.removeEventListener('destination', destinationHandler);
+  }, []);
 
   // Store activated target event
   useEffect(() => {
@@ -72,6 +91,10 @@ export default function App({ magnification=3 }) {
           }}
         />
         <WorldDisplay
+          {...destination}
+          // startWorld={"Terra Montans.txt"}
+          // startX={35}
+          // startY={17}
           width={VIEWPORT_WIDTH}
           height={VIEWPORT_HEIGHT}
           magnification={magnification}

@@ -1,16 +1,13 @@
 import { useState, useEffect } from 'react';
 
+import ScreenStack from './ScreenStack';
 import useLocation from '../../hooks/useLocation';
 import useInteraction from '../../hooks/useInteraction';
-import ScreenStack from './ScreenStack';
-import { KEY_ALIASES } from '../../constants';
-
-const START_WORLD = 'Terra Montans.txt'
-const START_Y = 17;
-const START_X = 35;
+import { keyAlias } from '../../utils';
 
 export default function WorldDisplay({
   width, height,
+  startWorld, startX=0, startY=0,
   target,
   magnification=1,
   keyMap={
@@ -23,9 +20,9 @@ export default function WorldDisplay({
   const [activeBuffer, setActiveBuffer] = useState(null);
 
   const { marker, layers, bump, local, position, interactions } = useLocation({
-    world: START_WORLD,
-    x: START_X,
-    y: START_Y,
+    world: startWorld,
+    x: startX,
+    y: startY,
     w: width,
     h: height,
     keyMap,
@@ -71,10 +68,10 @@ export default function WorldDisplay({
       width={width}
       height={height}
       hints={[
-        `(${KEY_ALIASES[keyMap.up] || keyMap.up}`,
-        `${KEY_ALIASES[keyMap.down] || keyMap.down}`,
-        `${KEY_ALIASES[keyMap.left] || keyMap.left}`,
-        `${KEY_ALIASES[keyMap.right] || keyMap.right})`,
+        `(${keyAlias(keyMap.up)}`,
+        `${keyAlias(keyMap.down)}`,
+        `${keyAlias(keyMap.left)}`,
+        `${keyAlias(keyMap.right)})`,
         ' to move, bump into a target to select',
       ].join('')}
       magnification={magnification}

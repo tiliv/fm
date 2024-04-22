@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 function inViewport(y, x, bump, h, w) {
   const [by, bx] = bump;
   return (
-    parseInt(by / h) === parseInt(y / h)
+    by >= 0 && bx >= 0
+    && parseInt(by / h) === parseInt(y / h)
     && parseInt(bx / w) === parseInt(x / w)
   );
 }
