@@ -40,17 +40,14 @@ export default function usePosition({
         setX(newX);
         setY(newY);
         setBump(null);
-      } else {
-        if (`${bump}` === `${newY},${newX}`) {
-          const interaction = interactions[`${newY + 1},${newX + 1}`];
-
-          if (interaction?.destination) {
-            const event = new CustomEvent('destination', { detail: interaction });
-            window.dispatchEvent(event);
-          }
-        } else {
-          setBump([newY, newX]);
+      } else if (`${bump}` === `${newY},${newX}`) {  // same bump twice in a row
+        const interaction = interactions[`${newY + 1},${newX + 1}`];
+        if (interaction?.destination) {
+          const event = new CustomEvent('destination', { detail: interaction });
+          window.dispatchEvent(event);
         }
+      } else {
+        setBump([newY, newX]);
       }
     };
 
