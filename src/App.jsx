@@ -6,7 +6,6 @@ import MenuDisplay from './components/displays/MenuDisplay';
 import Analysis from './components/Analysis';
 import useAnalyzer from './hooks/useAnalyzer';
 import { ACTIONS, ACTIONS_ORDER } from './Actions';
-import * as Buy from './actions/Buy';
 
 const START_WORLD = 'Terra Montans.txt'
 const START_Y = 17;
@@ -62,20 +61,7 @@ export default function App({ magnification=3, startWorld=START_WORLD, startX=ST
   // Load interaction data based on both the target and the menu choice
   useEffect(() => {
     if (!interaction || !menuChoice) return;
-    const { label, dataFile } = interaction;
-    if (!label || !dataFile) return;
-    fetch(`${label}/${dataFile}`)
-      .then((res) => res.text())
-      .then((text) => {
-        const items = text.split('---');
-        const actions = {...interaction};
-        items.forEach((item) => {
-          const [category] = item.trim().split('\n', 1);
-          actions[category] = item.slice(category.length + 1).trim();
-        });
-        actions[ACTIONS.BUY] = Buy.parse(actions);
-        setTargetData(actions);
-      });
+    setTargetData(interaction);
   }, [interaction, menuChoice]);
 
   return (

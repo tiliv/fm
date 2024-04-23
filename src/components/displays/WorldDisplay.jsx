@@ -4,6 +4,8 @@ import ScreenStack from './ScreenStack';
 import useLocation from '../../hooks/useLocation';
 import useInteraction from '../../hooks/useInteraction';
 import { keyAlias } from '../../utils';
+import { ACTIONS } from '../../Actions';
+import * as Buy from '../../actions/Buy';
 
 export default function WorldDisplay({
   width, height,
@@ -37,8 +39,30 @@ export default function WorldDisplay({
   });
 
   useEffect(() => {
-    const event = new CustomEvent('interaction', { detail: interaction });
-    window.dispatchEvent(event);
+    if (!interaction) {
+      const event = new CustomEvent('interaction', { detail: null });
+      window.dispatchEvent(event);
+    } else {
+      const { label, dataFile } = interaction;
+      if (!label || !dataFile) return;
+      fetch(`${label}/${dataFile}`)
+        .catch((err) => `Look:\n${err}`)
+        .then((res) => res.text())
+        .then((text) => {
+          const items = text.split('---');
+          const actions = {...interaction};
+          items.forEach((item) => {
+            const [category] = item.trim().split('\n', 1);
+            actions[category] = item.slice(category.length + 1).trim();
+          });
+          actions[ACTIONS.BUY] = Buy.parse(actions);
+          return actions;
+        })
+        .then((actions) => {
+          const event = new CustomEvent('interaction', { detail: actions });
+          window.dispatchEvent(event);
+        })
+    }
   }, [interaction]);
 
   useEffect(() => {
