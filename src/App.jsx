@@ -14,13 +14,16 @@ const START_X = 35;
 const VIEWPORT_WIDTH = 16;
 const VIEWPORT_HEIGHT = 8;
 
-export default function App({ magnification=3, startWorld=START_WORLD, startX=START_X, startY=START_Y }) {
+export default function App({ startMagnification=2, startWorld=START_WORLD, startX=START_X, startY=START_Y }) {
   // const [input, setInput] = useState('I love walking my dog.');
   // const { ready, analyze, blocks } = useAnalyzer();
 
+  const [magnification, setMagnification] = useState(startMagnification);
   const [interaction, setInteraction] = useState(null);
   const [menuChoice, setMenuChoice] = useState(null);
   const [targetData, setTargetData] = useState(null);
+  const [width, setWidth] = useState(VIEWPORT_WIDTH);
+  const [height, setHeight] = useState(VIEWPORT_HEIGHT);
 
   const [destination, setDestination] = useState({ startWorld, startX, startY });
 
@@ -67,11 +70,34 @@ export default function App({ magnification=3, startWorld=START_WORLD, startX=ST
   return (
     <>
       <h1>FM</h1>
+      <p>
+        <label style={{ margin: '0 0 0 1em' }} htmlFor="magnification">Zoom: </label>
+        <input id="magnification"
+          type="number"
+          value={magnification}
+          onChange={(e) => setMagnification(Number(e.target.value))}
+          style={{width: 50}}
+        />
+        <label style={{ margin: '0 0 0 1em' }} htmlFor="width">Width: </label>
+        <input id="width"
+          type="number"
+          value={width}
+          onChange={(e) => setWidth(parseInt(e.target.value))}
+          style={{width: 50}}
+        />
+        <label style={{ margin: '0 0 0 1em' }} htmlFor="height">Height: </label>
+        <input id="height"
+          type="number"
+          value={height}
+          onChange={(e) => setHeight(parseInt(e.target.value))}
+          style={{width: 50}}
+        />
+      </p>
 
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
         <StatsDisplay
-          width={VIEWPORT_WIDTH}
-          height={VIEWPORT_HEIGHT}
+          width={width}
+          height={height}
           magnification={magnification}
           keyMap={{
             up: 'w',
@@ -87,8 +113,8 @@ export default function App({ magnification=3, startWorld=START_WORLD, startX=ST
           // startWorld={"Terra Montans.txt"}
           // startX={35}
           // startY={17}
-          width={VIEWPORT_WIDTH}
-          height={VIEWPORT_HEIGHT}
+          width={width}
+          height={height}
           magnification={magnification}
           target={menuChoice ? interaction : null}
           keyMap={{
@@ -100,8 +126,8 @@ export default function App({ magnification=3, startWorld=START_WORLD, startX=ST
           }}
         />
         <MenuDisplay
-          width={VIEWPORT_WIDTH}
-          height={VIEWPORT_HEIGHT}
+          width={width}
+          height={height}
           magnification={magnification}
           target={interaction}
           targetData={targetData}

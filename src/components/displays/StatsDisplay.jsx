@@ -87,7 +87,9 @@ export default function StatsDisplay({
           break;
         case keyMap.select:
           setEquipChoice(EQUIPMENT_ORDER[subMenuChoice]);
-          const currentItem = inventory[EQUIPMENT_ORDER[subMenuChoice]].findIndex(({ id }) => id === equipment[EQUIPMENT_ORDER[subMenuChoice]].id);
+          const currentItem = inventory[EQUIPMENT_ORDER[subMenuChoice]].findIndex(
+            ({ id }) => id === equipment[EQUIPMENT_ORDER[subMenuChoice]].id
+          );
           setEquipScrollOffset(currentItem);
           break;
         // case keyMap.cancel:
@@ -180,9 +182,9 @@ export default function StatsDisplay({
     const buffer = bufferizeList(5, [''].concat(list, ['']), width, height, equipScrollOffset);
     setEquipmentScrollBuffer(buffer);
     setEquipmentScrollSelectionBuffer(buffer.map(
-      (line, i) => i === height - 2 ? line : ''
+      (line, i) => i === 6 ? line : ''
     ));
-  }, [equipChoice, equipScrollOffset]);
+  }, [equipChoice, equipScrollOffset, height, width]);
 
   return (
     <ScreenStack
@@ -230,10 +232,10 @@ export default function StatsDisplay({
               '', '', '', '',
               `${equipChoice[0].toUpperCase() + equipChoice.slice(1)}:`.padEnd(width - 5, ' ')
                 +
-                  (inventory[equipChoice][equipScrollOffset]?.stats.A ? (
-                    `Atk ${minifyNumbers(inventory[equipChoice][equipScrollOffset].stats.A)}`
+                  (inventory[equipChoice][equipScrollOffset]?.stats?.A ? (
+                    `Atk ${minifyNumbers(inventory[equipChoice][equipScrollOffset].stats?.A || 0)}`
                   ) : (
-                    `Def ${minifyNumbers(inventory[equipChoice][equipScrollOffset].stats.D)}`
+                    `Def ${minifyNumbers(inventory[equipChoice][equipScrollOffset].stats?.D || 0)}`
                   ))
             ]},
             equipmentScrollBuffer && { fg: '#c7c7c7', buffer: equipmentScrollBuffer },
