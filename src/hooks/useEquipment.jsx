@@ -13,7 +13,7 @@ function useEquipmentFile(kind, spec, position, secondPosition=null) {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetch(`/equipment/${kind}/${template}.txt`)
+    fetch(`equipment/${kind}/${template}.txt`)
       .then((res) => res.text())
       .then((text) => {
         const buffer = Array.from({ length: 4 }, () => Array(6).fill(' '));

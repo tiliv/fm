@@ -7,7 +7,7 @@ export default function useWorld({ world }) {
   const [interactions, setInteractions] = useState({});
 
   useEffect(() => {
-    fetch(`/world/${world}`)
+    fetch(`world/${world}`)
       .then((res) => res.text())
       .then((text) => {
         const [loadedMap, zoneKey, objects] = text.trim().split('---\n');
