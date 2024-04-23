@@ -57,6 +57,7 @@ const INVENTORY = {
     { id: 3, template: 'bags', rarity: 0, name: "Side bags", stats: {D: 0} },
   ],
   weapon: [
+    { id: 0, template: 'none', rarity: 0, name: '--', stats: {A: 0} },
     { id: 1, template: 'ax', rarity: 0, name: 'ax', stats: {A: 7} },
     { id: 2, template: 'bar', rarity: 0, name: 'bar', stats: {A: 3} },
     { id: 3, template: 'claw', rarity: 0, name: 'claw', stats: {A: 4} },
