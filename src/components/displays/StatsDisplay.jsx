@@ -218,7 +218,7 @@ export default function StatsDisplay({
         ]},
         ...(
           // Equipment
-          menuChoice === 0 ? (
+          TABS[menuChoice] === 'Equip' ? (
             equipChoice === null ? (
             [].concat((buffers || []).map(({ fg, buffer }) => ({
               fg: fg, buffer: [].concat(['', '', '', ''], buffer.map(
@@ -232,7 +232,7 @@ export default function StatsDisplay({
               '', '', '', '',
               `${equipChoice[0].toUpperCase() + equipChoice.slice(1)}:`.padEnd(width - 5, ' ')
                 +
-                  (inventory[equipChoice][equipScrollOffset]?.stats?.A ? (
+                  (inventory[equipChoice][equipScrollOffset]?.stats?.A !== undefined ? (
                     `Atk ${minifyNumbers(inventory[equipChoice][equipScrollOffset].stats?.A || 0)}`
                   ) : (
                     `Def ${minifyNumbers(inventory[equipChoice][equipScrollOffset].stats?.D || 0)}`
@@ -241,13 +241,15 @@ export default function StatsDisplay({
             equipmentScrollBuffer && { fg: '#c7c7c7', buffer: equipmentScrollBuffer },
             equipmentScrollBuffer && { bg: '#aaa', fg: 'black', buffer: equipmentScrollSelectionBuffer },
           ])
-        ) : menuChoice === 1 ? (
+        ) : TABS[menuChoice] === 'Map' ? (
           // Map
           [{fg: 'red', buffer: ['', '', '', '', "Map"]}]
-        ) : (
+        ) : TABS[menuChoice] === 'Log' ? (
           // Quests
           [{fg: 'green', buffer: ['', '', '', '', "Quests"]}]
-        )),
+        ) : TABS[menuChoice] === 'GP' ? (
+          []
+        ) : [{fg: 'gold', buffer: ['', '', '', '', "GP"]}]),
       ].filter(Boolean)}
     />
   );
