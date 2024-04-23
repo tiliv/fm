@@ -28,7 +28,7 @@ export default function MenuDisplay({
   const pageLength = height - 1;
 
   useEffect(() => {
-    if (started === null || !activeChoice || !targetData) {
+    if (started === null || !activeChoice || !targetData || !targetData[activeChoice]) {
       setScrollOffset(0);
       setScrollBuffer(null);
       return;
@@ -39,7 +39,7 @@ export default function MenuDisplay({
   useEffect(() => {
     const keydown = (e) => {
       if ([keyMap.down, keyMap.up].includes(e.key)) {
-        if (scrollBuffer === null) {
+        if (scrollBuffer === null && !activeChoice) {
           setSelected((selected) => {
             const delta = (e.key === keyMap.down ? 1 : -1);
             const newSelected = (selected + delta) % options.length;
@@ -53,12 +53,12 @@ export default function MenuDisplay({
             const delta = (e.key === keyMap.down ? 1 : -1);
             const newOffset = scrollOffset + delta;
             if (newOffset < 0) return 0;
-            if (delta > 0 && scrollBuffer.length < height) return scrollOffset;
+            if (delta > 0 && (scrollBuffer || '').length < height) return scrollOffset;
             return newOffset;
           });
         }
       } else if ([keyMap.pageDown, keyMap.pageUp].includes(e.key)) {
-        if (scrollBuffer === null) {
+        if (scrollBuffer === null && !activeChoice) {
           setPage((page) => {
             const maxPage = Math.ceil(options.length / pageLength);
             const delta = (e.key === '-' ? -1 : 1);
@@ -72,7 +72,7 @@ export default function MenuDisplay({
             const delta = (e.key === keyMap.pageDown ? 1 : -1) * (height - 2);
             const newOffset = scrollOffset + delta;
             if (newOffset < 0) return 0;
-            if (delta > 0 && scrollBuffer.length < height) return scrollOffset;
+            if (delta > 0 && (scrollBuffer || '').length < height) return scrollOffset;
             return newOffset;
           });
         }
@@ -92,12 +92,14 @@ export default function MenuDisplay({
 
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [target, targetData, scrollBuffer]);
+  }, [target, targetData, scrollBuffer, activeChoice]);
 
   useEffect(() => {
     const keydown = (e) => {
       if (e.key === keyMap.cancel) {
         setStarted(null);
+        setScrollOffset(0);
+        setScrollBuffer(null);
       } else if (target && e.key === keyMap.use) {
         setStarted(selected);
       }
