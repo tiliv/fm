@@ -66,11 +66,21 @@ export default function App({ magnification=3, startWorld=START_WORLD, startX=ST
       .then((res) => res.text())
       .then((text) => {
         const items = text.split('---');
-        const actions = {};
+        const actions = {...interaction};
         items.forEach((item) => {
           const [category] = item.trim().split('\n', 1);
           actions[category] = item.slice(category.length + 1).trim();
         });
+        if (actions.inventory) {
+          actions.Trade = actions.inventory.replace(/^,/, '').split(',')
+            .filter((item) => item.startsWith('$'))
+            .map((item) => {
+              const [kind, template, rarity, name, stat] = item.slice(1).split('/');
+              return { kind, template, name, rarity: parseInt(rarity, 10), stats: {
+                [template === 'weapon' ? 'A' : 'D']: parseInt(stat, 10),
+              }};
+            });
+        }
         setTargetData(actions);
       });
   }, [interaction, menuChoice]);
