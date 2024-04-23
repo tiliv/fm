@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import ScreenStack from './ScreenStack';
+import { ACTIONS } from '../../Actions';
 import { minifyNumbers, bufferize } from '../../utils';
 
 const optionKeys = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -31,7 +32,7 @@ export default function MenuDisplay({
   const [subSelected, setSubSelected] = useState(null);
 
   useEffect(() => {
-    if (!targetData || activeChoice !== "Trade") {
+    if (!targetData || ![ACTIONS.BUY].includes(activeChoice)) {
       setSubOptions(null);
       return;
     }

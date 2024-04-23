@@ -5,6 +5,8 @@ import WorldDisplay from './components/displays/WorldDisplay';
 import MenuDisplay from './components/displays/MenuDisplay';
 import Analysis from './components/Analysis';
 import useAnalyzer from './hooks/useAnalyzer';
+import { ACTIONS, ACTIONS_ORDER } from './Actions';
+import * as Buy from './actions/Buy';
 
 const START_WORLD = 'Terra Montans.txt'
 const START_Y = 17;
@@ -71,16 +73,7 @@ export default function App({ magnification=3, startWorld=START_WORLD, startX=ST
           const [category] = item.trim().split('\n', 1);
           actions[category] = item.slice(category.length + 1).trim();
         });
-        if (actions.inventory) {
-          actions.Trade = actions.inventory.replace(/^,/, '').split(',')
-            .filter((item) => item.startsWith('$'))
-            .map((item) => {
-              const [kind, template, rarity, name, stat] = item.slice(1).split('/');
-              return { kind, template, name, rarity: parseInt(rarity, 10), stats: {
-                [template === 'weapon' ? 'A' : 'D']: parseInt(stat, 10),
-              }};
-            });
-        }
+        actions[ACTIONS.BUY] = Buy.parse(actions);
         setTargetData(actions);
       });
   }, [interaction, menuChoice]);
@@ -127,14 +120,7 @@ export default function App({ magnification=3, startWorld=START_WORLD, startX=ST
           target={interaction}
           targetData={targetData}
           activeChoice={menuChoice}
-          options={[
-            "Look",
-            "Greet",
-            "Intimidate",
-            "Bribe",
-            "Trade",
-            "Fight",
-          ]}
+          options={ACTIONS_ORDER}
           keyMap={{
             down: 'j',
             up: 'k',
