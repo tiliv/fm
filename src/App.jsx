@@ -26,11 +26,14 @@ export default function App({ magnification=3, startWorld=START_WORLD, startX=ST
   // React to a destination event
   useEffect(() => {
     const destinationHandler = (e) => {
-      setDestination({
-        startWorld: e.detail.dataFile,
+      const newLocation = {
         startY: e.detail.destination[0] - 1,
         startX: e.detail.destination[1] - 1,
-      });
+      };
+      if (e.detail.dataFile) {
+        newLocation.startWorld = e.detail.dataFile;
+      }
+      setDestination((location) => ({...location, ...newLocation}));
     };
     window.addEventListener('destination', destinationHandler);
     return () => window.removeEventListener('destination', destinationHandler);
