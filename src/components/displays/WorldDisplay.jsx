@@ -44,7 +44,11 @@ export default function WorldDisplay({
       window.dispatchEvent(event);
     } else {
       const { label, dataFile } = interaction;
-      if (!label || !dataFile) return;
+      if (!label || !dataFile) {
+        const event = new CustomEvent('interaction', { detail: interaction });
+        window.dispatchEvent(event);
+        return;
+      };
       fetch(`${label}/${dataFile}`)
         .catch((err) => `Look:\n${err}`)
         .then((res) => res.text())
