@@ -61,7 +61,10 @@ export default function WorldDisplay({
             const [category] = item.trim().split('\n', 1);
             actions[category] = renderTemplate(item, { name: "Hero" }).slice(category.length + 1).trim();
           });
-          actions[ACTIONS.BUY] = Buy.parse(actions);
+          const inventory = Buy.parse(actions);
+          if (inventory.length > 0) {
+            actions[ACTIONS.BUY] = inventory;
+          }
           return actions;
         })
         .then((actions) => {
