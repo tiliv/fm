@@ -4,7 +4,7 @@ import ScreenStack from './ScreenStack';
 import { ACTIONS } from '../../Actions';
 import { minifyNumbers, bufferize } from '../../utils';
 
-const optionKeys = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const OPTION_KEYS = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 export default function MenuDisplay({
   width, height,
@@ -105,7 +105,7 @@ export default function MenuDisplay({
       } else {
         if (scrollBuffer === null) {
           // numbers, shift+letters
-          let i = optionKeys.indexOf(e.key.toUpperCase());
+          let i = OPTION_KEYS.indexOf(e.key.toUpperCase());
           if (e.shiftKey && (!isNaN(e.key) || i === -1)) {
             return;
           }
@@ -159,9 +159,9 @@ export default function MenuDisplay({
   }, [target, started]);
 
   const title = target ? `→${target.sprite} ${target.label}` : null;
-  const prefixedOptions = options.map((option, i) => `${optionKeys[i]}:${option}`);
+  const prefixedOptions = options.map((option, i) => `${OPTION_KEYS[i]}:${option}`);
   const optionsViewport = prefixedOptions.slice(page * (height - 1), (page + 1) * (height - 1));
-  const prefixedSubOptions = subOptions && subOptions.map((option, i) => `${optionKeys[i]}:${option.name}`);
+  const prefixedSubOptions = subOptions && subOptions.map((option, i) => `${OPTION_KEYS[i]}:${option.name}`);
   const subOptionsViewport = subOptions && prefixedSubOptions.slice(0, height - 2);
 
   return (
@@ -183,7 +183,7 @@ export default function MenuDisplay({
           // if no active choice, build a minimal buffer for just the highlighted option prefix
           ...(activeChoice ? [] : optionsViewport.map((option) => {
             const i = prefixedOptions.indexOf(option);
-            return i === selected ? `${optionKeys[i]}:` : '';
+            return i === selected ? `${OPTION_KEYS[i]}:` : '';
           })),
         ]},
 
@@ -193,7 +193,7 @@ export default function MenuDisplay({
           '',
           ...subOptionsViewport.map((option) => {
             const i = prefixedSubOptions.indexOf(option);
-            return i === subSelected ? `${optionKeys[i]}:` : '';
+            return i === subSelected ? `${OPTION_KEYS[i]}:` : '';
           }),
         ]}),
 
@@ -201,7 +201,7 @@ export default function MenuDisplay({
         activeChoice && (
           { bg: 'black', fg: '#c7c7c7', buffer: [
             '',
-            `${optionKeys[options.indexOf(activeChoice)]}:${activeChoice}`,
+            `${OPTION_KEYS[options.indexOf(activeChoice)]}:${activeChoice}`,
           ]}
         ),
         // Main menu content
