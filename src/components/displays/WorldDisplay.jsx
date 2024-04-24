@@ -5,6 +5,7 @@ import useLocation from '../../hooks/useLocation';
 import useInteraction from '../../hooks/useInteraction';
 import { ACTIONS } from '../../Actions';
 import * as Buy from '../../actions/Buy';
+import * as Load from '../../actions/Load';
 import { renderTemplate, keyAlias } from '../../utils';
 
 export default function WorldDisplay({
@@ -59,11 +60,14 @@ export default function WorldDisplay({
           const actions = {...interaction};
           items.forEach((item) => {
             const [category] = item.trim().split('\n', 1);
-            actions[category] = renderTemplate(item, { name: "Hero" }).slice(category.length + 1).trim();
+            actions[category] = renderTemplate(item, { name: saveSlot }).slice(category.length + 1).trim();
           });
           const inventory = Buy.parse(actions);
           if (inventory.length > 0) {
             actions[ACTIONS.BUY] = inventory;
+          }
+          if (actions.Load !== undefined) {
+            actions["Load"] = Load.list().map((name) => ({ name }));
           }
           return actions;
         })
@@ -72,7 +76,7 @@ export default function WorldDisplay({
           window.dispatchEvent(event);
         })
     }
-  }, [interaction]);
+  }, [interaction, saveSlot]);
 
   useEffect(() => {
     if (!target) {

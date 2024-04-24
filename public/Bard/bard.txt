@@ -5,4 +5,3 @@ Save
 "I'll sing about you forever, ${name}."
 ---
 Load
-"Whose tale do you wish to hear?"

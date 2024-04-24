@@ -6,6 +6,7 @@ import useSave from '../../hooks/useSave';
 import { minifyNumbers, bufferize } from '../../utils';
 
 const OPTION_KEYS = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const SUB_MENU_CHOICES = [ACTIONS.BUY, "Load"];
 
 export default function MenuDisplay({
   saveSlot,
@@ -39,7 +40,15 @@ export default function MenuDisplay({
   });
 
   useEffect(() => {
-    if (!targetData || ![ACTIONS.BUY].includes(activeChoice)) {
+    if (activeChoice === "Save") {
+      const event = new CustomEvent("Save");
+      window.dispatchEvent(event);
+    }
+  }, [activeChoice]);
+
+  useEffect(() => {
+    // console.log("Active choice", activeChoice, targetData);
+    if (!targetData || !SUB_MENU_CHOICES.includes(activeChoice)) {
       setSubOptions(null);
       return;
     }
@@ -50,9 +59,9 @@ export default function MenuDisplay({
   useEffect(() => {
     if (
       started === null
-      || !targetData
-      || !targetData[activeChoice]
+      || !targetData?.[activeChoice]
       || typeof targetData[activeChoice] !== 'string'
+      || targetData[activeChoice].length === 0
     ) {
       setScrollOffset(0);
       setScrollBuffer(null);
@@ -129,7 +138,7 @@ export default function MenuDisplay({
 
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [target, targetData, scrollBuffer, activeChoice, subOptions]);
+  }, [target, targetData, scrollBuffer, activeChoice, options, subOptions]);
 
   useEffect(() => {
     const keydown = (e) => {
@@ -150,7 +159,7 @@ export default function MenuDisplay({
 
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [target, selected]);
+  }, [target, selected, subSelected, subOptions, activeChoice]);
 
   useEffect(() => {
     if (!target) {
@@ -229,7 +238,10 @@ export default function MenuDisplay({
               if (i === subSelected){
                 label = `  ${label.split(':')[1]}`;
               }
-              return label.slice(0, -1) + minifyNumbers(spec.stats.A || spec.stats.D)
+              if (spec.stats === undefined) {
+                return label;
+              }
+              return label.slice(0, -1) + minifyNumbers(spec.stats?.A || spec.stats?.D || 0)
             }),
           ]}
         ),

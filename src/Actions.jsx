@@ -6,6 +6,12 @@ export const ACTIONS_ORDER = [
   'Bribe',
   'Fight',
 ];
+export const TARGETED_ACTIONS = [
+  'Buy',
+  'Sell',
+  'Bribe',
+  'Fight',
+];
 
 export const ACTIONS = Object.fromEntries(ACTIONS_ORDER.map((action) => [
   action.toUpperCase(),

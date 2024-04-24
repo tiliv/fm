@@ -5,8 +5,8 @@ import WorldDisplay from './components/displays/WorldDisplay';
 import MenuDisplay from './components/displays/MenuDisplay';
 import Analysis from './components/Analysis';
 import useAnalyzer from './hooks/useAnalyzer';
-import { ACTIONS, ACTIONS_ORDER } from './Actions';
 import useSave from './hooks/useSave';
+import { ACTIONS, TARGETED_ACTIONS, ACTIONS_ORDER } from './Actions';
 
 const START_WORLD = 'Terra Montans.txt'
 const START_Y = 17;
@@ -15,11 +15,12 @@ const START_X = 35;
 const VIEWPORT_WIDTH = 16;
 const VIEWPORT_HEIGHT = 8;
 
-let START_SAVE_SLOT = localStorage.getItem('latest');
-if (!START_SAVE_SLOT) {
-  START_SAVE_SLOT = 'Hero';
-  localStorage.setItem('latest', START_SAVE_SLOT);
-}
+// let START_SAVE_SLOT = localStorage.getItem('latest');
+// if (!START_SAVE_SLOT) {
+//   START_SAVE_SLOT = 'Hero';
+//   localStorage.setItem('latest', START_SAVE_SLOT);
+// }
+const START_SAVE_SLOT = 'Hero2';
 
 
 export default function App({
@@ -52,13 +53,45 @@ export default function App({
   });
 
   useEffect(() => {
+    const loadHandler = (e) => {
+      // const newSaveSlot = e.detail;
+      // setSaveSlot(newSaveSlot);
+      // console.log('Load event', e.detail);
+      const loadEvent = new CustomEvent('load', { detail: e.detail });
+      window.dispatchEvent(loadEvent);
+    };
+    window.addEventListener('Load', loadHandler);
+    return () => window.removeEventListener('Load', loadHandler);
+  }, []);
+
+  useEffect(() => {
     if (!interaction) {
-      setActiveOptions(ACTIONS_ORDER);
+      setActiveOptions(ACTIONS_ORDER.filter((option) => !TARGETED_ACTIONS.includes(option)));
       return;
     };
-    const newOptions = Object.keys(interaction).filter((option) => /^[A-Z]$/.test(option[0]));
+    const newOptions = [];
+    ACTIONS_ORDER.forEach((option) => {
+      if (interaction[option]) {
+        newOptions.push(option);
+      }
+    });
+    newOptions.push(...Object.keys(interaction).filter((option) => {
+      if (newOptions.includes(option)) return false;
+      if (option === ACTIONS.BUY) return true;
+      return /^[A-Z]$/.test(option[0]);
+    }));
     setActiveOptions(newOptions);
   }, [interaction]);
+
+  // // React to a slot change event
+  // useEffect(() => {
+  //   const saveSlotHandler = (e) => {
+  //     const newSaveSlot = e.detail;
+  //     setSaveSlot(newSaveSlot);
+  //   };
+  //   window.addEventListener('ChangeSlot', saveSlotHandler);
+  //   return () => window.removeEventListener('ChangeSlot', saveSlotHandler);
+  // }, []);
 
   // React to a destination event
   useEffect(() => {
