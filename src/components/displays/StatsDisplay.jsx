@@ -248,8 +248,8 @@ export default function StatsDisplay({
           // Quests
           [{fg: 'green', buffer: ['', '', '', '', "Quests"]}]
         ) : TABS[menuChoice] === 'GP' ? (
-          []
-        ) : [{fg: 'gold', buffer: ['', '', '', '', "GP"]}]),
+          [{fg: 'gold', buffer: ['', '', '', '', "GP"]}]
+        ) : []),
       ].filter(Boolean)}
     />
   );

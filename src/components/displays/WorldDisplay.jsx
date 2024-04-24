@@ -3,9 +3,9 @@ import { useState, useEffect } from 'react';
 import ScreenStack from './ScreenStack';
 import useLocation from '../../hooks/useLocation';
 import useInteraction from '../../hooks/useInteraction';
-import { keyAlias } from '../../utils';
 import { ACTIONS } from '../../Actions';
 import * as Buy from '../../actions/Buy';
+import { renderTemplate, keyAlias } from '../../utils';
 
 export default function WorldDisplay({
   width, height,
@@ -57,7 +57,7 @@ export default function WorldDisplay({
           const actions = {...interaction};
           items.forEach((item) => {
             const [category] = item.trim().split('\n', 1);
-            actions[category] = item.slice(category.length + 1).trim();
+            actions[category] = renderTemplate(item, { name: "Hero" }).slice(category.length + 1).trim();
           });
           actions[ACTIONS.BUY] = Buy.parse(actions);
           return actions;

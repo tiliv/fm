@@ -1,3 +1,11 @@
+export function renderTemplate (tmpl, data) {
+  const keys = Object.keys(data);
+  const values = Object.values(data);
+  const func = new Function(...keys, `return \`${tmpl}\`;`);
+  return func(...values);
+};
+
+
 const KEY_ALIASES = {
   ArrowDown: '↓',
   ArrowUp: '↑',

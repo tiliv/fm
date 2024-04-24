@@ -3,3 +3,6 @@ Jacinthe is a tavern owner.  She is a human woman and is 5'6" tall.  She has lon
 ---
 Greet
 "Welcome in.  Not much to sell, but buy up a drink and rest a bit if you're needin' it."
+---
+Save
+"Your story's safe with me, ${name}."

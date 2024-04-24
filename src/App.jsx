@@ -27,6 +27,17 @@ export default function App({ startMagnification=2, startWorld=START_WORLD, star
 
   const [destination, setDestination] = useState({ startWorld, startX, startY });
 
+  const [activeOptions, setActiveOptions] = useState(ACTIONS_ORDER);
+
+  useEffect(() => {
+    if (!interaction) {
+      setActiveOptions(ACTIONS_ORDER);
+      return;
+    };
+    const newOptions = Object.keys(interaction).filter((option) => /^[A-Z]$/.test(option[0]));
+    setActiveOptions(newOptions);
+  }, [interaction]);
+
   // React to a destination event
   useEffect(() => {
     const destinationHandler = (e) => {
@@ -132,7 +143,7 @@ export default function App({ startMagnification=2, startWorld=START_WORLD, star
           target={interaction}
           targetData={targetData}
           activeChoice={menuChoice}
-          options={ACTIONS_ORDER}
+          options={activeOptions}
           keyMap={{
             down: 'j',
             up: 'k',
