@@ -1,2 +1,8 @@
+Look
+The bard plucks slowly at the strings of their lute, a faraway look in their eyes.
+---
 Save
 "I'll sing about you forever, ${name}."
+---
+Load
+"Whose tale do you wish to hear?"

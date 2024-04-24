@@ -8,6 +8,7 @@ import * as Buy from '../../actions/Buy';
 import { renderTemplate, keyAlias } from '../../utils';
 
 export default function WorldDisplay({
+  saveSlot,
   width, height,
   startWorld, startX=0, startY=0,
   target,
@@ -22,6 +23,7 @@ export default function WorldDisplay({
   const [activeBuffer, setActiveBuffer] = useState(null);
 
   const { marker, layers, bump, local, position, interactions } = useLocation({
+    saveSlot,
     world: startWorld,
     x: startX,
     y: startY,

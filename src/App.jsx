@@ -6,6 +6,7 @@ import MenuDisplay from './components/displays/MenuDisplay';
 import Analysis from './components/Analysis';
 import useAnalyzer from './hooks/useAnalyzer';
 import { ACTIONS, ACTIONS_ORDER } from './Actions';
+import useSave from './hooks/useSave';
 
 const START_WORLD = 'Terra Montans.txt'
 const START_Y = 17;
@@ -14,20 +15,41 @@ const START_X = 35;
 const VIEWPORT_WIDTH = 16;
 const VIEWPORT_HEIGHT = 8;
 
-export default function App({ startMagnification=2, startWorld=START_WORLD, startX=START_X, startY=START_Y }) {
+let START_SAVE_SLOT = localStorage.getItem('latest');
+if (!START_SAVE_SLOT) {
+  START_SAVE_SLOT = 'Hero';
+  localStorage.setItem('latest', START_SAVE_SLOT);
+}
+
+
+export default function App({
+  startMagnification=2,
+  startWorld=START_WORLD,
+  startX=START_X,
+  startY=START_Y,
+  startWidth=VIEWPORT_WIDTH,
+  startHeight=VIEWPORT_HEIGHT,
+  startSaveSlot=START_SAVE_SLOT,
+}) {
   // const [input, setInput] = useState('I love walking my dog.');
   // const { ready, analyze, blocks } = useAnalyzer();
 
+  const [saveSlot, setSaveSlot] = useState(startSaveSlot);
   const [magnification, setMagnification] = useState(startMagnification);
   const [interaction, setInteraction] = useState(null);
   const [menuChoice, setMenuChoice] = useState(null);
   const [targetData, setTargetData] = useState(null);
-  const [width, setWidth] = useState(VIEWPORT_WIDTH);
-  const [height, setHeight] = useState(VIEWPORT_HEIGHT);
-
+  const [width, setWidth] = useState(startWidth);
+  const [height, setHeight] = useState(startHeight);
   const [destination, setDestination] = useState({ startWorld, startX, startY });
-
   const [activeOptions, setActiveOptions] = useState(ACTIONS_ORDER);
+
+  useSave(saveSlot, {
+    magnification: [magnification, setMagnification],
+    width: [width, setWidth],
+    height: [height, setHeight],
+    destination: [destination, setDestination],
+  });
 
   useEffect(() => {
     if (!interaction) {
@@ -107,6 +129,7 @@ export default function App({ startMagnification=2, startWorld=START_WORLD, star
 
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
         <StatsDisplay
+          saveSlot={saveSlot}
           width={width}
           height={height}
           magnification={magnification}
@@ -120,6 +143,7 @@ export default function App({ startMagnification=2, startWorld=START_WORLD, star
           }}
         />
         <WorldDisplay
+          saveSlot={saveSlot}
           {...destination}
           // startWorld={"Terra Montans.txt"}
           // startX={35}
@@ -137,6 +161,7 @@ export default function App({ startMagnification=2, startWorld=START_WORLD, star
           }}
         />
         <MenuDisplay
+          saveSlot={saveSlot}
           width={width}
           height={height}
           magnification={magnification}

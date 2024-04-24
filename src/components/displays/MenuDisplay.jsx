@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 
 import ScreenStack from './ScreenStack';
 import { ACTIONS } from '../../Actions';
+import useSave from '../../hooks/useSave';
 import { minifyNumbers, bufferize } from '../../utils';
 
 const OPTION_KEYS = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 export default function MenuDisplay({
+  saveSlot,
   width, height,
   target, targetData, activeChoice,
   options,
@@ -30,6 +32,11 @@ export default function MenuDisplay({
 
   const [subOptions, setSubOptions] = useState(null);
   const [subSelected, setSubSelected] = useState(null);
+
+  useSave(saveSlot, {
+    selected: [selected, setSelected],
+    page: [page, setPage],
+  });
 
   useEffect(() => {
     if (!targetData || ![ACTIONS.BUY].includes(activeChoice)) {

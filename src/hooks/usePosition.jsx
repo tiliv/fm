@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 
+import useSave from './useSave';
+
 export default function usePosition({
+  saveSlot,
   marker='Θ',
   defaultX=0,
   defaultY=0,
@@ -18,6 +21,11 @@ export default function usePosition({
   const [x, setX] = useState(defaultX);
   const [y, setY] = useState(defaultY);
   const [bump, setBump] = useState(null);
+
+  useSave(saveSlot, {
+    x: [x, (v) => setTimeout(() => setX(v), 50)],
+    y: [y, (v) => setTimeout(() => setY(v), 50)],
+  });
 
   useEffect(() => {
     setBump(null);
