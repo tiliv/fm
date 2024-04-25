@@ -20,36 +20,37 @@ const VIEWPORT_HEIGHT = 8;
 //   START_SAVE_SLOT = 'Hero';
 //   localStorage.setItem('latest', START_SAVE_SLOT);
 // }
-const START_SAVE_SLOT = 'Hero2';
 
 
 export default function App({
   startMagnification=2,
-  startWorld=START_WORLD,
-  startX=START_X,
-  startY=START_Y,
+  beginWorld=START_WORLD,
+  beginX=START_X,
+  beginY=START_Y,
   startWidth=VIEWPORT_WIDTH,
   startHeight=VIEWPORT_HEIGHT,
-  startSaveSlot=START_SAVE_SLOT,
 }) {
   // const [input, setInput] = useState('I love walking my dog.');
   // const { ready, analyze, blocks } = useAnalyzer();
 
-  const [saveSlot, setSaveSlot] = useState(startSaveSlot);
   const [magnification, setMagnification] = useState(startMagnification);
   const [interaction, setInteraction] = useState(null);
   const [menuChoice, setMenuChoice] = useState(null);
   const [targetData, setTargetData] = useState(null);
   const [width, setWidth] = useState(startWidth);
   const [height, setHeight] = useState(startHeight);
-  const [destination, setDestination] = useState({ startWorld, startX, startY });
+  const [startWorld, setStartWorld] = useState(beginWorld);
+  const [startX, setStartX] = useState(beginX);
+  const [startY, setStartY] = useState(beginY);
   const [activeOptions, setActiveOptions] = useState(ACTIONS_ORDER);
 
-  useSave(saveSlot, {
+  useSave({
     magnification: [magnification, setMagnification],
     width: [width, setWidth],
     height: [height, setHeight],
-    destination: [destination, setDestination],
+    startWorld: [startWorld, setStartWorld],
+    startX: [startX, setStartX],
+    startY: [startY, setStartY],
   });
 
   useEffect(() => {
@@ -83,31 +84,19 @@ export default function App({
     setActiveOptions(newOptions);
   }, [interaction]);
 
-  // // React to a slot change event
-  // useEffect(() => {
-  //   const saveSlotHandler = (e) => {
-  //     const newSaveSlot = e.detail;
-  //     setSaveSlot(newSaveSlot);
-  //   };
-  //   window.addEventListener('ChangeSlot', saveSlotHandler);
-  //   return () => window.removeEventListener('ChangeSlot', saveSlotHandler);
-  // }, []);
-
   // React to a destination event
   useEffect(() => {
     const destinationHandler = (e) => {
-      const newLocation = {
-        startY: e.detail.destination[0] - 1,
-        startX: e.detail.destination[1] - 1,
-      };
-      if (e.detail.dataFile) {
-        newLocation.startWorld = e.detail.dataFile;
-      }
-      setDestination((location) => ({...location, ...newLocation}));
+      const newY = e.detail.destination[0] - 1;
+      const newX = e.detail.destination[1] - 1;
+      const newWorld = e.detail.dataFile && e.detail.dataFile;
+      setStartWorld(newWorld || startWorld);
+      setStartX(newX);
+      setStartY(newY);
     };
     window.addEventListener('destination', destinationHandler);
     return () => window.removeEventListener('destination', destinationHandler);
-  }, []);
+  }, [startWorld]);
 
   // Store activated target event
   useEffect(() => {
@@ -162,7 +151,6 @@ export default function App({
 
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
         <StatsDisplay
-          saveSlot={saveSlot}
           width={width}
           height={height}
           magnification={magnification}
@@ -176,11 +164,9 @@ export default function App({
           }}
         />
         <WorldDisplay
-          saveSlot={saveSlot}
-          {...destination}
-          // startWorld={"Terra Montans.txt"}
-          // startX={35}
-          // startY={17}
+          startWorld={startWorld}
+          startX={startX}
+          startY={startY}
           width={width}
           height={height}
           magnification={magnification}
@@ -194,7 +180,6 @@ export default function App({
           }}
         />
         <MenuDisplay
-          saveSlot={saveSlot}
           width={width}
           height={height}
           magnification={magnification}

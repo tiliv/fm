@@ -38,7 +38,6 @@ function farColumns(info1, info2) {
 }
 
 export default function StatsDisplay({
-  saveSlot,
   width, height, world,
   keyMap={
     up: 'w',
@@ -51,7 +50,7 @@ export default function StatsDisplay({
   magnification=1,
 }) {
   const { inventory, equipment, setEquipment } = useInventory();
-  const { hp, maxHp, mp, strength, defense, speed } = useStats();
+  const { name, hp, maxHp, mp, strength, defense, speed } = useStats();
   const { buffers, ...slots } = useEquipment(equipment);
   const [equippedBuffer, setEquippedBuffer] = useState(null);
 
@@ -203,7 +202,7 @@ export default function StatsDisplay({
       ].join('')}
       buffers={[
         { fg: '#c7c7c7', buffer: [
-          `➧${saveSlot}`,
+          `➧${name}`,
           ['HP:', `${hp}`.padStart(3, ' '), 'ヽ', `${minifyNumbers(maxHp)}`.padStart(3, ' '),
           ' M:', mp].join(''),
           [

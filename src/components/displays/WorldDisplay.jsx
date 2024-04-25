@@ -3,15 +3,15 @@ import { useState, useEffect } from 'react';
 import ScreenStack from './ScreenStack';
 import useLocation from '../../hooks/useLocation';
 import useInteraction from '../../hooks/useInteraction';
+import useStats from '../../hooks/useStats';
+import { list } from '../../actions/Load';
 import { ACTIONS } from '../../Actions';
 import * as Buy from '../../actions/Buy';
-import * as Load from '../../actions/Load';
 import { renderTemplate, keyAlias } from '../../utils';
 
 export default function WorldDisplay({
-  saveSlot,
   width, height,
-  startWorld, startX=0, startY=0,
+  startWorld, startX, startY,
   target,
   magnification=1,
   keyMap={
@@ -23,8 +23,8 @@ export default function WorldDisplay({
 }) {
   const [activeBuffer, setActiveBuffer] = useState(null);
 
+  const { name } = useStats();
   const { marker, layers, bump, local, position, interactions } = useLocation({
-    saveSlot,
     world: startWorld,
     x: startX,
     y: startY,
@@ -60,14 +60,14 @@ export default function WorldDisplay({
           const actions = {...interaction};
           items.forEach((item) => {
             const [category] = item.trim().split('\n', 1);
-            actions[category] = renderTemplate(item, { name: saveSlot }).slice(category.length + 1).trim();
+            actions[category] = renderTemplate(item, { name }).slice(category.length + 1).trim();
           });
           const inventory = Buy.parse(actions);
           if (inventory.length > 0) {
             actions[ACTIONS.BUY] = inventory;
           }
           if (actions.Load !== undefined) {
-            actions["Load"] = Load.list().map((name) => ({ name }));
+            actions["Load"] = list().map((name) => ({ name }));
           }
           return actions;
         })
@@ -76,7 +76,7 @@ export default function WorldDisplay({
           window.dispatchEvent(event);
         })
     }
-  }, [interaction, saveSlot]);
+  }, [interaction, name]);
 
   useEffect(() => {
     if (!target) {
@@ -88,7 +88,7 @@ export default function WorldDisplay({
     buffer[local.y][local.x] = marker;
     buffer[(r - 1) % height][(c - 1) % width] = target.sprite;
     setActiveBuffer(buffer);
-  }, [target]);
+  }, [target, width, height]);
 
   const buffers = [
     { fg: '#555', buffer: layers.solid },

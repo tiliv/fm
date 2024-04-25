@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 export default function useStats() {
-  const [name, setName] = useState('Hero');
   const [hp, setHp] = useState(100);
   const [maxHp, setMaxHp] = useState(100);
   const [mp, setMp] = useState(100);
@@ -10,7 +9,7 @@ export default function useStats() {
   const [speed, setSpeed] = useState(5);
 
   return {
-    name,
+    name: localStorage.getItem('latest'),
     hp, maxHp,
     mp,
     strength,

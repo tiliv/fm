@@ -9,7 +9,6 @@ const OPTION_KEYS = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const SUB_MENU_CHOICES = [ACTIONS.BUY, "Load"];
 
 export default function MenuDisplay({
-  saveSlot,
   width, height,
   target, targetData, activeChoice,
   options,
@@ -34,7 +33,7 @@ export default function MenuDisplay({
   const [subOptions, setSubOptions] = useState(null);
   const [subSelected, setSubSelected] = useState(null);
 
-  useSave(saveSlot, {
+  useSave({
     selected: [selected, setSelected],
     page: [page, setPage],
   });
