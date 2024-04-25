@@ -1,8 +1,37 @@
 import { useEffect } from 'react';
-import * as Save from '../actions/Save';
-import * as Load from '../actions/Load';
 
-export default function useSave(slot, {...vars}) {
-  useEffect(Save.save(slot, vars));
-  useEffect(Load.load(slot, vars));
+const IGNORE_VALUES = [undefined, null];
+
+export default function useSave({...vars}) {
+  useEffect(() => {
+    const saveHandler = (e) => {
+      const { name: slot=localStorage.getItem('latest') } = e.detail || {};
+      // console.log("* Saving", slot);
+      localStorage.setItem('latest', slot);
+      Object.entries(vars).forEach(([key, [value, _]]) => {
+        // console.log(slot, key, value);
+        localStorage.setItem(`${slot}/${key}`, JSON.stringify(value));
+      });
+    };
+    window.addEventListener('Save', saveHandler);
+    return () => {
+      window.removeEventListener('Save', saveHandler);
+    };
+  });
+  useEffect(() => {
+    const loadHandler = (e) => {
+      const { name: slot=localStorage.getItem('latest') } = e.detail || {};
+      // console.log("* Loading", slot);
+      localStorage.setItem('latest', slot);
+      Object.entries(vars).forEach(([key, [_, setter]]) => {
+        const v = JSON.parse(localStorage.getItem(`${slot}/${key}`));
+        // console.log(slot, key, v);
+        if (!IGNORE_VALUES.includes(v)) {
+          setter(v);
+        }
+      });
+    };
+    window.addEventListener('load', loadHandler);
+    return () => window.removeEventListener('load', loadHandler);
+  });
 }
