@@ -5,8 +5,8 @@ import useStats from '../hooks/useStats';
 import useEquipmentBuffers from '../hooks/useEquipmentBuffers';
 import { keyAlias, minifyNumbers } from '../utils';
 
-const TABS = ['Equip', 'Magic', 'Log']
-
+const TABS_ORDER = ['Equip', 'Magic', 'Log'];
+const TABS = Object.fromEntries(TABS_ORDER.map((tab) => [tab.toUpperCase(), tab]));
 
 export default function DisplayStats({
   width, height, magnification=1,
@@ -26,8 +26,8 @@ export default function DisplayStats({
   useEffect(() => {
     const keydown = (e) => {
       switch (e.key) {
-        case keyMap.left: setMenuChoice((choice) => (choice + TABS.length - 1) % TABS.length); break;
-        case keyMap.right: setMenuChoice((choice) => (choice + 1) % TABS.length); break;
+        case keyMap.left: setMenuChoice((choice) => (choice + TABS_ORDER.length - 1) % TABS_ORDER.length); break;
+        case keyMap.right: setMenuChoice((choice) => (choice + 1) % TABS_ORDER.length); break;
       }
     };
     window.addEventListener('keydown', keydown);
@@ -35,8 +35,8 @@ export default function DisplayStats({
   }, []);
 
   const equipmentBuffers = useEquipmentBuffers(menuChoice === 0, { width, height, keyMap });
-  const magicBuffers = [{ fg: 'red', buffer: ['', '', '', '', TABS[1]]}];
-  const logBuffers = [{ fg: 'green', buffer: ['', '', '', '', TABS[2]]}];
+  const magicBuffers = [{ fg: 'red', buffer: ['', '', '', '', TABS.MAGIC]}];
+  const logBuffers = [{ fg: 'green', buffer: ['', '', '', '', TABS.LOG]}];
   const lowerBuffers = [
     ...(equipmentBuffers || []),
     ...(menuChoice === 1 ? magicBuffers : []),
@@ -67,11 +67,17 @@ export default function DisplayStats({
             '  D:', `${defense}`.padStart(2, ' '),
             '  S:', `${speed}`.padStart(2, ' '),
           ].join(''),
-          TABS.join(' '),
+          TABS_ORDER.join(' '),
         ]},
+
+        // Active tab highlight
         { bg: '#c7c7c7', fg: 'black', buffer: [
           '', '', '',
-          [...Array.from(TABS.slice(0, menuChoice).join(' '), () => ''), ...(menuChoice ? [''] : []), ...TABS[menuChoice].split('')]
+          [
+            ...Array.from(TABS_ORDER.slice(0, menuChoice).join(' '), () => ''),
+            ...(menuChoice ? [''] : []), // skip injection of extra space for first tab
+            ...TABS_ORDER[menuChoice].split('')
+          ]
         ]},
         ...lowerBuffers,
       ]}
