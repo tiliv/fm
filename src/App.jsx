@@ -15,13 +15,6 @@ const START_X = 35;
 const VIEWPORT_WIDTH = 16;
 const VIEWPORT_HEIGHT = 8;
 
-// let START_SAVE_SLOT = localStorage.getItem('latest');
-// if (!START_SAVE_SLOT) {
-//   START_SAVE_SLOT = 'Hero';
-//   localStorage.setItem('latest', START_SAVE_SLOT);
-// }
-
-
 export default function App({
   startMagnification=2,
   beginWorld=START_WORLD,

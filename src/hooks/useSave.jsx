@@ -20,7 +20,7 @@ export default function useSave({...vars}) {
   });
   useEffect(() => {
     const loadHandler = (e) => {
-      const { name: slot=localStorage.getItem('latest') } = e.detail || {};
+      const { name: slot=localStorage.getItem('latest') || "Hero" } = e.detail || {};
       // console.log("* Loading", slot);
       localStorage.setItem('latest', slot);
       Object.entries(vars).forEach(([key, [_, setter]]) => {
