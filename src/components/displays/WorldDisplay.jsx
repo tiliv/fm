@@ -4,6 +4,7 @@ import ScreenStack from './ScreenStack';
 import useLocation from '../../hooks/useLocation';
 import useInteraction from '../../hooks/useInteraction';
 import useStats from '../../hooks/useStats';
+import useSave from '../../hooks/useSave';
 import { list } from '../../actions/Load';
 import { ACTIONS } from '../../Actions';
 import * as Buy from '../../actions/Buy';
@@ -22,6 +23,18 @@ export default function WorldDisplay({
   },
 }) {
   const [activeBuffer, setActiveBuffer] = useState(null);
+
+  // This is redundant to the outer App.jsx useSave, because that one fails a
+  // race condition to save data before it's unmounted and re-mounted. This one
+  // saves data fine, but won't load anything, as the setters are no-op.
+  useSave({
+    magnification: [magnification, () => {}],
+    width: [width, () => {}],
+    height: [height, () => {}],
+    startWorld: [startWorld, () => {}],
+    startX: [startX, () => {}],
+    startY: [startY, () => {}],
+  });
 
   const { name } = useStats();
   const { marker, layers, bump, local, position, interactions } = useLocation({
