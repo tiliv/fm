@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 
 import ScreenStack from './ScreenStack';
-import { ACTIONS } from '../../Actions';
-import useSave from '../../hooks/useSave';
-import { minifyNumbers, bufferize } from '../../utils';
+import { ACTIONS } from '../Actions';
+import useSave from '../hooks/useSave';
+import { minifyNumbers, bufferize } from '../utils';
 
 const OPTION_KEYS = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const SUB_MENU_CHOICES = [ACTIONS.BUY, "Load"];
 
-export default function MenuDisplay({
+export default function DisplayMenu({
   width, height,
   target, targetData, activeChoice,
   options,

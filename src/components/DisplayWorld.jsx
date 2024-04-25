@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 
 import ScreenStack from './ScreenStack';
-import useLocation from '../../hooks/useLocation';
-import useInteraction from '../../hooks/useInteraction';
-import useStats from '../../hooks/useStats';
-import useSave from '../../hooks/useSave';
-import { list } from '../../actions/Load';
-import { ACTIONS } from '../../Actions';
-import * as Buy from '../../actions/Buy';
-import { renderTemplate, keyAlias } from '../../utils';
+import useLocation from '../hooks/useLocation';
+import useInteraction from '../hooks/useInteraction';
+import useStats from '../hooks/useStats';
+import useSave from '../hooks/useSave';
+import { list } from '../actions/Load';
+import { ACTIONS } from '../Actions';
+import * as Buy from '../actions/Buy';
+import { renderTemplate, keyAlias } from '../utils';
 
-export default function WorldDisplay({
+export default function DisplayWorld({
   width, height,
   startWorld, startX, startY,
   target,

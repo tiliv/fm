@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import Progress from '../components/Progress';
+import Progress from './Progress';
 
 export default function Analysis({ name, version, labels, hypothesis, output }) {
   // const [labels, setLabels] = useState(["job", "eating", "recreation"]);

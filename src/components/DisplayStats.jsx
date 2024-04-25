@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 
 import ScreenStack from './ScreenStack';
-import useStats from '../../hooks/useStats';
-import useEquipment from '../../hooks/useEquipment';
-import useInventory from '../../hooks/useInventory';
-import { keyAlias, minifyNumbers, bufferizeList } from '../../utils';
+import useStats from '../hooks/useStats';
+import useEquipment from '../hooks/useEquipment';
+import useInventory from '../hooks/useInventory';
+import { keyAlias, minifyNumbers, bufferizeList } from '../utils';
 
-const TABS = ['Equip', 'Map', 'Log', 'GP']
+const TABS = ['Equip', 'Magic', 'Log']
 
 const ABBREVIATIONS = {
   weapon: 'Wp',
@@ -37,7 +37,7 @@ function farColumns(info1, info2) {
   );
 }
 
-export default function StatsDisplay({
+export default function DisplayStats({
   width, height, world,
   keyMap={
     up: 'w',
@@ -50,7 +50,7 @@ export default function StatsDisplay({
   magnification=1,
 }) {
   const { inventory, equipment, setEquipment } = useInventory();
-  const { name, hp, maxHp, mp, strength, defense, speed } = useStats();
+  const { name, hp, maxHp, gold, strength, defense, speed } = useStats();
   const { buffers, ...slots } = useEquipment(equipment);
   const [equippedBuffer, setEquippedBuffer] = useState(null);
 
@@ -204,7 +204,7 @@ export default function StatsDisplay({
         { fg: '#c7c7c7', buffer: [
           `➧${name}`,
           ['HP:', `${hp}`.padStart(3, ' '), 'ヽ', `${minifyNumbers(maxHp)}`.padStart(3, ' '),
-          ' M:', mp].join(''),
+          ' G:', gold].join(''),
           [
             'A:', `${strength}`.padStart(2, ' '),
             '  D:', `${defense}`.padStart(2, ' '),
@@ -218,7 +218,7 @@ export default function StatsDisplay({
         ]},
         ...(
           // Equipment
-          TABS[menuChoice] === 'Equip' ? (
+          menuChoice === 0 ? (
             equipChoice === null ? (
             [].concat((buffers || []).map(({ fg, buffer }) => ({
               fg: fg, buffer: [].concat(['', '', '', ''], buffer.map(
@@ -241,14 +241,12 @@ export default function StatsDisplay({
             equipmentScrollBuffer && { fg: '#c7c7c7', buffer: equipmentScrollBuffer },
             equipmentScrollBuffer && { bg: '#aaa', fg: 'black', buffer: equipmentScrollSelectionBuffer },
           ])
-        ) : TABS[menuChoice] === 'Map' ? (
-          // Map
-          [{fg: 'red', buffer: ['', '', '', '', "Map"]}]
-        ) : TABS[menuChoice] === 'Log' ? (
-          // Quests
-          [{fg: 'green', buffer: ['', '', '', '', "Quests"]}]
-        ) : TABS[menuChoice] === 'GP' ? (
-          [{fg: 'gold', buffer: ['', '', '', '', "GP"]}]
+        ) : menuChoice === 1 ? (
+          // Magic
+          [{fg: 'red', buffer: ['', '', '', '', TABS[menuChoice]]}]
+        ) : menuChoice === 2 ? (
+          // Log
+          [{fg: 'green', buffer: ['', '', '', '', TABS[menuChoice]]}]
         ) : []),
       ].filter(Boolean)}
     />

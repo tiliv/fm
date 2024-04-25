@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 
-import StatsDisplay from './components/displays/StatsDisplay';
-import WorldDisplay from './components/displays/WorldDisplay';
-import MenuDisplay from './components/displays/MenuDisplay';
+import DisplayStats from './components/DisplayStats';
+import DisplayWorld from './components/DisplayWorld';
+import DisplayMenu from './components/DisplayMenu';
 import Analysis from './components/Analysis';
 import useAnalyzer from './hooks/useAnalyzer';
 import useSave from './hooks/useSave';
@@ -143,7 +143,7 @@ export default function App({
       </p>
 
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
-        <StatsDisplay
+        <DisplayStats
           width={width}
           height={height}
           magnification={magnification}
@@ -156,7 +156,7 @@ export default function App({
             cancel: 'Escape',
           }}
         />
-        <WorldDisplay
+        <DisplayWorld
           startWorld={startWorld}
           startX={startX}
           startY={startY}
@@ -172,7 +172,7 @@ export default function App({
             use: 'Enter',
           }}
         />
-        <MenuDisplay
+        <DisplayMenu
           width={width}
           height={height}
           magnification={magnification}
