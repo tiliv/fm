@@ -6,8 +6,8 @@ import useInteraction from '../hooks/useInteraction';
 import useStats from '../hooks/useStats';
 import useSave from '../hooks/useSave';
 import { list } from '../actions/Load';
-import { ACTIONS } from '../Actions';
 import * as Buy from '../actions/Buy';
+import { ACTIONS } from '../Actions';
 import { renderTemplate, keyAlias } from '../utils';
 
 export default function DisplayWorld({
