@@ -1,0 +1,50 @@
+$arms/straight/2/Iron sleeves/4
+$arms/pauldrons/2/Pauldrons/6
+
+$body/bandit/3/Bandit's coat/2
+$body/full/4/Full plate/9
+$body/harness/1/Leather harness/1
+$body/jacket/2/Jacket/3
+$body/light/0/Light armor/1
+$body/loose/0/Loose shirt/1
+$body/robe/0/Robe/1
+$body/sash/0/Sash/1
+$body/shirt/0/Shirt/1
+$body/toga/0/Toga/1
+$body/tunic/0/Tunic/1
+
+$feet/boots/2/Boots/2
+$feet/dainty/0/Dainty shoes/1
+
+$hair/ponytail/0/Ponytail"
+$hair/short/0/Short hair"
+$hair/long/0/Long hair"
+
+$head/bandana/0/Bandana/0
+$head/hat/2/Hat/0
+$head/helmet/2/Iron helmet/2
+$head/smallhat/2/Tiny hat/0
+$head/warm/1/Warm hat/0
+
+$legs/shorts/0/Tattered shorts/0
+$legs/shortskirt/2/Crooked skirt/1
+$legs/longskirt/0/Battle skirt/2
+$legs/loincloth/0/Loincloth/0
+
+$shield/board/1/Driftwood/2
+$shield/round/1/Round shield/5
+
+$waist/bag/1/Side bag/0
+$waist/bags/0/Side bags/0
+
+$weapon/ax/0/ax/7
+$weapon/bar/0/bar/3
+$weapon/claw/0/claw/4
+$weapon/flail/0/flail/6
+$weapon/mace/0/mace/2
+$weapon/magicstaff/4/Arcane Staff", stats/2
+$weapon/quarterstaff/0/quarterstaff/2
+$weapon/spear/0/spear/5
+$weapon/sword/0/sword/4
+$weapon/trident/0/trident/6
+$weapon/whip/0/whip/3
