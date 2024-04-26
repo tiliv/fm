@@ -19,6 +19,29 @@ export function keyAlias(key) {
 }
 
 
+export function parseInventory({ inventory='' }) {
+  return inventory.replace(/^,/, '').split(',')
+    .filter((item) => item.startsWith('$'))
+    .map((item) => {
+      const [kind, template, rarity, name, stat, id=null] = item.slice(1).split('/');
+      return {
+        id: id !== null ? parseInt(id, 10) : null,
+        kind,
+        template,
+        name,
+        rarity: parseInt(rarity, 10),
+        stats: { [kind === 'weapon' ? 'A' : 'D']: parseInt(stat, 10) },
+      };
+    });
+}
+
+export function unparseInventory(kind, items) {
+  return items.map(({ id, template, rarity, name, stats }) => {
+    return `$${kind}/${template}/${rarity}/${name}/${stats.D || stats.A}/${id}`;
+  }).join(',');
+}
+
+
 const MINI_NUMBERS = '₀₁₂₃₄₅₆₇₈₉⏨'
 export function minifyNumbers(str) {
   return `${str}`.replace(/\d/g, (match) => MINI_NUMBERS[match]);

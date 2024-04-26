@@ -6,9 +6,8 @@ import useInteraction from '../hooks/useInteraction';
 import useStats from '../hooks/useStats';
 import useSave from '../hooks/useSave';
 import { list } from '../actions/Load';
-import * as Buy from '../actions/Buy';
 import { ACTIONS } from '../Actions';
-import { renderTemplate, keyAlias } from '../utils';
+import { renderTemplate, keyAlias, parseInventory } from '../utils';
 
 export default function DisplayWorld({
   width, height,
@@ -75,7 +74,7 @@ export default function DisplayWorld({
             const [category] = item.trim().split('\n', 1);
             actions[category] = renderTemplate(item, { name }).slice(category.length + 1).trim();
           });
-          const inventory = Buy.parse(actions);
+          const inventory = parseInventory(actions);
           if (inventory.length > 0) {
             actions[ACTIONS.BUY] = inventory;
           }

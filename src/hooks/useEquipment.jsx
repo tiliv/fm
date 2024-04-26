@@ -8,8 +8,9 @@ const RARITY_COLORS = [
   '#f0f',
 ];
 
-function useEquipmentFile(kind, spec, position, secondPosition=null) {
-  const { template='none', rarity=0, name='--' } = spec || {};
+function useEquipmentFile(inventory, kind, id, position, secondPosition=null) {
+  const item = inventory[kind]?.find(item => item.id === id);
+  const { template='none', rarity=0, name='--' } = item || {};
   const [data, setData] = useState(null);
 
   useEffect(() => {
@@ -38,7 +39,7 @@ function useEquipmentFile(kind, spec, position, secondPosition=null) {
           }
       });
         const data = {
-          ...spec, kind, rarity, template, name, buffer, icon,
+          ...item, kind, rarity, template, name, buffer, icon,
         };
         stats && stats.split('\n').forEach((line) => {
           const [stat, value] = line.split(':');
@@ -47,13 +48,14 @@ function useEquipmentFile(kind, spec, position, secondPosition=null) {
         return data;
       })
       .then(setData);
-  }, [kind, name]);
+  }, [kind, name, template]);
 
   return data;
 }
 
 
 export default function useEquipment({
+  inventory,
   hair=null,
   head=null,
   arms=null,
@@ -64,15 +66,15 @@ export default function useEquipment({
   weapon=null,
   shield=null,
 }) {
-  const hairData = useEquipmentFile("hair", hair, [0, 2]);
-  const headData = useEquipmentFile("head", head, [0, 3]);
-  const armsData = useEquipmentFile("arms", arms, [1, 2], [1, 4]);
-  const bodyData = useEquipmentFile("body", body, [1, 3]);
-  const waistData = useEquipmentFile("waist", waist, [2, 2], [2, 4]);
-  const legsData = useEquipmentFile("legs", legs, [2, 3]);
-  const feetData = useEquipmentFile("feet", feet, [3, 2], [3, 4]);
-  const weaponData = useEquipmentFile("weapon", weapon, [1, 0]);
-  const shieldData = useEquipmentFile("shield", shield, [1, 5]);
+  const hairData = useEquipmentFile(inventory, "hair", hair, [0, 2]);
+  const headData = useEquipmentFile(inventory, "head", head, [0, 3]);
+  const armsData = useEquipmentFile(inventory, "arms", arms, [1, 2], [1, 4]);
+  const bodyData = useEquipmentFile(inventory, "body", body, [1, 3]);
+  const waistData = useEquipmentFile(inventory, "waist", waist, [2, 2], [2, 4]);
+  const legsData = useEquipmentFile(inventory, "legs", legs, [2, 3]);
+  const feetData = useEquipmentFile(inventory, "feet", feet, [3, 2], [3, 4]);
+  const weaponData = useEquipmentFile(inventory, "weapon", weapon, [1, 0]);
+  const shieldData = useEquipmentFile(inventory, "shield", shield, [1, 5]);
 
   const [buffers, setBuffers] = useState(null);
 

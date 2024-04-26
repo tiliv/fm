@@ -19,16 +19,18 @@ const EQUIPMENT_ORDER = [
   'head', 'arms', 'shield', 'waist',
 ];
 
-function farColumns(info1, info2) {
-  function label(data) {
-    const { kind='?', icon, stats: { A=0, D=0 }={} } = data;
+function farColumns(inventory, equipment, kind1, kind2) {
+  function label(kind) {
+    const { icon, stats: { A=0, D=0 }={} } = (
+      inventory[kind]?.find(({ id }) => id === equipment[kind]) || {}
+    );
     return `${ABBREVIATIONS[kind]} ${minifyNumbers(A || D)}`;
   }
   return (
-    label(info1 || {}).split('')
+    label(kind1).split('')
     .concat(
       ['', '', '', '', '', '', ''],
-      label(info2 || {}).split('')
+      label(kind2).split('')
     )
   );
 }
@@ -36,8 +38,8 @@ function farColumns(info1, info2) {
 export default function useEquipmentBuffers(enabled, { width, height, keyMap }) {
   const [buffers, setBuffers] = useState(null);
 
-  const { inventory, equipment, setEquipment } = useInventory();
-  const { buffers: _buffers, ...slots } = useEquipment(equipment);
+  const { inventory, equipment, equip } = useInventory('player');
+  const { buffers: _buffers } = useEquipment({ inventory, ...equipment });
 
   // Main display
   const [equipmentLayoutBuffer, setEquipmentLayoutBuffer] = useState(null);
@@ -65,16 +67,21 @@ export default function useEquipmentBuffers(enabled, { width, height, keyMap }) 
           break;
         case keyMap.select:
           setSlotChoice(EQUIPMENT_ORDER[selectedSlot]);
-          const currentItem = inventory[EQUIPMENT_ORDER[selectedSlot]].findIndex(
-            ({ id }) => id === equipment[EQUIPMENT_ORDER[selectedSlot]].id
+          const items = inventory[EQUIPMENT_ORDER[selectedSlot]];
+          if (!items) {
+            setScrollOffset(0);
+            return;
+          }
+          const currentItem = items.findIndex(
+            ({ id }) => id === equipment[EQUIPMENT_ORDER[selectedSlot]]
           );
-          setScrollOffset(currentItem);
+          setScrollOffset(currentItem + 1);  // +1 because empty '--' is always prepended
           break;
       }
     }
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [enabled, slotChoice, selectedSlot]);
+  }, [enabled, slotChoice, selectedSlot, inventory, equipment]);
 
   // Keybind equipment listing selection
   useEffect(() => {
@@ -83,18 +90,18 @@ export default function useEquipmentBuffers(enabled, { width, height, keyMap }) 
       switch (e.key) {
         case keyMap.up:
           setScrollOffset((offset) => {
-            if (offset === 0) return 0;
+            if (offset <= 0) return 0;
             return offset - 1;
           });
           break;
         case keyMap.down:
           setScrollOffset((offset) => {
-            if (offset >= inventory[slotChoice].length - 3 + 2) return offset;
+            if (offset >= inventory[slotChoice].length) return offset;
             return offset + 1;
           });
           break;
         case keyMap.select:
-          setEquipment(slotChoice, inventory[slotChoice][scrollOffset].id);
+          equip(slotChoice, inventory[slotChoice][scrollOffset - 1]?.id || null);
           setSlotChoice(null);
           break;
         case keyMap.cancel:
@@ -104,7 +111,7 @@ export default function useEquipmentBuffers(enabled, { width, height, keyMap }) 
     }
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [enabled, slotChoice, setEquipment]);
+  }, [enabled, slotChoice, equip, inventory, equipment]);
 
   // Primary view
   // Main equipment display, doesn't update unless equipped items change
@@ -115,12 +122,12 @@ export default function useEquipmentBuffers(enabled, { width, height, keyMap }) 
     }
     setEquipmentLayoutBuffer([
       '', '', '', '',
-      farColumns(slots.weapon, slots.head),
-      farColumns(slots.body, slots.arms),
-      farColumns(slots.legs, slots.shield),
-      farColumns(slots.feet, slots.waist),
+      farColumns(inventory, equipment, 'weapon', 'head'),
+      farColumns(inventory, equipment, 'body', 'arms'),
+      farColumns(inventory, equipment, 'legs', 'shield'),
+      farColumns(inventory, equipment, 'feet', 'waist'),
     ]);
-  }, [enabled, slotChoice, slots.weapon, slots.head, slots.body, slots.arms, slots.legs, slots.shield, slots.feet, slots.waist]);
+  }, [enabled, slotChoice, inventory, equipment]);
 
   // Based on selected slot, create the highlighter buffer
   useEffect(() => {
@@ -141,9 +148,11 @@ export default function useEquipmentBuffers(enabled, { width, height, keyMap }) 
   // Create equipment scroll buffer
   useEffect(() => {
     if (!enabled || !slotChoice) return;
-    const list = inventory[slotChoice].map(({ id, name }) => {
+    const list = [
+      { id: null, name: '--' }
+    ].concat(inventory[slotChoice]).map(({ id, name }) => {
       let label = `  ${name}`;
-      if (id === equipment[slotChoice].id) {
+      if (id === equipment[slotChoice]) {
         label = `*${label.slice(1)}`;
       }
       label = label.padEnd(width, ' ');
@@ -154,14 +163,14 @@ export default function useEquipmentBuffers(enabled, { width, height, keyMap }) 
     setScrollSelectionBuffer(buffer.map(
       (line, i) => i === 6 ? line : ''
     ));
-  }, [enabled, slotChoice, scrollOffset, inventory, height, width]);
+  }, [enabled, slotChoice, scrollOffset, inventory, equipment, height, width]);
 
   useEffect(() => {
     if (!enabled) {
       setBuffers(null);
       return;
     }
-    if (!slotChoice) {
+    if (slotChoice === null) {
       setBuffers([
         equipmentLayoutBuffer && { fg: '#555', buffer: equipmentLayoutBuffer },
         selectedSlotBuffer && { bg: '#888', fg: 'black', buffer: selectedSlotBuffer },
@@ -179,17 +188,17 @@ export default function useEquipmentBuffers(enabled, { width, height, keyMap }) 
           '', '', '', '',
           `${slotChoice[0].toUpperCase() + slotChoice.slice(1)}:`.padEnd(width - 5, ' ')
             +
-              (inventory[slotChoice][scrollOffset]?.stats?.A !== undefined ? (
-                `Atk ${minifyNumbers(inventory[slotChoice][scrollOffset].stats?.A || 0)}`
+              (slotChoice === 'weapon' || inventory[slotChoice][scrollOffset - 1]?.stats?.A !== undefined ? (
+                `Atk ${minifyNumbers(inventory[slotChoice][scrollOffset - 1]?.stats?.A || 0)}`
               ) : (
-                `Def ${minifyNumbers(inventory[slotChoice][scrollOffset].stats?.D || 0)}`
+                `Def ${minifyNumbers(inventory[slotChoice][scrollOffset - 1]?.stats?.D || 0)}`
               ))
         ]},
         scrollBuffer && { fg: '#c7c7c7', buffer: scrollBuffer },
         scrollSelectionBuffer && { bg: '#aaa', fg: 'black', buffer: scrollSelectionBuffer },
       ].filter(Boolean));
     }
-  }, [enabled, slotChoice, scrollOffset, scrollBuffer, scrollSelectionBuffer, equipmentLayoutBuffer, selectedSlotBuffer, inventory]);
+  }, [enabled, _buffers, slotChoice, scrollOffset, scrollBuffer, scrollSelectionBuffer, equipmentLayoutBuffer, selectedSlotBuffer, inventory]);
 
   return buffers;
 }
