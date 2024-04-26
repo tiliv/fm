@@ -29,10 +29,20 @@ function setInventoryType(subject, kind, items) {
   localStorage.setItem(key, itemsString);
 }
 
-export default function useInventory(subject) {
+function getEquipmentType(subject, kind) {
   const saveSlot = localStorage.getItem('latest');
-  const key = `${saveSlot}/${subject}/inventory`;
+  const key = `${saveSlot}/${subject}/equipped/${kind}`;
+  const id = localStorage.getItem(key);
+  return parseInt(id, 10) || null;
+};
 
+function setEquipmentType(subject, kind, id) {
+  const saveSlot = localStorage.getItem('latest');
+  const key = `${saveSlot}/${subject}/equipped/${kind}`;
+  localStorage.setItem(key, id);
+};
+
+export default function useInventory(subject) {
   const [inventory, setInventory] = useState({});
   const [equipment, setEquipment] = useState({});
 
@@ -50,18 +60,23 @@ export default function useInventory(subject) {
     const equipment = Object.fromEntries(CATEGORIES.map((category) => [category, null]));
     CATEGORIES.forEach((kind) => {
       const items = getInventoryType(subject, kind);
+      const equipped = getEquipmentType(subject, kind);
       inventory[kind].push(...items);
-      equipment[kind] = inventory[kind].find(({ equipped }) => equipped)?.id || null;
+      equipment[kind] = inventory[kind].find(({ id }) => id === equipped)?.id || null;
     });
     setInventory(inventory);
     setEquipment(equipment);
   }, [subject]);
 
   const equip = function(kind, id) {
-    setEquipment((equipment) => ({
-      ...equipment,
-      [kind]: id,
-    }));
+    setEquipment((equipment) => {
+      const newEquipment = {
+        ...equipment,
+        [kind]: id,
+      };
+      setEquipmentType(subject, kind, newEquipment[kind]);
+      return newEquipment;
+    });
   };
 
   const acquire = function(kind, item) {
