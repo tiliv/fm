@@ -39,9 +39,9 @@ export default function useInventory(subject) {
 
   const equip = function(kind, id) {
     setEquipment((equipment) => ({
-        ...equipment,
-        [kind]: id,
-      }));
+      ...equipment,
+      [kind]: id,
+    }));
   };
 
   const acquire = function(kind, item) {
@@ -51,9 +51,9 @@ export default function useInventory(subject) {
       0
     );
     setInventory((inventory) => ({
-        ...inventory,
-        [kind]: [...inventory[kind], { ...item, id: maxId + 1 }],
-      }));
+      ...inventory,
+      [kind]: [...inventory[kind], { ...item, id: maxId + 1 }],
+    }));
   };
 
   return {
@@ -61,5 +61,5 @@ export default function useInventory(subject) {
     equipment,
     equip,
     acquire,
-  }
+  };
 }
