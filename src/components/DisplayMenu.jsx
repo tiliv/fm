@@ -70,7 +70,7 @@ export default function DisplayMenu({
       return;
     }
     setScrollBuffer(bufferize(2, targetData[activeChoice], width, height, scrollOffset));
-  }, [started, targetData, scrollOffset]);
+  }, [started, targetData, scrollOffset, activeChoice]);
 
   // Key handling for navigation and selection
   useEffect(() => {
