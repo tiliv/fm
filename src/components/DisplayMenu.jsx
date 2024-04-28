@@ -38,6 +38,7 @@ export default function DisplayMenu({
     page: [page, setPage],
   });
 
+  // Trigger event matching the "Save" choice
   useEffect(() => {
     if (activeChoice === "Save") {
       const event = new CustomEvent("Save");
@@ -45,6 +46,7 @@ export default function DisplayMenu({
     }
   }, [activeChoice]);
 
+  // Prepare sub menu options view
   useEffect(() => {
     // console.log("Active choice", activeChoice, targetData);
     if (!targetData || !SUB_MENU_CHOICES.includes(activeChoice)) {
@@ -55,6 +57,7 @@ export default function DisplayMenu({
     setSubSelected(0);
   }, [activeChoice, targetData]);
 
+  // Prepare scrollable text buffer view
   useEffect(() => {
     if (
       started === null
@@ -69,6 +72,7 @@ export default function DisplayMenu({
     setScrollBuffer(bufferize(2, targetData[activeChoice], width, height, scrollOffset));
   }, [started, targetData, scrollOffset]);
 
+  // Key handling for navigation and selection
   useEffect(() => {
     const keydown = (e) => {
       if ([keyMap.down, keyMap.up].includes(e.key)) {
@@ -139,6 +143,9 @@ export default function DisplayMenu({
     return () => window.removeEventListener('keydown', keydown);
   }, [target, targetData, scrollBuffer, activeChoice, options, subOptions]);
 
+  // Key handling for choosing and cancellation
+  // Choosing a top-level option sets the "started" state to lock it in.
+  // Choosing a sub menu option throws an event named as the label text.
   useEffect(() => {
     const keydown = (e) => {
       if (e.key === keyMap.cancel) {
@@ -160,6 +167,9 @@ export default function DisplayMenu({
     return () => window.removeEventListener('keydown', keydown);
   }, [target, selected, subSelected, subOptions, activeChoice]);
 
+  // Prepare or reset the menu states
+  // A menuChoice event will re-render this component with `activeChoice` set,
+  // but only when there is also an active target.
   useEffect(() => {
     if (!target) {
       setStarted(null);
