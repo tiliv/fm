@@ -35,10 +35,11 @@ export function parseInventory({ inventory='' }) {
     });
 }
 
-export function unparseInventory(kind, items) {
-  return items.map(({ id, template, rarity, name, stats }) => {
-    return `$${kind}/${template}/${rarity}/${name}/${stats.D || stats.A}/${id}`;
-  }).join(',');
+// export function unparseInventory(kind, items) {
+//   return items.map(({ id, template, rarity, name, stats }) => {
+//     return `$${kind}/${template}/${rarity}/${name}/${stats.D || stats.A}/${id}`;
+//   }).join(',');
+// }
 }
 
 
