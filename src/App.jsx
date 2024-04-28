@@ -6,7 +6,7 @@ import DisplayMenu from './components/DisplayMenu';
 import Analysis from './components/Analysis';
 import useAnalyzer from './hooks/useAnalyzer';
 import useSave from './hooks/useSave';
-import { ACTIONS, TARGETED_ACTIONS, ACTIONS_ORDER } from './Actions';
+import { TARGETED_ACTIONS, ACTIONS_ORDER } from './Actions';
 
 const START_WORLD = 'Terra Montans.txt'
 const START_Y = 17;
