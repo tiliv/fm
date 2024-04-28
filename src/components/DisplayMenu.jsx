@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 
 import ScreenStack from './ScreenStack';
-import { ACTIONS } from '../Actions';
 import useSave from '../hooks/useSave';
 import { minifyNumbers, bufferize } from '../utils';
 
 const OPTION_KEYS = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-const SUB_MENU_CHOICES = [ACTIONS.BUY, "Load"];
 
 export default function DisplayMenu({
   width, height,
@@ -48,8 +46,7 @@ export default function DisplayMenu({
 
   // Prepare sub menu options view
   useEffect(() => {
-    // console.log("Active choice", activeChoice, targetData);
-    if (!targetData || !SUB_MENU_CHOICES.includes(activeChoice)) {
+    if (typeof targetData?.[activeChoice] !== 'object') {
       setSubOptions(null);
       return;
     }
