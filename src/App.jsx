@@ -56,6 +56,24 @@ export default function App({
     return () => window.removeEventListener('Load', loadHandler);
   }, []);
 
+  // Respond to 'menuChoice' event from menu and feed it back as stable state
+  useEffect(() => {
+    const menuChoiceHandler = (e) => {
+      setMenuChoice(e.detail);
+    };
+    window.addEventListener('menuChoice', menuChoiceHandler);
+    return () => window.removeEventListener('menuChoice', menuChoiceHandler);
+  }, []);
+
+  // Respond to 'interaction' event from world by saving it for other displays
+  useEffect(() => {
+    const interactionHandler = (e) => {
+      setInteraction(e.detail);
+    };
+    window.addEventListener('interaction', interactionHandler);
+    return () => window.removeEventListener('interaction', interactionHandler);
+  }, []);
+
   // Respond to 'destination' event from world double bump
   useEffect(() => {
     const destinationHandler = (e) => {
@@ -69,24 +87,6 @@ export default function App({
     window.addEventListener('destination', destinationHandler);
     return () => window.removeEventListener('destination', destinationHandler);
   }, [startWorld]);
-
-  // Respond to 'interaction' event from world by saving it for other displays
-  useEffect(() => {
-    const interactionHandler = (e) => {
-      setInteraction(e.detail);
-    };
-    window.addEventListener('interaction', interactionHandler);
-    return () => window.removeEventListener('interaction', interactionHandler);
-  }, []);
-
-  // Respond to 'menuChoice' event from menu and feed it back as stable state
-  useEffect(() => {
-    const menuChoiceHandler = (e) => {
-      setMenuChoice(e.detail);
-    };
-    window.addEventListener('menuChoice', menuChoiceHandler);
-    return () => window.removeEventListener('menuChoice', menuChoiceHandler);
-  }, []);
 
   // Prepare active menu choices based on the target's data
   useEffect(() => {
