@@ -64,8 +64,8 @@ export default function DisplayWorld({
         return;
       };
       fetch(`interactions/${label}/${dataFile}`)
-        .catch((err) => `Look:\n${err}`)
         .then((res) => res.text())
+        .catch((err) => `Look:\n${err}`)
         .then((text) => parseInteraction(interaction, text, { name }))
         .then((newInteraction) => {
           const event = new CustomEvent('interaction', { detail: newInteraction });
