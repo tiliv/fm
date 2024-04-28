@@ -64,7 +64,7 @@ export default function DisplayWorld({
         window.dispatchEvent(event);
         return;
       };
-      fetch(`${label}/${dataFile}`)
+      fetch(`interactions/${label}/${dataFile}`)
         .catch((err) => `Look:\n${err}`)
         .then((res) => res.text())
         .then((text) => {
