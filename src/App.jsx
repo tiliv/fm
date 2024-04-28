@@ -49,9 +49,6 @@ export default function App({
   // Respond to Load menu choice event by throwing the real `load` event.
   useEffect(() => {
     const loadHandler = (e) => {
-      // const newSaveSlot = e.detail;
-      // setSaveSlot(newSaveSlot);
-      // console.log('Load event', e.detail);
       const loadEvent = new CustomEvent('load', { detail: e.detail });
       window.dispatchEvent(loadEvent);
     };
