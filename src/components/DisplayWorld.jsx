@@ -53,6 +53,7 @@ export default function DisplayWorld({
     h: height,
   });
 
+  // Try to hydrate a bumped 'interaction' with a corresponding dataFile.
   useEffect(() => {
     if (!interaction) {
       const event = new CustomEvent('interaction', { detail: null });
@@ -90,6 +91,7 @@ export default function DisplayWorld({
     }
   }, [interaction, name]);
 
+  // Build the full-screen opacity buffer and copy over player & target sprites.
   useEffect(() => {
     if (!target) {
       setActiveBuffer(null);
@@ -108,7 +110,7 @@ export default function DisplayWorld({
     { fg: '#f50', buffer: interactionBuffer },
     { fg: '#000', buffer: layers.objects },
     activeBuffer && { bg: '#ccc7', fg: '#000', buffer: activeBuffer },
-  ].filter(b => !!b);
+  ].filter(Boolean);
 
   return (
     <ScreenStack
