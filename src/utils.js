@@ -1,3 +1,6 @@
+import { ACTIONS } from './Actions';
+import { list } from './actions/Load';
+
 export function renderTemplate (tmpl, data) {
   const keys = Object.keys(data);
   const values = Object.values(data);
@@ -40,6 +43,26 @@ export function parseInventory({ inventory='' }) {
 //     return `$${kind}/${template}/${rarity}/${name}/${stats.D || stats.A}/${id}`;
 //   }).join(',');
 // }
+
+
+export function parseInteraction(interaction, dataFileText, { name }) {
+  const items = dataFileText.split('---');
+  const actions = {...interaction};
+  items.forEach((item) => {
+    const [category] = item.trim().split('\n', 1);
+    actions[category] = renderTemplate(item, { name }).slice(category.length + 1).trim();
+  });
+  const inventory = parseInventory(actions);
+  if (inventory.length > 0) {
+    actions[ACTIONS.BUY] = inventory;
+  }
+  if (actions.Load !== undefined) {
+    actions["Load"] = list().map((name) => ({ name }));
+  }
+  if (actions.Sell !== undefined) {
+
+  }
+  return actions;
 }
 
 
