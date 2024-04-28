@@ -46,6 +46,7 @@ export default function App({
     startY: [startY, setStartY],
   });
 
+  // Respond to Load menu choice event by throwing the real `load` event.
   useEffect(() => {
     const loadHandler = (e) => {
       // const newSaveSlot = e.detail;
@@ -58,20 +59,24 @@ export default function App({
     return () => window.removeEventListener('Load', loadHandler);
   }, []);
 
+  // Prepare active menu choices based on the target's data
   useEffect(() => {
     if (!interaction) {
       setActiveOptions(ACTIONS_ORDER.filter((option) => !TARGETED_ACTIONS.includes(option)));
       return;
     };
     const newOptions = [];
+
+    // Add official actions to the menu choices
     ACTIONS_ORDER.forEach((option) => {
       if (interaction[option]) {
         newOptions.push(option);
       }
     });
+
+    // Add extra Capitalized actions from the target's data
     newOptions.push(...Object.keys(interaction).filter((option) => {
       if (newOptions.includes(option)) return false;
-      if (option === ACTIONS.BUY) return true;
       return /^[A-Z]$/.test(option[0]);
     }));
     setActiveOptions(newOptions);
@@ -91,7 +96,7 @@ export default function App({
     return () => window.removeEventListener('destination', destinationHandler);
   }, [startWorld]);
 
-  // Store activated target event
+  // Store activated target event from the world
   useEffect(() => {
     const interactionHandler = (e) => {
       setInteraction(e.detail);
@@ -100,7 +105,7 @@ export default function App({
     return () => window.removeEventListener('interaction', interactionHandler);
   }, []);
 
-  // Store activated menu choice event
+  // Store activated menu choice event so that the menu gets activeChoice
   useEffect(() => {
     const menuChoiceHandler = (e) => {
       setMenuChoice(e.detail);
