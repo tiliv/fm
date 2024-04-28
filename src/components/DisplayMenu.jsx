@@ -24,7 +24,7 @@ export default function DisplayMenu({
 }) {
   const [page, setPage] = useState(0);
   const [selected, setSelected] = useState(0);
-  const [started, setStarted] = useState(null);
+  const [started, setStarted] = useState(null);  // fixme: is this redundant to activeChoice?
   const [scrollOffset, setScrollOffset] = useState(0);
   const [scrollBuffer, setScrollBuffer] = useState(null);
 
@@ -61,9 +61,9 @@ export default function DisplayMenu({
   useEffect(() => {
     if (
       started === null
-      || !targetData?.[activeChoice]
-      || typeof targetData[activeChoice] !== 'string'
-      || targetData[activeChoice].length === 0
+      || !targetData?.[activeChoice]  // target doesn't respond to current choice
+      || typeof targetData[activeChoice] !== 'string'  // choice results in sub menu
+      || targetData[activeChoice].length === 0  // choice is empty string  // fixme: this was probably for old Buy placeholder choice
     ) {
       setScrollOffset(0);
       setScrollBuffer(null);
