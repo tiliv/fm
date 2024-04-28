@@ -46,7 +46,7 @@ export default function App({
     startY: [startY, setStartY],
   });
 
-  // Respond to Load menu choice event by throwing the real `load` event.
+  // Respond to 'Load' menu choice event by throwing the real `load` event.
   useEffect(() => {
     const loadHandler = (e) => {
       const loadEvent = new CustomEvent('load', { detail: e.detail });
@@ -54,6 +54,38 @@ export default function App({
     };
     window.addEventListener('Load', loadHandler);
     return () => window.removeEventListener('Load', loadHandler);
+  }, []);
+
+  // Respond to 'destination' event from world double bump
+  useEffect(() => {
+    const destinationHandler = (e) => {
+      const newY = e.detail.destination[0] - 1;
+      const newX = e.detail.destination[1] - 1;
+      const newWorld = e.detail.dataFile && e.detail.dataFile;
+      setStartWorld(newWorld || startWorld);
+      setStartX(newX);
+      setStartY(newY);
+    };
+    window.addEventListener('destination', destinationHandler);
+    return () => window.removeEventListener('destination', destinationHandler);
+  }, [startWorld]);
+
+  // Respond to 'interaction' event from world by saving it for other displays
+  useEffect(() => {
+    const interactionHandler = (e) => {
+      setInteraction(e.detail);
+    };
+    window.addEventListener('interaction', interactionHandler);
+    return () => window.removeEventListener('interaction', interactionHandler);
+  }, []);
+
+  // Respond to 'menuChoice' event from menu and feed it back as stable state
+  useEffect(() => {
+    const menuChoiceHandler = (e) => {
+      setMenuChoice(e.detail);
+    };
+    window.addEventListener('menuChoice', menuChoiceHandler);
+    return () => window.removeEventListener('menuChoice', menuChoiceHandler);
   }, []);
 
   // Prepare active menu choices based on the target's data
@@ -78,38 +110,6 @@ export default function App({
     }));
     setActiveOptions(newOptions);
   }, [interaction]);
-
-  // React to a destination event
-  useEffect(() => {
-    const destinationHandler = (e) => {
-      const newY = e.detail.destination[0] - 1;
-      const newX = e.detail.destination[1] - 1;
-      const newWorld = e.detail.dataFile && e.detail.dataFile;
-      setStartWorld(newWorld || startWorld);
-      setStartX(newX);
-      setStartY(newY);
-    };
-    window.addEventListener('destination', destinationHandler);
-    return () => window.removeEventListener('destination', destinationHandler);
-  }, [startWorld]);
-
-  // Store activated target event from the world
-  useEffect(() => {
-    const interactionHandler = (e) => {
-      setInteraction(e.detail);
-    };
-    window.addEventListener('interaction', interactionHandler);
-    return () => window.removeEventListener('interaction', interactionHandler);
-  }, []);
-
-  // Store activated menu choice event so that the menu gets activeChoice
-  useEffect(() => {
-    const menuChoiceHandler = (e) => {
-      setMenuChoice(e.detail);
-    };
-    window.addEventListener('menuChoice', menuChoiceHandler);
-    return () => window.removeEventListener('menuChoice', menuChoiceHandler);
-  }, []);
 
   // Load interaction data based on both the target and the menu choice
   useEffect(() => {
