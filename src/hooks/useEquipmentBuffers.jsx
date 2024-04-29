@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 
 import useEquipment from '../hooks/useEquipment';
-import useInventory from '../hooks/useInventory';
 import { minifyNumbers, bufferizeList } from '../utils';
 
 const ABBREVIATIONS = {
@@ -35,10 +34,13 @@ function farColumns(inventory, equipment, kind1, kind2) {
   );
 }
 
-export default function useEquipmentBuffers(enabled, { width, height, keyMap }) {
+export default function useEquipmentBuffers(enabled, {
+  inventory, equipment, equip,
+
+  width, height, keyMap,
+}) {
   const [buffers, setBuffers] = useState(null);
 
-  const { inventory, equipment, equip } = useInventory('player');
   const { buffers: _buffers } = useEquipment({ inventory, ...equipment });
 
   // Main display
@@ -111,7 +113,7 @@ export default function useEquipmentBuffers(enabled, { width, height, keyMap }) 
     }
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [enabled, slotChoice, equip, inventory, equipment]);
+  }, [enabled, slotChoice, equip, inventory, scrollOffset, equipment]);
 
   // Primary view
   // Main equipment display, doesn't update unless equipped items change

@@ -5,6 +5,7 @@ import DisplayWorld from './components/DisplayWorld';
 import DisplayMenu from './components/DisplayMenu';
 import Analysis from './components/Analysis';
 import useAnalyzer from './hooks/useAnalyzer';
+import useInventory from './hooks/useInventory';
 import useSave from './hooks/useSave';
 import { TARGETED_ACTIONS, ACTIONS_ORDER } from './Actions';
 
@@ -36,6 +37,32 @@ export default function App({
   const [startX, setStartX] = useState(beginX);
   const [startY, setStartY] = useState(beginY);
   const [activeOptions, setActiveOptions] = useState(ACTIONS_ORDER);
+
+  const { inventory, equipment, equip, acquire } = useInventory('player');
+
+  const statsKeyMap = {
+    up: 'w',
+    down: 's',
+    left: 'a',
+    right: 'd',
+    select: ' ',
+    cancel: 'Escape',
+  };
+  const worldKeyMap = {
+    up: 'ArrowUp',
+    down: 'ArrowDown',
+    left: 'ArrowLeft',
+    right: 'ArrowRight',
+    use: 'Enter',
+  };
+  const menuKeyMap = {
+    down: 'j',
+    up: 'k',
+    pageDown: '=',
+    pageUp: '-',
+    use: 'Enter',
+    cancel: 'Backspace',
+  };
 
   useSave({
     magnification: [magnification, setMagnification],
@@ -146,50 +173,45 @@ export default function App({
 
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
         <DisplayStats
+          inventory={inventory}
+          equipment={equipment}
+          equip={equip}
+
           width={width}
           height={height}
           magnification={magnification}
-          keyMap={{
-            up: 'w',
-            down: 's',
-            left: 'a',
-            right: 'd',
-            select: ' ',
-            cancel: 'Escape',
-          }}
+          keyMap={statsKeyMap}
         />
         <DisplayWorld
+          target={menuChoice ? interaction : null}
+
+          inventory={inventory}
+          equipment={equipment}
+          equip={equip}
+          acquire={acquire}
+
           startWorld={startWorld}
           startX={startX}
           startY={startY}
           width={width}
           height={height}
           magnification={magnification}
-          target={menuChoice ? interaction : null}
-          keyMap={{
-            up: 'ArrowUp',
-            down: 'ArrowDown',
-            left: 'ArrowLeft',
-            right: 'ArrowRight',
-            use: 'Enter',
-          }}
+          keyMap={worldKeyMap}
         />
         <DisplayMenu
-          width={width}
-          height={height}
-          magnification={magnification}
           target={interaction}
           targetData={targetData}
           activeChoice={menuChoice}
           options={activeOptions}
-          keyMap={{
-            down: 'j',
-            up: 'k',
-            pageDown: '=',
-            pageUp: '-',
-            use: 'Enter',
-            cancel: 'Backspace',
-          }}
+
+          inventory={inventory}
+          equipment={equipment}
+          acquire={acquire}
+
+          width={width}
+          height={height}
+          magnification={magnification}
+          keyMap={menuKeyMap}
         />
       </div>
       {/* <div style={{display: 'flex', flexDirection: 'row', alignItems: 'stretch'}}>

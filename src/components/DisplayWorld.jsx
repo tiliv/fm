@@ -8,9 +8,12 @@ import useSave from '../hooks/useSave';
 import { keyAlias, parseInteraction } from '../utils';
 
 export default function DisplayWorld({
+  target,
+
+  inventory,
+
   width, height,
   startWorld, startX, startY,
-  target,
   magnification=1,
   keyMap={
     up: 'ArrowUp',
@@ -70,7 +73,7 @@ export default function DisplayWorld({
         .then((newInteraction) => {
           const event = new CustomEvent('interaction', { detail: newInteraction });
           window.dispatchEvent(event);
-        })
+        });
     }
   }, [interaction, name]);
 

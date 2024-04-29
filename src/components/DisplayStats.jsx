@@ -9,6 +9,8 @@ const TABS_ORDER = ['Equip', 'Magic', 'Log'];
 const TABS = Object.fromEntries(TABS_ORDER.map((tab) => [tab.toUpperCase(), tab]));
 
 export default function DisplayStats({
+  inventory, equipment, equip,
+
   width, height, magnification=1,
   keyMap={
     up: 'w',
@@ -34,7 +36,10 @@ export default function DisplayStats({
     return () => window.removeEventListener('keydown', keydown);
   }, []);
 
-  const equipmentBuffers = useEquipmentBuffers(menuChoice === 0, { width, height, keyMap });
+  const equipmentBuffers = useEquipmentBuffers(menuChoice === 0, {
+    inventory, equipment, equip,
+    width, height, keyMap,
+  });
   const magicBuffers = [{ fg: 'red', buffer: ['', '', '', '', TABS.MAGIC]}];
   const logBuffers = [{ fg: 'green', buffer: ['', '', '', '', TABS.LOG]}];
   const lowerBuffers = [
