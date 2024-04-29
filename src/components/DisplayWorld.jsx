@@ -69,13 +69,13 @@ export default function DisplayWorld({
       fetch(`interactions/${label}/${dataFile}`)
         .then((res) => res.text())
         .catch((err) => `Look:\n${err}`)
-        .then((text) => parseInteraction(interaction, text, { name }))
+        .then((text) => parseInteraction(interaction, text, { name, inventory }))
         .then((newInteraction) => {
           const event = new CustomEvent('interaction', { detail: newInteraction });
           window.dispatchEvent(event);
         });
     }
-  }, [interaction, name]);
+  }, [interaction, name, inventory]);
 
   // Build the full-screen opacity buffer and copy over player & target sprites.
   useEffect(() => {
