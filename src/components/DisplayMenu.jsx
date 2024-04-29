@@ -26,10 +26,12 @@ export default function DisplayMenu({
   const [scrollOffset, setScrollOffset] = useState(0);
   const [scrollBuffer, setScrollBuffer] = useState(null);
 
-  const pageLength = height - 1;
-
+  const [subTitles, setSubTitles] = useState([]);
   const [subOptions, setSubOptions] = useState(null);
   const [subSelected, setSubSelected] = useState(null);
+  const [subActiveChoice, setSubActiveChoice] = useState(null);
+
+  const pageLength = height - 1 - subTitles.length;
 
   useSave({
     selected: [selected, setSelected],
@@ -52,7 +54,14 @@ export default function DisplayMenu({
     }
     setSubOptions(targetData[activeChoice]);
     setSubSelected(0);
-  }, [activeChoice, targetData]);
+  }, [activeChoice, targetData, subActiveChoice]);
+
+  // Prepare sub-sub menu options view
+  useEffect(() => {
+    if (!subActiveChoice?.items) return;
+    setSubSelected(0);
+    setSubOptions(subActiveChoice.items);
+  }, [subActiveChoice]);
 
   // Prepare scrollable text buffer view
   useEffect(() => {
@@ -102,7 +111,7 @@ export default function DisplayMenu({
       } else if ([keyMap.pageDown, keyMap.pageUp].includes(e.key)) {
         if (scrollBuffer === null && !activeChoice) {
           setPage((page) => {
-            const maxPage = Math.ceil(options.length / pageLength);
+            const maxPage = Math.ceil((subOptions === null ? options.length : subOptions.length) / pageLength);
             const delta = (e.key === '-' ? -1 : 1);
             const newPage = page + delta;
             if (newPage >= maxPage) return maxPage - 1;
@@ -138,7 +147,7 @@ export default function DisplayMenu({
 
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [target, targetData, scrollBuffer, activeChoice, options, subOptions]);
+  }, [target, targetData, scrollBuffer, activeChoice, options, subOptions, pageLength]);
 
   // Key handling for choosing and cancellation
   // Choosing a top-level option sets the "started" state to lock it in.
@@ -146,17 +155,24 @@ export default function DisplayMenu({
   useEffect(() => {
     const keydown = (e) => {
       if (e.key === keyMap.cancel) {
-        setStarted(null);
-        setScrollOffset(0);
-        setScrollBuffer(null);
+        if (subActiveChoice) {
+          setSubActiveChoice(null);
+          // setSubSelected(null);  // fixme: restore prior subSelected?
+        } else {
+          setStarted(null);
+          setScrollOffset(0);
+          setScrollBuffer(null);
+        }
       } else if (!subOptions && target && e.key === keyMap.use) {
         setStarted(selected);
       } else if (subOptions && e.key === keyMap.use) {
-        // throw event for sub menu choice
-        const event = new CustomEvent(activeChoice, {
-          detail: subOptions[subSelected],
-        });
-        window.dispatchEvent(event);
+        if (subOptions[subSelected].items) {
+          setSubActiveChoice(subOptions[subSelected]);
+        } else {
+          // throw event for sub menu choice.  Top-level choice is event name
+          const event = new CustomEvent(activeChoice, { detail: subOptions[subSelected] });
+          window.dispatchEvent(event);
+        }
       }
     };
 
@@ -173,18 +189,29 @@ export default function DisplayMenu({
     }
 
     setPage(Math.floor((started || selected) / pageLength));
-
     const event = new CustomEvent('menuChoice', {
       detail: target ? options[started] : null,
     });
     window.dispatchEvent(event);
-  }, [target, started]);
+  }, [target, started, pageLength]);
+
+  useEffect(() => {
+    const subTitles = [];
+    if (activeChoice) {
+      subTitles.push(`${OPTION_KEYS[options.indexOf(activeChoice)]}:${activeChoice}`);
+      if (subActiveChoice) {
+        subTitles.push(`${OPTION_KEYS[subOptions.indexOf(subActiveChoice)]}:${subActiveChoice.name}`);
+      }
+    }
+    setSubTitles(subTitles);
+  }, [activeChoice, subActiveChoice]);
 
   const title = target ? `→${target.sprite} ${target.label}` : null;
   const prefixedOptions = options.map((option, i) => `${OPTION_KEYS[i]}:${option}`);
   const optionsViewport = prefixedOptions.slice(page * (height - 1), (page + 1) * (height - 1));
   const prefixedSubOptions = subOptions && subOptions.map((option, i) => `${OPTION_KEYS[i]}:${option.name}`);
-  const subOptionsViewport = subOptions && prefixedSubOptions.slice(0, height - 2);
+  const subOptionsViewport = subOptions && prefixedSubOptions.slice(page * pageLength, pageLength);
+  console.log('page', page);
 
   return (
     <ScreenStack
@@ -211,8 +238,7 @@ export default function DisplayMenu({
 
         // Sub menu highlight
         (subOptions && { bg: 'black', fg: '#c7c7c7', buffer: [
-          '',
-          '',
+          ...(' '.repeat(subTitles.length).split(' ')),
           ...subOptionsViewport.map((option) => {
             const i = prefixedSubOptions.indexOf(option);
             return i === subSelected ? `${OPTION_KEYS[i]}:` : '';
@@ -221,23 +247,23 @@ export default function DisplayMenu({
 
         // Active selection during sub display
         activeChoice && (
-          { bg: 'black', fg: '#c7c7c7', buffer: [
-            '',
-            `${OPTION_KEYS[options.indexOf(activeChoice)]}:${activeChoice}`,
-          ]}
+          { bg: 'black', fg: '#c7c7c7', buffer: ['', ...subTitles]}
         ),
         // Main menu content
         !activeChoice && (
-          { fg: 'black', buffer: ['', ...optionsViewport.map((option) => {
-            const i = prefixedOptions.indexOf(option);
-            return i === selected ? `  ${option.split(':')[1]}` : option;
-          })]}
+          { fg: 'black', buffer: [
+            ...(' '.repeat(subTitles.length).split(' ')),
+            ...optionsViewport.map((option) => {
+              const i = prefixedOptions.indexOf(option);
+              return i === selected ? `  ${option.split(':')[1]}` : option;
+            }),
+          ]}
         ),
         // Active sub content
         (activeChoice && scrollBuffer) && { fg: 'black', buffer: scrollBuffer},
         (activeChoice && subOptionsViewport) && (
           { fg: 'black', buffer: [
-            '', '',
+            ...(' '.repeat(subTitles.length).split(' ')),
             ...subOptionsViewport.map((option, i) => {
               const spec = subOptions[i];
               let label = option.padEnd(width, ' ');
