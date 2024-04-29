@@ -7,7 +7,6 @@ import Analysis from './components/Analysis';
 import useAnalyzer from './hooks/useAnalyzer';
 import useInventory from './hooks/useInventory';
 import useSave from './hooks/useSave';
-import { TARGETED_ACTIONS, ACTIONS_ORDER } from './Actions';
 
 const START_WORLD = 'Terra Montans.txt'
 const START_Y = 17;
@@ -28,14 +27,11 @@ export default function App({
   // const { ready, analyze, blocks } = useAnalyzer();
 
   const [magnification, setMagnification] = useState(startMagnification);
-  const [menuChoice, setMenuChoice] = useState(null);
-  const [targetData, setTargetData] = useState(null);
   const [width, setWidth] = useState(startWidth);
   const [height, setHeight] = useState(startHeight);
   const [startWorld, setStartWorld] = useState(beginWorld);
   const [startX, setStartX] = useState(beginX);
   const [startY, setStartY] = useState(beginY);
-  const [activeOptions, setActiveOptions] = useState(ACTIONS_ORDER);
 
   const [interaction, setInteraction] = useState(null);
   const { inventory, equipment, equip, acquire } = useInventory('player');
@@ -73,25 +69,6 @@ export default function App({
     startY: [startY, setStartY],
   });
 
-  // Respond to 'Load' menu choice event by throwing the real `load` event.
-  useEffect(() => {
-    const loadHandler = (e) => {
-      const loadEvent = new CustomEvent('load', { detail: e.detail });
-      window.dispatchEvent(loadEvent);
-    };
-    window.addEventListener('Load', loadHandler);
-    return () => window.removeEventListener('Load', loadHandler);
-  }, []);
-
-  // Respond to 'menuChoice' event from menu and feed it back as stable state
-  useEffect(() => {
-    const menuChoiceHandler = (e) => {
-      setMenuChoice(e.detail);
-    };
-    window.addEventListener('menuChoice', menuChoiceHandler);
-    return () => window.removeEventListener('menuChoice', menuChoiceHandler);
-  }, []);
-
   // Respond to 'interaction' event from world by saving it for other displays
   useEffect(() => {
     const interactionHandler = (e) => {
@@ -114,35 +91,6 @@ export default function App({
     window.addEventListener('destination', destinationHandler);
     return () => window.removeEventListener('destination', destinationHandler);
   }, [startWorld]);
-
-  // Prepare active menu choices based on the target's data
-  useEffect(() => {
-    if (!interaction) {
-      setActiveOptions(ACTIONS_ORDER.filter((option) => !TARGETED_ACTIONS.includes(option)));
-      return;
-    };
-    const newOptions = [];
-
-    // Add official actions to the menu choices
-    ACTIONS_ORDER.forEach((option) => {
-      if (interaction[option]) {
-        newOptions.push(option);
-      }
-    });
-
-    // Add extra Capitalized actions from the target's data
-    newOptions.push(...Object.keys(interaction).filter((option) => {
-      if (newOptions.includes(option)) return false;
-      return /^[A-Z]$/.test(option[0]);
-    }));
-    setActiveOptions(newOptions);
-  }, [interaction]);
-
-  // Load interaction data based on both the target and the menu choice
-  useEffect(() => {
-    if (!interaction || !menuChoice) return;
-    setTargetData(interaction);
-  }, [interaction, menuChoice]);
 
   return (
     <>
@@ -183,7 +131,7 @@ export default function App({
           keyMap={statsKeyMap}
         />
         <DisplayWorld
-          target={menuChoice ? interaction : null}
+          target={interaction}
 
           inventory={inventory}
           equipment={equipment}
@@ -200,9 +148,6 @@ export default function App({
         />
         <DisplayMenu
           target={interaction}
-          targetData={targetData}
-          activeChoice={menuChoice}
-          options={activeOptions}
 
           inventory={inventory}
           equipment={equipment}

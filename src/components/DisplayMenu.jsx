@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react';
 
 import ScreenStack from './ScreenStack';
 import useSave from '../hooks/useSave';
+import { ACTIONS_ORDER } from '../Actions';
 import { minifyNumbers, bufferize } from '../utils';
 
 const OPTION_KEYS = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 export default function DisplayMenu({
-  width, height,
-  target, targetData, activeChoice,
-  options,
-  magnification=1,
+  target,
+
+  width, height, magnification=1,
   keyMap={
     down: 'j',
     up: 'k',
@@ -20,197 +20,161 @@ export default function DisplayMenu({
     cancel: 'Backspace',
   },
 }) {
-  const [page, setPage] = useState(0);
+
+  const [menus, setMenus] = useState([]);
+  const [options, setOptions] = useState(null);
+  const [optionsViewport, setOptionsViewport] = useState(null);
+  const [text, setText] = useState(null);
+  const [textViewport, setTextViewport] = useState(null);
   const [selected, setSelected] = useState(0);
-  const [started, setStarted] = useState(null);  // fixme: is this redundant to activeChoice?
-  const [scrollOffset, setScrollOffset] = useState(0);
-  const [scrollBuffer, setScrollBuffer] = useState(null);
 
-  const [subTitles, setSubTitles] = useState([]);
-  const [subOptions, setSubOptions] = useState(null);
-  const [subSelected, setSubSelected] = useState(null);
-  const [subActiveChoice, setSubActiveChoice] = useState(null);
+  const _viewportHeight = height - menus.length;
+  const _page = Math.floor(selected / _viewportHeight);
+  const _offset = _page * _viewportHeight;
 
-  const pageLength = height - 1 - subTitles.length;
-
-  useSave({
-    selected: [selected, setSelected],
-    page: [page, setPage],
-  });
-
-  // Trigger event matching the "Save" choice
-  useEffect(() => {
-    if (activeChoice === "Save") {
-      const event = new CustomEvent("Save");
-      window.dispatchEvent(event);
-    }
-  }, [activeChoice]);
-
-  // Prepare sub menu options view
-  useEffect(() => {
-    if (typeof targetData?.[activeChoice] !== 'object') {
-      setSubOptions(null);
-      return;
-    }
-    setSubOptions(targetData[activeChoice]);
-    setSubSelected(0);
-  }, [activeChoice, targetData, subActiveChoice]);
-
-  // Prepare sub-sub menu options view
-  useEffect(() => {
-    if (!subActiveChoice?.items) return;
-    setSubSelected(0);
-    setSubOptions(subActiveChoice.items);
-  }, [subActiveChoice]);
-
-  // Prepare scrollable text buffer view
-  useEffect(() => {
-    if (
-      started === null
-      || !targetData?.[activeChoice]  // target doesn't respond to current choice
-      || typeof targetData[activeChoice] !== 'string'  // choice results in sub menu
-      || targetData[activeChoice].length === 0  // choice is empty string  // fixme: this was probably for old Buy placeholder choice
-    ) {
-      setScrollOffset(0);
-      setScrollBuffer(null);
-      return;
-    }
-    setScrollBuffer(bufferize(2, targetData[activeChoice], width, height, scrollOffset));
-  }, [started, targetData, scrollOffset, activeChoice]);
-
-  // Key handling for navigation and selection
-  useEffect(() => {
-    const keydown = (e) => {
-      if ([keyMap.down, keyMap.up].includes(e.key)) {
-        const delta = (e.key === keyMap.down ? 1 : -1);
-
-        if (subOptions) {
-          setSubSelected((subSelected) => {
-            const newSelected = (subSelected + delta) % subOptions.length;
-            if (newSelected < 0) {
-              return subOptions.length - 1;
-            }
-            return newSelected;
-          });
-        } else if (scrollBuffer === null && !activeChoice) {
-          setSelected((selected) => {
-            const newSelected = (selected + delta) % options.length;
-            if (newSelected < 0) {
-              return options.length - 1;
-            }
-            return newSelected;
-          });
-        } else {
-          setScrollOffset((scrollOffset) => {
-            const newOffset = scrollOffset + delta;
-            if (newOffset < 0) return 0;
-            if (delta > 0 && (scrollBuffer || '').length < height) return scrollOffset;
-            return newOffset;
-          });
-        }
-      } else if ([keyMap.pageDown, keyMap.pageUp].includes(e.key)) {
-        if (scrollBuffer === null && !activeChoice) {
-          setPage((page) => {
-            const maxPage = Math.ceil((subOptions === null ? options.length : subOptions.length) / pageLength);
-            const delta = (e.key === '-' ? -1 : 1);
-            const newPage = page + delta;
-            if (newPage >= maxPage) return maxPage - 1;
-            if (newPage < 0) return 0;
-            return newPage;
-          });
-        } else {
-          setScrollOffset((scrollOffset) => {
-            const delta = (e.key === keyMap.pageDown ? 1 : -1) * (height - 2);
-            const newOffset = scrollOffset + delta;
-            if (newOffset < 0) return 0;
-            if (delta > 0 && (scrollBuffer || '').length < height) return scrollOffset;
-            return newOffset;
-          });
-        }
-      } else {
-        if (scrollBuffer === null) {
-          // numbers, shift+letters
-          let i = OPTION_KEYS.indexOf(e.key.toUpperCase());
-          if (e.shiftKey && (!isNaN(e.key) || i === -1)) {
-            return;
-          }
-          if (i > -1 && i < (subOptions || options).length) {
-            if (subOptions) {
-              setSubSelected(i);
-            } else {
-              setSelected(i);
-            }
-          }
-        }
-      }
-    };
-
-    window.addEventListener('keydown', keydown);
-    return () => window.removeEventListener('keydown', keydown);
-  }, [target, targetData, scrollBuffer, activeChoice, options, subOptions, pageLength]);
-
-  // Key handling for choosing and cancellation
-  // Choosing a top-level option sets the "started" state to lock it in.
-  // Choosing a sub menu option throws an event named as the label text.
-  useEffect(() => {
-    const keydown = (e) => {
-      if (e.key === keyMap.cancel) {
-        if (subActiveChoice) {
-          setSubActiveChoice(null);
-          // setSubSelected(null);  // fixme: restore prior subSelected?
-        } else {
-          setStarted(null);
-          setScrollOffset(0);
-          setScrollBuffer(null);
-        }
-      } else if (!subOptions && target && e.key === keyMap.use) {
-        setStarted(selected);
-      } else if (subOptions && e.key === keyMap.use) {
-        if (subOptions[subSelected].items) {
-          setSubActiveChoice(subOptions[subSelected]);
-        } else {
-          // throw event for sub menu choice.  Top-level choice is event name
-          const event = new CustomEvent(activeChoice, { detail: subOptions[subSelected] });
-          window.dispatchEvent(event);
-        }
-      }
-    };
-
-    window.addEventListener('keydown', keydown);
-    return () => window.removeEventListener('keydown', keydown);
-  }, [target, selected, subSelected, subOptions, activeChoice]);
-
-  // Prepare or reset the menu states
-  // A menuChoice event will re-render this component with `activeChoice` set,
-  // but only when there is also an active target.
+  // Set fresh menu on target change
   useEffect(() => {
     if (!target) {
-      setStarted(null);
+      setOptionsViewport(null);
+      setTextViewport(null);
+      setMenus([]);
+      return;
     }
 
-    setPage(Math.floor((started || selected) / pageLength));
-    const event = new CustomEvent('menuChoice', {
-      detail: target ? options[started] : null,
-    });
-    window.dispatchEvent(event);
-  }, [target, started, pageLength]);
-
-  useEffect(() => {
-    const subTitles = [];
-    if (activeChoice) {
-      subTitles.push(`${OPTION_KEYS[options.indexOf(activeChoice)]}:${activeChoice}`);
-      if (subActiveChoice) {
-        subTitles.push(`${OPTION_KEYS[subOptions.indexOf(subActiveChoice)]}:${subActiveChoice.name}`);
+    const items = ACTIONS_ORDER.filter((option) => target[option])
+    items.push(...Object.keys(target).filter((option) => {
+      if (items.includes(option)) return false;
+      return /^[A-Z]$/.test(option[0]);
+    }))
+    items.forEach((option, i) => {
+      if (typeof target[option] === 'string') {
+        items[i] = { name: option, text: target[option] };
+      } else if (typeof target[option] === 'object') {
+        items[i] = { name: option, items: target[option] };
       }
-    }
-    setSubTitles(subTitles);
-  }, [activeChoice, subActiveChoice]);
+    });
 
-  const title = target ? `→${target.sprite} ${target.label}` : null;
-  const prefixedOptions = options.map((option, i) => `${OPTION_KEYS[i]}:${option}`);
-  const optionsViewport = prefixedOptions.slice(page * (height - 1), (page + 1) * (height - 1));
-  const prefixedSubOptions = subOptions && subOptions.map((option, i) => `${OPTION_KEYS[i]}:${option.name}`);
-  const subOptionsViewport = subOptions && prefixedSubOptions.slice(page * pageLength, pageLength);
+    setMenus([{
+      title: `→${target.sprite} ${target.label}`,
+      items,
+    }])
+  }, [`${target?.coordinates}`]);  // fixme: target 'updates' when player inventory changes
+
+  // Set options to current menu
+  useEffect(() => {
+    const { items=null, text=null } = menus[menus.length - 1] || {};
+    setOptions(items);
+    setText(text);
+  }, [menus.length, width, _viewportHeight]);
+
+  // Set optionsViewport to current menu page
+  useEffect(() => {
+    if (!options) {
+      setOptionsViewport(null);
+      return;
+    }
+    setOptionsViewport(options.slice(_offset, _offset + _viewportHeight));
+  }, [options, _viewportHeight, _offset]);
+
+  // Set textViewport to current menu text at offset
+  useEffect(() => {
+    if (!text) {
+      setTextViewport(null);
+      return;
+    }
+    setTextViewport(bufferize(menus.length, text, width, height, selected));
+  }, [menus.length, text, width, height, selected]);
+
+  // Key handler for cancel
+  useEffect(() => {
+    const keyHandler = (e) => {
+      if (e.key === keyMap.cancel) {
+        setMenus((menus) => {
+          if (menus.length > 1) {
+            const newMenus = menus.slice(0, -1);
+            setSelected(newMenus[newMenus.length - 1].selected);
+            return newMenus;
+          }
+          return menus;
+        });
+      }
+    };
+    window.addEventListener('keydown', keyHandler);
+    return () => window.removeEventListener('keydown', keyHandler);
+  }, []);
+
+  // Key handler for current menu
+  useEffect(() => {
+    if (!options) {
+      return;
+    }
+    const keyHandler = (e) => {
+      switch (e.key) {
+        case keyMap.down:
+          setSelected((selected) => (selected + 1) % options.length);
+          break;
+        case keyMap.up:
+          setSelected((selected) => (selected - 1 + options.length) % options.length);
+          break;
+        case keyMap.pageDown:
+          setSelected((selected) => Math.min(options.length - 1, selected + _viewportHeight));
+          break;
+        case keyMap.pageUp:
+          setSelected((selected) => Math.max(0, selected - _viewportHeight));
+          break;
+        case keyMap.use:
+          setSelected((selected) => {
+            const option = options[selected];
+            if (!option.items && !option.text) {
+              const topOption = menus[0].items[menus[0].selected];
+              const eventNames = { Load: 'load' };
+              const event = new CustomEvent(
+                eventNames[topOption.name] || topOption.name,
+                { detail: option }
+              );
+              setTimeout((event) => window.dispatchEvent(event), 0, event);
+              return selected;
+            }
+            setMenus((menus) => {
+              menus[menus.length - 1].selected = selected;
+              return [...menus, {
+                title: `${OPTION_KEYS[selected]}:${option.name}`,
+                items: option.items,
+                text: option.text,
+              }];
+            });
+            return 0;
+          });
+      }
+    };
+    window.addEventListener('keydown', keyHandler);
+    return () => window.removeEventListener('keydown', keyHandler);
+  }, [options, width, _viewportHeight]);
+
+  // Key handler for text viewport
+  useEffect(() => {
+    if (!textViewport) {
+      return;
+    }
+    const keyHandler = (e) => {
+      let delta = 0;
+      switch (e.key) {
+        case keyMap.down: delta = 1; break;
+        case keyMap.up: delta = -1; break;
+        case keyMap.pageDown: delta = _viewportHeight; break;
+        case keyMap.pageUp: delta = -_viewportHeight; break;
+        default: return;
+      }
+      setSelected((selected) => {
+        const offset = selected + delta
+        if (offset < 0) return 0;
+        if (delta > 0 && textViewport.length < height) return selected;
+        return offset;
+      });
+    };
+    window.addEventListener('keydown', keyHandler);
+    return () => window.removeEventListener('keydown', keyHandler);
+  }, [textViewport, width, _viewportHeight]);
 
   return (
     <ScreenStack
@@ -225,58 +189,21 @@ export default function DisplayMenu({
         `(${keyMap.cancel}) to end`,
       ].join('')}
       buffers={[
-        // Title stuff locked up top
-        { bg: 'black', fg: '#c7c7c7', buffer: [
-          title || '(No target)',
-          // if no active choice, build a minimal buffer for just the highlighted option prefix
-          ...(activeChoice ? [] : optionsViewport.map((option) => {
-            const i = prefixedOptions.indexOf(option);
-            return i === selected ? `${OPTION_KEYS[i]}:` : '';
-          })),
+        { bg: 'black', fg: '#c7c7c7', buffer: menus.map((menu) => menu.title) },
+        (menus.length && optionsViewport) && { bg: '#c7c7c7', fg: 'black', buffer: [
+          ...(' '.repeat(menus.length - 1).split(' ')),
+          ...optionsViewport.map(
+            (option, i) => `${OPTION_KEYS[_offset + i]}:${option.name}`
+          ),
         ]},
-
-        // Sub menu highlight
-        (subOptions && { bg: 'black', fg: '#c7c7c7', buffer: [
-          ...(' '.repeat(subTitles.length).split(' ')),
-          ...subOptionsViewport.map((option) => {
-            const i = prefixedSubOptions.indexOf(option);
-            return i === subSelected ? `${OPTION_KEYS[i]}:` : '';
-          }),
-        ]}),
-
-        // Active selection during sub display
-        activeChoice && (
-          { bg: 'black', fg: '#c7c7c7', buffer: ['', ...subTitles]}
-        ),
-        // Main menu content
-        !activeChoice && (
-          { fg: 'black', buffer: [
-            ...(' '.repeat(subTitles.length).split(' ')),
-            ...optionsViewport.map((option) => {
-              const i = prefixedOptions.indexOf(option);
-              return i === selected ? `  ${option.split(':')[1]}` : option;
-            }),
-          ]}
-        ),
-        // Active sub content
-        (activeChoice && scrollBuffer) && { fg: 'black', buffer: scrollBuffer},
-        (activeChoice && subOptionsViewport) && (
-          { fg: 'black', buffer: [
-            ...(' '.repeat(subTitles.length).split(' ')),
-            ...subOptionsViewport.map((option, i) => {
-              const spec = subOptions[i];
-              let label = option.padEnd(width, ' ');
-              if (i === subSelected){
-                label = `  ${label.split(':')[1]}`;
-              }
-              if (spec.stats === undefined) {
-                return label;
-              }
-              return label.slice(0, -1) + minifyNumbers(spec.stats?.A || spec.stats?.D || 0)
-            }),
-          ]}
-        ),
-      ].filter(b => !!b)}
+        (menus.length && optionsViewport) && { bg: 'black', fg: '#c7c7c7', buffer: [
+          ...(' '.repeat(menus.length - 1).split(' ')),
+          ...optionsViewport.map(
+            (_, i) => selected === _offset + i ? `${OPTION_KEYS[_offset + i]}:` : ''
+          ),
+        ]},
+        (menus.length && textViewport) && { fg: 'black', buffer: textViewport}
+      ].filter(Boolean)}
     />
   );
 }
