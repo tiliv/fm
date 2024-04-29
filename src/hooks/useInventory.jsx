@@ -67,14 +67,16 @@ export default function useInventory(subject, {
     const acquire = function({ detail: { recipient, kind, item } }) {
       if (subject !== recipient) return;
       // console.log(recipient, 'Acquire', item);
-      const maxId = inventory[kind].reduce(
-        (max, { id }) => Math.max(max, id),
-        0
-      );
-      setInventory((inventory) => ({
-        ...inventory,
-        [kind]: [...inventory[kind], { ...item, id: maxId + 1 }],
-      }));
+      setInventory((inventory) => {
+        const maxId = inventory[kind].reduce(
+          (max, { id }) => Math.max(max, id),
+          0
+        );
+        return {
+          ...inventory,
+          [kind]: [...inventory[kind], { ...item, id: maxId + 1 }],
+        }
+      });
     }
     window.addEventListener('Acquire', acquire);
     return () => window.removeEventListener('Acquire', acquire);
