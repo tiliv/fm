@@ -146,6 +146,17 @@ export default function DisplayMenu({
             });
             return 0;
           });
+        default:
+          if (e.key.length === 1) {
+            const number = !isNaN(e.key);
+            const letter = /^[A-Z]$/.test(e.key);
+            if (number || (e.shiftKey && letter)) {
+              const index = OPTION_KEYS.indexOf(e.key);
+              if (index >= 0 && index < options.length) {
+                setSelected(index);
+              }
+            }
+          }
       }
     };
     window.addEventListener('keydown', keyHandler);
