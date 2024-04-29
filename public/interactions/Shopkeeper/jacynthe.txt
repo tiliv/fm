@@ -8,4 +8,4 @@ Save
 "Your story's safe with me, ${name}."
 ---
 Sell
-weapons,body
+weapon,body
