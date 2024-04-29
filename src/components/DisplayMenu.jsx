@@ -211,7 +211,6 @@ export default function DisplayMenu({
   const optionsViewport = prefixedOptions.slice(page * (height - 1), (page + 1) * (height - 1));
   const prefixedSubOptions = subOptions && subOptions.map((option, i) => `${OPTION_KEYS[i]}:${option.name}`);
   const subOptionsViewport = subOptions && prefixedSubOptions.slice(page * pageLength, pageLength);
-  console.log('page', page);
 
   return (
     <ScreenStack
