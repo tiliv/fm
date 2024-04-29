@@ -35,6 +35,7 @@ export default function DisplayMenu({
   // Set fresh menu on target change
   useEffect(() => {
     if (!target) {
+      setSelected(0);
       setOptionsViewport(null);
       setTextViewport(null);
       setMenus([]);
