@@ -28,7 +28,6 @@ export default function App({
   // const { ready, analyze, blocks } = useAnalyzer();
 
   const [magnification, setMagnification] = useState(startMagnification);
-  const [interaction, setInteraction] = useState(null);
   const [menuChoice, setMenuChoice] = useState(null);
   const [targetData, setTargetData] = useState(null);
   const [width, setWidth] = useState(startWidth);
@@ -38,6 +37,7 @@ export default function App({
   const [startY, setStartY] = useState(beginY);
   const [activeOptions, setActiveOptions] = useState(ACTIONS_ORDER);
 
+  const [interaction, setInteraction] = useState(null);
   const { inventory, equipment, equip, acquire } = useInventory('player');
 
   const statsKeyMap = {
