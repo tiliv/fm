@@ -30,7 +30,7 @@ export default function useInventory(subject, {
     [`${subject}/equipment`]: [equipment, setEquipment],
   });
 
-  // Player responds to Buy event
+  // Respond to 'Buy' event
   useEffect(() => {
     const buy = function({ detail: { buyer, kind, ...item } }) {
       if (subject !== buyer) return;
