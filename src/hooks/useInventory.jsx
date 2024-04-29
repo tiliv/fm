@@ -30,6 +30,26 @@ export default function useInventory(subject, {
     [`${subject}/equipment`]: [equipment, setEquipment],
   });
 
+  // // Sync with existing
+  // useEffect(() => {
+  //   // Respond to 'sync-inventory' when softId doesn't match ours
+  //   const get = function({ detail, id }) {
+  //     if (subject !== detail || softId === id) return;  // ignore off topic and self
+  //     const reply = new CustomEvent('set-inventory', { detail, id, inventory, equipment });
+  //     window.dispatchEvent(reply);
+  //   };
+  //   const set = function({ detail, id, inventory, equipment }) {
+  //     if (subject !== detail || softId !== id) return;  // ignore off topic and others
+  //     setInventory(inventory);
+  //     setEquipment(equipment);
+  //   };
+  //   window.addEventListener('get-inventory', get);
+  //   window.addEventListener('set-inventory', set);
+
+  //   const event = new CustomEvent('get-inventory', { detail: subject, id: softId });
+  //   window.dispatchEvent(event);
+  // }, [subject]);
+
   // Respond to 'Buy' event
   useEffect(() => {
     const buy = function({ detail: { buyer, kind, ...item } }) {
