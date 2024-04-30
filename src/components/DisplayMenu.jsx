@@ -63,7 +63,7 @@ export default function DisplayMenu({
     const { items=null, text=null } = menus[menus.length - 1] || {};
     setOptions(items);
     setText(text);
-  }, [menus.length, width, _viewportHeight]);
+  }, [menus.length, menus[0], width, _viewportHeight]);
 
   // Set optionsViewport to current menu page
   useEffect(() => {
