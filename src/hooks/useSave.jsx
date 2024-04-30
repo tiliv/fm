@@ -5,7 +5,7 @@ const IGNORE_VALUES = [undefined, null];
 export default function useSave({...vars}) {
   useEffect(() => {
     const saveHandler = (e) => {
-      const { name: slot=localStorage.getItem('latest') } = e.detail || {};
+      const { slot=localStorage.getItem('latest') } = e.detail || {};
       // console.log("* Saving", slot);
       localStorage.setItem('latest', slot);
       Object.entries(vars).forEach(([key, [value, _]]) => {
@@ -20,7 +20,7 @@ export default function useSave({...vars}) {
   });
   useEffect(() => {
     const loadHandler = (e) => {
-      const { name: slot=localStorage.getItem('latest') || "Hero" } = e.detail || {};
+      const { slot=localStorage.getItem('latest') || "Hero" } = e.detail || {};
       // console.log("* Loading", slot);
       localStorage.setItem('latest', slot);
       Object.entries(vars).forEach(([key, [_, setter]]) => {

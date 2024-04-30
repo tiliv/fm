@@ -9,8 +9,8 @@ export const EQUIPMENT = {
   waist: "Waist gear",
 }
 
-export function parse(kindList, { interaction, inventory }) {
-  return kindList.split(',').map((kind) => {
+export function parse({ text }, { interaction, inventory }) {
+  return text.split(',').map((kind) => {
     if (EQUIPMENT[kind] !== undefined) {
       return { name: EQUIPMENT[kind], items: inventory[kind] || [] };
     }

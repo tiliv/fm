@@ -42,22 +42,19 @@ export default function DisplayMenu({
       return;
     }
 
-    const items = ACTIONS_ORDER.filter((option) => target[option])
-    items.push(...Object.keys(target).filter((option) => {
-      if (items.includes(option)) return false;
-      return /^[A-Z]$/.test(option[0]);
-    }))
-    items.forEach((option, i) => {
-      if (typeof target[option] === 'string') {
-        items[i] = { name: option, text: target[option] };
-      } else if (typeof target[option] === 'object') {
-        items[i] = { name: option, items: target[option] };
-      }
-    });
+    // const items = ACTIONS_ORDER.filter((option) => target[option]);
+    const items = Object.entries(target)
+      .filter(([k]) => ACTIONS_ORDER.includes(k))
+      .sort(([k1], [k2]) => ACTIONS_ORDER.indexOf(k1) - ACTIONS_ORDER.indexOf(k2))
+      ;
+    items.push(...Object.entries(target).filter(([k]) => {
+      if (items.find(([k2]) => k2 === k)) return false;
+      return /^[A-Z]$/.test(k[0]);
+    }));
 
     setMenus([{
       title: `→${target.sprite} ${target.label}`,
-      items,
+      items: items.map(([_, v]) => v),
     }])
   }, [`${target?.coordinates}`]);  // fixme: target 'updates' when player inventory changes
 
@@ -126,7 +123,7 @@ export default function DisplayMenu({
         case keyMap.use:
           setSelected((selected) => {
             const option = options[selected];
-            if (!option.items && !option.text) {
+            if (option.event) {
               const _selected = isNaN(menus[0].selected) ? selected : menus[0].selected;
               const topOption = menus[0].items[_selected];
               const eventNames = { Load: 'load' };
@@ -135,7 +132,12 @@ export default function DisplayMenu({
                 { detail: option }
               );
               setTimeout((event) => window.dispatchEvent(event), 0, event);
-              return selected;
+
+              // Bail now if nothing to display
+              // (I don't think this is in use yet)
+              if (!option.items && !option.text) {
+                return selected;
+              }
             }
             setMenus((menus) => {
               menus[menus.length - 1].selected = selected;

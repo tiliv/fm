@@ -51,17 +51,33 @@ export function parseInteraction(interaction, dataFileText, { name, inventory })
   const actions = {...interaction};
   items.forEach((item) => {
     const [category] = item.trim().split('\n', 1);
-    actions[category] = renderTemplate(item, { name }).slice(category.length + 1).trim();
+    actions[category] = {
+      name: category,
+      text: renderTemplate(item, { name }).slice(category.length + 1).trim()
+    };
   });
   const theirInventory = parseInventory(actions);
   if (theirInventory.length > 0) {
-    actions[ACTIONS.BUY] = theirInventory.map((item) => ({ ...item, buyer: 'player' }));
+    actions[ACTIONS.BUY] = {
+      name: ACTIONS.BUY,
+      items: theirInventory.map((item) => ({ ...item, buyer: 'player', event: 'Buy' })),
+      text: null,
+    };
+  }
+  if (actions.Save !== undefined) {
+    actions.Save.event = 'Save';
   }
   if (actions.Load !== undefined) {
-    actions.Load = Load.list().map((name) => ({ name }));
+    Object.assign(actions.Load, {
+      items: Load.list().map((slot) => ({ slot, name: slot, event: 'Load' })),
+      text: null,
+    });
   }
   if (actions.Sell !== undefined) {
-    actions.Sell = Sell.parse(actions.Sell, { interaction, inventory });
+    Object.assign(actions.Sell, {
+      items: Sell.parse(actions.Sell, { interaction, inventory }),
+      text: null,
+    });
   }
   return actions;
 }
