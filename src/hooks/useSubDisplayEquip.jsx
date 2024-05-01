@@ -39,6 +39,7 @@ export default function useSubDisplayEquip(enabled, {
     inventory,
     equipment,
     positions: SPRITE_POSITIONS,
+    offsetLeft: 4,
     width: 6,
     height: 4,
   });
