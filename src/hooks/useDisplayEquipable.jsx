@@ -67,7 +67,7 @@ export default function useDisplayEquipable(enabled, {
           break;
         case keyMap.down:
           setScrollOffset((offset) => {
-            if (offset >= inventory[slotChoice]?.length || 1) return offset;
+            if (offset >= (inventory[slotChoice] || []).length) return offset;
             return offset + 1;
           });
           break;
