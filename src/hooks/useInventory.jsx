@@ -48,13 +48,14 @@ export default function useInventory(subject, {
     const eventName = `Acquire.${subject}`;
     const acquire = function({ detail: { kind, item } }) {
       setInventory((inventory) => {
-        const maxId = inventory[kind].reduce(
+        const existing = inventory[kind] || [];
+        const maxId = existing.reduce(
           (max, { id }) => Math.max(max, id),
           0
         );
         return {
           ...inventory,
-          [kind]: [...inventory[kind], { ...item, id: maxId + 1 }],
+          [kind]: [...existing, { ...item, id: maxId + 1 }],
         }
       });
     }
