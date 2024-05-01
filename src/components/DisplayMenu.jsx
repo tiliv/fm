@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import ScreenStack from './ScreenStack';
 import useSave from '../hooks/useSave';
@@ -27,6 +27,7 @@ export default function DisplayMenu({
   const [text, setText] = useState(null);
   const [textViewport, setTextViewport] = useState(null);
   const [selected, setSelected] = useState(0);
+  const useKeyDownRef = useRef(false);
 
   const _viewportHeight = height - menus.length;
   const _page = Math.floor(selected / _viewportHeight);
@@ -121,7 +122,9 @@ export default function DisplayMenu({
           setSelected((selected) => Math.max(0, selected - _viewportHeight));
           break;
         case keyMap.use:
+          if (useKeyDownRef.current) return;
           setSelected((selected) => {
+            useKeyDownRef.current = true;
             const option = options[selected];
             if (option.event) {
               const event = new CustomEvent(
@@ -129,6 +132,7 @@ export default function DisplayMenu({
                 { detail: option }
               );
               setTimeout((event) => window.dispatchEvent(event), 0, event);
+              useKeyDownRef.current = false;
 
               // Bail now if option was event-only
               if (!option.items && !option.text) {
@@ -161,6 +165,17 @@ export default function DisplayMenu({
     window.addEventListener('keydown', keyHandler);
     return () => window.removeEventListener('keydown', keyHandler);
   }, [options, width, _viewportHeight]);
+
+  // Key release handler for Use key
+  useEffect(() => {
+    const keyHandler = (e) => {
+      if (e.key === keyMap.use) {
+        useKeyDownRef.current = false;
+      }
+    };
+    window.addEventListener('keyup', keyHandler);
+    return () => window.removeEventListener('keyup', keyHandler);
+  }, []);
 
   // Key handler for text viewport
   useEffect(() => {
