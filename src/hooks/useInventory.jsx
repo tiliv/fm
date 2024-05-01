@@ -12,6 +12,7 @@ const CATEGORIES = [
   'feet',
   'weapon',
   'shield',
+  'ring',
 ];
 
 const EMPTY_INVENTORY = Object.fromEntries(CATEGORIES.map((category) => [category, []]));
