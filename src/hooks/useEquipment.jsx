@@ -1,117 +1,226 @@
 import { useState, useEffect } from 'react';
 
-const RARITY_COLORS = [
-  '#888',
-  '#c7c7c7',
-  '#8d8',
-  '#ff0',
-  '#f0f',
+import useSpriteLayers from './useSpriteLayers';
+import { minifyNumbers, bufferizeList } from '../utils';
+
+const ABBREVIATIONS = {
+  weapon: 'Wp',
+  shield: 'Sh',
+  head: 'Hd',
+  body: 'Bd',
+  arms: 'Ar',
+  waist: 'Ws',
+  legs: 'Lg',
+  feet: 'Ft',
+};
+const EQUIPMENT_ORDER = [
+  'weapon', 'body', 'legs', 'feet',
+  'head', 'arms', 'shield', 'waist',
 ];
+const POSITIONS = {
+  hair: [[0, 2]],
+  head: [[0, 3]],
+  arms: [[1, 2], [1, 4]],
+  body: [[1, 3]],
+  waist: [[2, 2], [2, 4]],
+  legs: [[2, 3]],
+  feet: [[3, 2], [3, 4]],
+  weapon: [[1, 0]],
+  shield: [[1, 5]],
+};
 
-function useEquipmentFile(inventory, kind, id, position, secondPosition=null) {
-  const item = inventory[kind]?.find(item => item.id === id);
-  const { template='none', rarity=0, name='--' } = item || {};
-  const [data, setData] = useState(null);
-
-  useEffect(() => {
-    fetch(`equipment/${kind}/${template}.txt`)
-      .then((res) => res.text())
-      .then((text) => {
-        const buffer = Array.from({ length: 4 }, () => Array(6).fill(' '));
-        const [graphics, stats] = text.trim().split('---');
-        const lines = graphics.split('\n');
-        let icon = null;
-        lines.forEach((line) => {
-          let [offset, sprites=''] = line.split(':');
-          offset = parseInt(offset, 10);
-          if (!secondPosition || !sprites.includes(',')) {
-            sprites = sprites.split('');
-            sprites.forEach((char, i) => {
-              buffer[position[0] + offset][position[1] + i] = char;
-            });
-          } else if (sprites.includes(',')) {
-            sprites = sprites.split(',', 2);
-            buffer[position[0] + offset][position[1]] = sprites[0];
-            buffer[secondPosition[0] + offset][secondPosition[1]] = sprites[1];
-          }
-          if (!icon) {
-            icon = sprites.join('').trim()[0];
-          }
-      });
-        const data = {
-          ...item, kind, rarity, template, name, buffer, icon,
-        };
-        stats && stats.split('\n').forEach((line) => {
-          const [stat, value] = line.split(':');
-          data.stats[stat] = parseInt(value, 10);
-        });
-        return data;
-      })
-      .then(setData);
-  }, [kind, name, template]);
-
-  return data;
+function farColumns(inventory, equipment, kind1, kind2) {
+  function label(kind) {
+    const { icon, stats: { A=0, D=0 }={} } = (
+      inventory[kind]?.find(({ id }) => id === equipment[kind]) || {}
+    );
+    return `${ABBREVIATIONS[kind]} ${minifyNumbers(A || D)}`;
+  }
+  return (
+    label(kind1).split('')
+    .concat(
+      ['', '', '', '', '', '', ''],
+      label(kind2).split('')
+    )
+  );
 }
 
+export default function useEquipment(enabled, {
+  inventory, equipment, equip,
 
-export default function useEquipment({
-  inventory,
-  hair=null,
-  head=null,
-  arms=null,
-  body=null,
-  waist=null,
-  legs=null,
-  feet=null,
-  weapon=null,
-  shield=null,
+  width, height, keyMap,
 }) {
-  const hairData = useEquipmentFile(inventory, "hair", hair, [0, 2]);
-  const headData = useEquipmentFile(inventory, "head", head, [0, 3]);
-  const armsData = useEquipmentFile(inventory, "arms", arms, [1, 2], [1, 4]);
-  const bodyData = useEquipmentFile(inventory, "body", body, [1, 3]);
-  const waistData = useEquipmentFile(inventory, "waist", waist, [2, 2], [2, 4]);
-  const legsData = useEquipmentFile(inventory, "legs", legs, [2, 3]);
-  const feetData = useEquipmentFile(inventory, "feet", feet, [3, 2], [3, 4]);
-  const weaponData = useEquipmentFile(inventory, "weapon", weapon, [1, 0]);
-  const shieldData = useEquipmentFile(inventory, "shield", shield, [1, 5]);
-
   const [buffers, setBuffers] = useState(null);
 
-  // Flatten buffers into a single buffer
-  useEffect(() => {
-    const buffers = Array.from({ length: RARITY_COLORS.length }, () => ({
-      fg: '#fff', buffer: [],
-    }));
-    RARITY_COLORS.forEach((color, i) => {
-      buffers[i].fg = color;
-      buffers[i].buffer = Array.from({ length: 4 }, () => Array(6).fill(''));
-    });
-    function copy(piece) {
-      if (!piece) return;
-      piece && piece.buffer.forEach((line, y) => {
-        line.forEach((char, x) => {
-          if (char !== ' ') {
-            buffers[piece.rarity].buffer[y][x] = char;
-          }
-        });
-      });
-    }
-    [hairData, headData, armsData, bodyData, waistData, legsData, feetData,
-      weaponData, shieldData].forEach(copy);
-    setBuffers(buffers);
-  }, [hairData, headData, armsData, bodyData, waistData, legsData, feetData, weaponData, shieldData]);
+  const { layers: equipmentSpriteLayers } = useSpriteLayers({
+    inventory,
+    equipment,
+    positions: POSITIONS,
+    width: 6,
+    height: 4,
+  });
 
-  return {
-    hair: hairData,
-    head: headData,
-    arms: armsData,
-    body: bodyData,
-    waist: waistData,
-    legs: legsData,
-    feet: feetData,
-    weapon: weaponData,
-    shield: shieldData,
-    buffers,
-  };
+  // Main display
+  const [equipmentLayoutBuffer, setEquipmentLayoutBuffer] = useState(null);
+
+  // Navigating slots
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [selectedSlotBuffer, setSelectedSlotBuffer] = useState(null);
+
+  // Picking from equipment list for a given slot
+  const [slotChoice, setSlotChoice] = useState(null);
+  const [scrollBuffer, setScrollBuffer] = useState(null);
+  const [scrollSelectionBuffer, setScrollSelectionBuffer] = useState(null);
+  const [scrollOffset, setScrollOffset] = useState(0);
+
+  // Keybind slot selection
+  useEffect(() => {
+    if (!enabled || slotChoice !== null) return;
+    const keydown = (e) => {
+      switch (e.key) {
+        case keyMap.up:
+          setSelectedSlot((choice) => (choice + EQUIPMENT_ORDER.length - 1) % EQUIPMENT_ORDER.length);
+          break;
+        case keyMap.down:
+          setSelectedSlot((choice) => ((choice === null ? -1 : choice) + 1) % EQUIPMENT_ORDER.length);
+          break;
+        case keyMap.select:
+          setSlotChoice(EQUIPMENT_ORDER[selectedSlot]);
+          const items = inventory[EQUIPMENT_ORDER[selectedSlot]];
+          if (!items) {
+            setScrollOffset(0);
+            return;
+          }
+          const currentItem = items.findIndex(
+            ({ id }) => id === equipment[EQUIPMENT_ORDER[selectedSlot]]
+          );
+          setScrollOffset(currentItem + 1);  // +1 because empty '--' is always prepended
+          break;
+      }
+    }
+    window.addEventListener('keydown', keydown);
+    return () => window.removeEventListener('keydown', keydown);
+  }, [enabled, slotChoice, selectedSlot, inventory, equipment]);
+
+  // Keybind equipment listing selection
+  useEffect(() => {
+    if (!enabled || slotChoice === null) return;
+    const keydown = (e) => {
+      switch (e.key) {
+        case keyMap.up:
+          setScrollOffset((offset) => {
+            if (offset <= 0) return 0;
+            return offset - 1;
+          });
+          break;
+        case keyMap.down:
+          setScrollOffset((offset) => {
+            if (offset >= inventory[slotChoice].length) return offset;
+            return offset + 1;
+          });
+          break;
+        case keyMap.select:
+          equip(slotChoice, inventory[slotChoice][scrollOffset - 1]?.id || null);
+          setSlotChoice(null);
+          break;
+        case keyMap.cancel:
+          setSlotChoice(null);
+          break;
+      }
+    }
+    window.addEventListener('keydown', keydown);
+    return () => window.removeEventListener('keydown', keydown);
+  }, [enabled, slotChoice, equip, inventory, scrollOffset, equipment]);
+
+  // Primary view
+  // Main equipment display, doesn't update unless equipped items change
+  useEffect(() => {
+    if (!enabled || slotChoice !== null) {
+      setEquipmentLayoutBuffer(null);
+      return;
+    }
+    setEquipmentLayoutBuffer([
+      '', '', '', '',
+      farColumns(inventory, equipment, 'weapon', 'head'),
+      farColumns(inventory, equipment, 'body', 'arms'),
+      farColumns(inventory, equipment, 'legs', 'shield'),
+      farColumns(inventory, equipment, 'feet', 'waist'),
+    ]);
+  }, [enabled, slotChoice, inventory, equipment]);
+
+  // Based on selected slot, create the highlighter buffer
+  useEffect(() => {
+    if (!enabled || selectedSlot === null) {
+      setSelectedSlotBuffer(null);
+      return;
+    }
+    const buffer = [];
+    buffer.push('', '', '', '');
+    buffer.push(...Array.from({ length: selectedSlot % (EQUIPMENT_ORDER.length / 2) }, () => ''));
+    buffer.push([...Array.from({ length: selectedSlot >= (EQUIPMENT_ORDER.length / 2) ? 11 : 0 }, () => ''),
+      ...ABBREVIATIONS[EQUIPMENT_ORDER[selectedSlot]].split('')
+    ]);
+    setSelectedSlotBuffer(buffer);
+  }, [enabled, selectedSlot]);
+
+  // Secondary view
+  // Create equipment scroll buffer
+  useEffect(() => {
+    if (!enabled || !slotChoice) return;
+    const list = [
+      { id: null, name: '--' }
+    ].concat(inventory[slotChoice]).map(({ id, name }) => {
+      let label = `  ${name}`;
+      if (id === equipment[slotChoice]) {
+        label = `*${label.slice(1)}`;
+      }
+      label = label.padEnd(width, ' ');
+      return label;
+    });
+    const buffer = bufferizeList(5, [''].concat(list, ['']), width, height, scrollOffset);
+    setScrollBuffer(buffer);
+    setScrollSelectionBuffer(buffer.map(
+      (line, i) => i === 6 ? line : ''
+    ));
+  }, [enabled, slotChoice, scrollOffset, inventory, equipment, height, width]);
+
+  useEffect(() => {
+    if (!enabled) {
+      setBuffers(null);
+      return;
+    }
+    if (slotChoice === null) {
+      setBuffers([
+        equipmentLayoutBuffer && { fg: '#555', buffer: equipmentLayoutBuffer },
+        selectedSlotBuffer && { bg: '#888', fg: 'black', buffer: selectedSlotBuffer },
+        ...(
+          [].concat((equipmentSpriteLayers || []).map(({ fg, buffer }) => ({
+            fg: fg, buffer: [].concat(['', '', '', ''], buffer.map(
+              (line) => [].concat(['', '', '', ''], line)
+            ))
+          })),
+        ))
+      ].filter(Boolean));
+    } else {
+      setBuffers([
+        { bg: '#888', fg: 'black', buffer: [
+          '', '', '', '',
+          `${slotChoice[0].toUpperCase() + slotChoice.slice(1)}:`.padEnd(width - 5, ' ')
+            +
+              (slotChoice === 'weapon' || inventory[slotChoice][scrollOffset - 1]?.stats?.A !== undefined ? (
+                `Atk ${minifyNumbers(inventory[slotChoice][scrollOffset - 1]?.stats?.A || 0)}`
+              ) : (
+                `Def ${minifyNumbers(inventory[slotChoice][scrollOffset - 1]?.stats?.D || 0)}`
+              ))
+        ]},
+        scrollBuffer && { fg: '#c7c7c7', buffer: scrollBuffer },
+        scrollSelectionBuffer && { bg: '#aaa', fg: 'black', buffer: scrollSelectionBuffer },
+      ].filter(Boolean));
+    }
+  }, [
+    enabled, equipmentSpriteLayers, slotChoice, scrollOffset, scrollBuffer,
+    scrollSelectionBuffer, equipmentLayoutBuffer, selectedSlotBuffer, inventory,
+  ]);
+
+  return buffers;
 }
