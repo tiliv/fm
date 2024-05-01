@@ -8,9 +8,11 @@ const RARITY_COLORS = [
   '#f0f',
 ];
 
+const MAP_KIND_SAME = (kind) => kind;
+
 export default function useSpriteLayers({
   inventory, equipment, positions,
-  mapKind=null,
+  mapKind=MAP_KIND_SAME,
   offsetLeft=0,
   width, height,  // local width/height, not screen size
 }) {
@@ -26,7 +28,7 @@ export default function useSpriteLayers({
     const promises = Object.keys(positions).map((kind) => {
       const id = equipment[kind];
       const item = inventoryRef.current[kind]?.find((item) => item.id === id) || {};
-      const loadKind = mapKind ? mapKind(kind) : kind;
+      const loadKind = mapKind(kind);
       return loadSprite(
         loadKind,
         { ...item, kind },
@@ -40,7 +42,7 @@ export default function useSpriteLayers({
       }));
       setSprites(spritesByKind);
     });
-  }, [equipment, positions, offsetLeft, width, height]);
+  }, [equipment, positions, offsetLeft, width, height, mapKind]);
 
   // Flatten buffers into a single buffer per rarity
   useEffect(() => {
