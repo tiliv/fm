@@ -93,10 +93,11 @@ export default function useDisplayEquipable(enabled, {
     }
 
     const buffer = Array.from({ length: height - 4 }, () => Array(width).fill(''));
-    Object.entries(slots).forEach(([kind, [label, [row, col]]]) => {
-      const item = inventory[kind].find(({ id }) => id === equipment[kind]) || {};
-      const { stats: { A=0, D=0 }={} } = item;
-      const display = `${label} ${minifyNumbers(A || D)}`;
+    Object.entries(slots).forEach(([kind, [label, [row, col], statType=null]]) => {
+      const item = inventory[kind]?.find(({ id }) => id === equipment[kind]) || {};
+      const { stats: { [statType]: stat=null }={} } = item;
+      const statValue = statType === null ? '' : stat === null ? '-' : minifyNumbers(stat);
+      const display = `${label}${label ? ' ' : ''}${statValue}`;
       buffer[row].splice(col, display.length, ...display.split(''));
     });
 
@@ -113,10 +114,11 @@ export default function useDisplayEquipable(enabled, {
     const buffer = Array.from({ length: height - 4 }, () => Array(width).fill(''));
     slotOrder.forEach((kind, i) => {
       if (i !== selectedSlot) return;
-      const [label, [row, col]] = slots[kind];
-      const item = inventory[kind].find(({ id }) => id === equipment[kind]) || {};
-      const { stats: { A=0, D=0 }={} } = item;
-      const display = `${label} ${minifyNumbers(A || D)}`;
+      const [label, [row, col], statType=null] = slots[kind];
+      const item = inventory[kind]?.find(({ id }) => id === equipment[kind]) || {};
+      const { stats: { [statType]: stat=null }={} } = item;
+      const statValue = statType === null ? '' : stat === null ? '-' : minifyNumbers(stat);
+      const display = `${label}${label ? ' ' : ''}${statValue}`;
       buffer[row].splice(col, display.length, ...display.split(''));
     });
 
@@ -148,6 +150,7 @@ export default function useDisplayEquipable(enabled, {
     ));
   }, [enabled, slotChoice, scrollOffset, inventory, equipment, height, width]);
 
+  // Store active view
   useEffect(() => {
     if (!enabled) {
       setBuffers(null);
@@ -159,9 +162,7 @@ export default function useDisplayEquipable(enabled, {
         selectedSlotBuffer && { bg: '#888', fg: 'black', buffer: selectedSlotBuffer },
         ...(
           [].concat((spriteLayers || []).map(({ fg, buffer }) => ({
-            fg: fg, buffer: [].concat(['', '', '', ''], buffer.map(
-              (line) => [].concat(['', '', '', ''], line)
-            ))
+            fg: fg, buffer: [].concat(['', '', '', ''], buffer)
           })),
         ))
       ].filter(Boolean));
