@@ -31,6 +31,7 @@ const SPRITE_POSITIONS = {
   ring4a: [[3, 0]],
   ring4b: [[3, 2]],
 };
+const MAP_KIND = () => 'ring';
 
 export default function useSubDisplayRings(enabled, {
   inventory, equipment, equip,
@@ -43,7 +44,7 @@ export default function useSubDisplayRings(enabled, {
     positions: SPRITE_POSITIONS,
     width,
     height: 4,
-    mapKind: (kind) => 'rings',
+    mapKind: MAP_KIND,
   });
 
   const buffers = useDisplayEquipable(enabled, {
@@ -53,6 +54,7 @@ export default function useSubDisplayRings(enabled, {
     spriteLayers: layers,
     slotOrder: SLOT_ORDER,
     slots: SLOTS,
+    mapKind: MAP_KIND,
   });
 
   return buffers;
