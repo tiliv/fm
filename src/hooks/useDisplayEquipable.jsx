@@ -1,67 +1,19 @@
 import { useState, useEffect } from 'react';
 
-import useSpriteLayers from './useSpriteLayers';
 import { minifyNumbers, bufferizeList } from '../utils';
 
-const ABBREVIATIONS = {
-  weapon: 'Wp',
-  shield: 'Sh',
-  head: 'Hd',
-  body: 'Bd',
-  arms: 'Ar',
-  waist: 'Ws',
-  legs: 'Lg',
-  feet: 'Ft',
-};
-const EQUIPMENT_ORDER = [
-  'weapon', 'body', 'legs', 'feet',
-  'head', 'arms', 'shield', 'waist',
-];
-const POSITIONS = {
-  hair: [[0, 2]],
-  head: [[0, 3]],
-  arms: [[1, 2], [1, 4]],
-  body: [[1, 3]],
-  waist: [[2, 2], [2, 4]],
-  legs: [[2, 3]],
-  feet: [[3, 2], [3, 4]],
-  weapon: [[1, 0]],
-  shield: [[1, 5]],
-};
 
-function farColumns(inventory, equipment, kind1, kind2) {
-  function label(kind) {
-    const { icon, stats: { A=0, D=0 }={} } = (
-      inventory[kind]?.find(({ id }) => id === equipment[kind]) || {}
-    );
-    return `${ABBREVIATIONS[kind]} ${minifyNumbers(A || D)}`;
-  }
-  return (
-    label(kind1).split('')
-    .concat(
-      ['', '', '', '', '', '', ''],
-      label(kind2).split('')
-    )
-  );
-}
-
-export default function useEquipment(enabled, {
+export default function useDisplayEquipable(enabled, {
   inventory, equipment, equip,
+  slotOrder, slots,
+  spriteLayers,
 
   width, height, keyMap,
 }) {
   const [buffers, setBuffers] = useState(null);
 
-  const { layers: equipmentSpriteLayers } = useSpriteLayers({
-    inventory,
-    equipment,
-    positions: POSITIONS,
-    width: 6,
-    height: 4,
-  });
-
   // Main display
-  const [equipmentLayoutBuffer, setEquipmentLayoutBuffer] = useState(null);
+  const [layoutBuffer, setLayoutBuffer] = useState(null);
 
   // Navigating slots
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -79,20 +31,20 @@ export default function useEquipment(enabled, {
     const keydown = (e) => {
       switch (e.key) {
         case keyMap.up:
-          setSelectedSlot((choice) => (choice + EQUIPMENT_ORDER.length - 1) % EQUIPMENT_ORDER.length);
+          setSelectedSlot((choice) => (choice + slotOrder.length - 1) % slotOrder.length);
           break;
         case keyMap.down:
-          setSelectedSlot((choice) => ((choice === null ? -1 : choice) + 1) % EQUIPMENT_ORDER.length);
+          setSelectedSlot((choice) => ((choice === null ? -1 : choice) + 1) % slotOrder.length);
           break;
         case keyMap.select:
-          setSlotChoice(EQUIPMENT_ORDER[selectedSlot]);
-          const items = inventory[EQUIPMENT_ORDER[selectedSlot]];
+          setSlotChoice(slotOrder[selectedSlot]);
+          const items = inventory[slotOrder[selectedSlot]];
           if (!items) {
             setScrollOffset(0);
             return;
           }
           const currentItem = items.findIndex(
-            ({ id }) => id === equipment[EQUIPMENT_ORDER[selectedSlot]]
+            ({ id }) => id === equipment[slotOrder[selectedSlot]]
           );
           setScrollOffset(currentItem + 1);  // +1 because empty '--' is always prepended
           break;
@@ -102,7 +54,7 @@ export default function useEquipment(enabled, {
     return () => window.removeEventListener('keydown', keydown);
   }, [enabled, slotChoice, selectedSlot, inventory, equipment]);
 
-  // Keybind equipment listing selection
+  // Keybind list picker selection
   useEffect(() => {
     if (!enabled || slotChoice === null) return;
     const keydown = (e) => {
@@ -133,20 +85,23 @@ export default function useEquipment(enabled, {
   }, [enabled, slotChoice, equip, inventory, scrollOffset, equipment]);
 
   // Primary view
-  // Main equipment display, doesn't update unless equipped items change
+  // Main display, doesn't update unless equipped items change
   useEffect(() => {
     if (!enabled || slotChoice !== null) {
-      setEquipmentLayoutBuffer(null);
+      setLayoutBuffer(null);
       return;
     }
-    setEquipmentLayoutBuffer([
-      '', '', '', '',
-      farColumns(inventory, equipment, 'weapon', 'head'),
-      farColumns(inventory, equipment, 'body', 'arms'),
-      farColumns(inventory, equipment, 'legs', 'shield'),
-      farColumns(inventory, equipment, 'feet', 'waist'),
-    ]);
-  }, [enabled, slotChoice, inventory, equipment]);
+
+    const buffer = Array.from({ length: height - 4 }, () => Array(width).fill(''));
+    Object.entries(slots).forEach(([kind, [label, [row, col]]]) => {
+      const item = inventory[kind].find(({ id }) => id === equipment[kind]) || {};
+      const { stats: { A=0, D=0 }={} } = item;
+      const display = `${label} ${minifyNumbers(A || D)}`;
+      buffer[row].splice(col, display.length, ...display.split(''));
+    });
+
+    setLayoutBuffer(['', '', '', '', ...buffer]);
+  }, [enabled, slotChoice, inventory, equipment, width, height]);
 
   // Based on selected slot, create the highlighter buffer
   useEffect(() => {
@@ -154,14 +109,23 @@ export default function useEquipment(enabled, {
       setSelectedSlotBuffer(null);
       return;
     }
-    const buffer = [];
-    buffer.push('', '', '', '');
-    buffer.push(...Array.from({ length: selectedSlot % (EQUIPMENT_ORDER.length / 2) }, () => ''));
-    buffer.push([...Array.from({ length: selectedSlot >= (EQUIPMENT_ORDER.length / 2) ? 11 : 0 }, () => ''),
-      ...ABBREVIATIONS[EQUIPMENT_ORDER[selectedSlot]].split('')
-    ]);
-    setSelectedSlotBuffer(buffer);
-  }, [enabled, selectedSlot]);
+
+    const buffer = Array.from({ length: height - 4 }, () => Array(width).fill(''));
+    slotOrder.forEach((kind, i) => {
+      if (i !== selectedSlot) return;
+      const [label, [row, col]] = slots[kind];
+      const item = inventory[kind].find(({ id }) => id === equipment[kind]) || {};
+      const { stats: { A=0, D=0 }={} } = item;
+      const display = `${label} ${minifyNumbers(A || D)}`;
+      buffer[row].splice(col, display.length, ...display.split(''));
+    });
+
+    //   buffer.push(...Array.from({ length: selectedSlot % (slotOrder.length / 2) }, () => ''));
+    // buffer.push([...Array.from({ length: selectedSlot >= (slotOrder.length / 2) ? 11 : 0 }, () => ''),
+    //   ...abbreviations[slotOrder[selectedSlot]].split('')
+    // ]);
+    setSelectedSlotBuffer(['', '', '', '', ...buffer]);
+  }, [enabled, layoutBuffer, selectedSlot]);
 
   // Secondary view
   // Create equipment scroll buffer
@@ -191,10 +155,10 @@ export default function useEquipment(enabled, {
     }
     if (slotChoice === null) {
       setBuffers([
-        equipmentLayoutBuffer && { fg: '#555', buffer: equipmentLayoutBuffer },
+        layoutBuffer && { fg: '#555', buffer: layoutBuffer },
         selectedSlotBuffer && { bg: '#888', fg: 'black', buffer: selectedSlotBuffer },
         ...(
-          [].concat((equipmentSpriteLayers || []).map(({ fg, buffer }) => ({
+          [].concat((spriteLayers || []).map(({ fg, buffer }) => ({
             fg: fg, buffer: [].concat(['', '', '', ''], buffer.map(
               (line) => [].concat(['', '', '', ''], line)
             ))
@@ -218,8 +182,8 @@ export default function useEquipment(enabled, {
       ].filter(Boolean));
     }
   }, [
-    enabled, equipmentSpriteLayers, slotChoice, scrollOffset, scrollBuffer,
-    scrollSelectionBuffer, equipmentLayoutBuffer, selectedSlotBuffer, inventory,
+    enabled, spriteLayers, slotChoice, scrollOffset, scrollBuffer,
+    scrollSelectionBuffer, layoutBuffer, selectedSlotBuffer, inventory,
   ]);
 
   return buffers;

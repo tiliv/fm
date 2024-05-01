@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import ScreenStack from './ScreenStack';
 import useStats from '../hooks/useStats';
-import useEquipment from '../hooks/useEquipment';
+import useSubDisplayEquip from '../hooks/useSubDisplayEquip';
 import { keyAlias, minifyNumbers } from '../utils';
 
 const TABS_ORDER = ['Equip', 'Magic', 'Log'];
@@ -36,7 +36,7 @@ export default function DisplayStats({
     return () => window.removeEventListener('keydown', keydown);
   }, []);
 
-  const equipmentBuffers = useEquipment(menuChoice === 0, {
+  const equipmentBuffers = useSubDisplayEquip(menuChoice === 0, {
     inventory, equipment, equip,
     width, height, keyMap,
   });
