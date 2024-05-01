@@ -95,7 +95,7 @@ export default function useDisplayEquipable(enabled, {
     const buffer = Array.from({ length: height - 4 }, () => Array(width).fill(''));
     Object.entries(slots).forEach(([kind, [label, [row, col], statType=null]]) => {
       const item = inventory[kind]?.find(({ id }) => id === equipment[kind]) || {};
-      const { stats: { [statType]: stat=null }={} } = item;
+      const { stats: { [statType?statType[0]:null]: stat=null }={} } = item;
       const statValue = statType === null ? '' : stat === null ? '-' : minifyNumbers(stat);
       const display = `${label}${label ? ' ' : ''}${statValue}`;
       buffer[row].splice(col, display.length, ...display.split(''));
@@ -116,7 +116,7 @@ export default function useDisplayEquipable(enabled, {
       if (i !== selectedSlot) return;
       const [label, [row, col], statType=null] = slots[kind];
       const item = inventory[kind]?.find(({ id }) => id === equipment[kind]) || {};
-      const { stats: { [statType]: stat=null }={} } = item;
+      const { stats: { [statType?statType[0]:null]: stat=null }={} } = item;
       const statValue = statType === null ? '' : stat === null ? '-' : minifyNumbers(stat);
       const display = `${label}${label ? ' ' : ''}${statValue}`;
       buffer[row].splice(col, display.length, ...display.split(''));
@@ -135,7 +135,7 @@ export default function useDisplayEquipable(enabled, {
     if (!enabled || !slotChoice) return;
     const list = [
       { id: null, name: '--' }
-    ].concat(inventory[slotChoice]).map(({ id, name }) => {
+    ].concat(inventory[slotChoice] || []).map(({ id, name }) => {
       let label = `  ${name}`;
       if (id === equipment[slotChoice]) {
         label = `*${label.slice(1)}`;
@@ -171,12 +171,9 @@ export default function useDisplayEquipable(enabled, {
         { bg: '#888', fg: 'black', buffer: [
           '', '', '', '',
           `${slotChoice[0].toUpperCase() + slotChoice.slice(1)}:`.padEnd(width - 5, ' ')
-            +
-              (slotChoice === 'weapon' || inventory[slotChoice][scrollOffset - 1]?.stats?.A !== undefined ? (
-                `Atk ${minifyNumbers(inventory[slotChoice][scrollOffset - 1]?.stats?.A || 0)}`
-              ) : (
-                `Def ${minifyNumbers(inventory[slotChoice][scrollOffset - 1]?.stats?.D || 0)}`
-              ))
+            + (slots[slotChoice][2]
+                ? `${slots[slotChoice][2]} ${minifyNumbers(inventory[slotChoice][scrollOffset - 1]?.stats?.[slots[slotChoice][2][0]] || 0)}`
+                : '')
         ]},
         scrollBuffer && { fg: '#c7c7c7', buffer: scrollBuffer },
         scrollSelectionBuffer && { bg: '#aaa', fg: 'black', buffer: scrollSelectionBuffer },
