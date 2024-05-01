@@ -49,7 +49,6 @@ export default function App({
     down: 'ArrowDown',
     left: 'ArrowLeft',
     right: 'ArrowRight',
-    use: 'Enter',
   };
   const menuKeyMap = {
     down: 'j',
