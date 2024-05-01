@@ -132,9 +132,18 @@ export default function DisplayMenu({
                 option.event,
                 { detail: option }
               );
-              setEvents((events) => [...events, event]);
-              useKeyDownRef.current = false;
 
+              // NOTE: setTimeout, window.dispatchEvent, and setState(() => {})
+              // all trigger a double-firing bug because of the outer setState()
+              // function we're operating in.  To preserve the possibility of
+              // multiple events in a keypress, we'll allow the bug to damage
+              // the event queue, but they'll be filtered out in the useEffect()
+              // that dispatches them.  Debouncing does not work.  The bug only
+              // happens once when the optionsViewport changes, and only when
+              // this particular keypress is the first one handled afterward.
+              setEvents((events) => [...events, event]);
+
+              useKeyDownRef.current = false;
               // Bail now if option was event-only
               if (!option.items && !option.text) {
                 return selected;
