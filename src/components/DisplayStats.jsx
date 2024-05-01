@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react';
 import ScreenStack from './ScreenStack';
 import useStats from '../hooks/useStats';
 import useSubDisplayEquip from '../hooks/useSubDisplayEquip';
+import useSubDisplayRings from '../hooks/useSubDisplayRings';
 import { keyAlias, minifyNumbers } from '../utils';
 
-const TABS_ORDER = ['Equip', 'Magic', 'Log'];
+const TABS_ORDER = ['Equip', 'Rings', 'Log'];
 const TABS = Object.fromEntries(TABS_ORDER.map((tab) => [tab.toUpperCase(), tab]));
 
 export default function DisplayStats({
@@ -40,11 +41,14 @@ export default function DisplayStats({
     inventory, equipment, equip,
     width, height, keyMap,
   });
-  const magicBuffers = [{ fg: 'red', buffer: ['', '', '', '', TABS.MAGIC]}];
+  const ringsBuffers = useSubDisplayRings(menuChoice === 1, {
+    inventory, equipment, equip,
+    width, height, keyMap,
+  });
   const logBuffers = [{ fg: 'green', buffer: ['', '', '', '', TABS.LOG]}];
   const lowerBuffers = [
     ...(equipmentBuffers || []),
-    ...(menuChoice === 1 ? magicBuffers : []),
+    ...(ringsBuffers || []),
     ...(menuChoice === 2 ? logBuffers : []),
   ];
 
