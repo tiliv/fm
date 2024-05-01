@@ -28,6 +28,7 @@ export default function DisplayMenu({
   const [textViewport, setTextViewport] = useState(null);
   const [selected, setSelected] = useState(0);
   const useKeyDownRef = useRef(false);
+  const [events, setEvents] = useState([]);
 
   const _viewportHeight = height - menus.length;
   const _page = Math.floor(selected / _viewportHeight);
@@ -131,7 +132,7 @@ export default function DisplayMenu({
                 option.event,
                 { detail: option }
               );
-              setTimeout((event) => window.dispatchEvent(event), 0, event);
+              setEvents((events) => [...events, event]);
               useKeyDownRef.current = false;
 
               // Bail now if option was event-only
@@ -202,6 +203,20 @@ export default function DisplayMenu({
     window.addEventListener('keydown', keyHandler);
     return () => window.removeEventListener('keydown', keyHandler);
   }, [textViewport, width, _viewportHeight]);
+
+  // Dispatch events, avoiding the rapid duplication bug on first keypress in a
+  // new optionsViewport.
+  useEffect(() => {
+    if (!events.length) return;
+    const handled = [];
+    events.forEach((event) => {
+      const repr = `${event.type}:${JSON.stringify(event.detail)}`;
+      if (handled.includes(repr)) return;
+      handled.push(repr);
+      window.dispatchEvent(event);
+    });
+    setEvents([]);
+  }, [events]);
 
   return (
     <ScreenStack
