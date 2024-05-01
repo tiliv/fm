@@ -124,17 +124,13 @@ export default function DisplayMenu({
           setSelected((selected) => {
             const option = options[selected];
             if (option.event) {
-              const _selected = isNaN(menus[0].selected) ? selected : menus[0].selected;
-              const topOption = menus[0].items[_selected];
-              const eventNames = { Load: 'load' };
               const event = new CustomEvent(
-                eventNames[topOption.name] || topOption.name,
+                option.event,
                 { detail: option }
               );
               setTimeout((event) => window.dispatchEvent(event), 0, event);
 
-              // Bail now if nothing to display
-              // (I don't think this is in use yet)
+              // Bail now if option was event-only
               if (!option.items && !option.text) {
                 return selected;
               }

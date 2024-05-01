@@ -60,7 +60,7 @@ export function parseInteraction(interaction, dataFileText, { name, inventory })
   if (theirInventory.length > 0) {
     actions[ACTIONS.BUY] = {
       name: ACTIONS.BUY,
-      items: theirInventory.map((item) => ({ ...item, buyer: 'player', event: 'Buy' })),
+      items: theirInventory.map((item) => ({ ...item, event: 'Buy.player' })),
       text: null,
     };
   }

@@ -30,43 +30,23 @@ export default function useInventory(subject, {
     [`${subject}/equipment`]: [equipment, setEquipment],
   });
 
-  // // Sync with existing
-  // useEffect(() => {
-  //   // Respond to 'sync-inventory' when softId doesn't match ours
-  //   const get = function({ detail, id }) {
-  //     if (subject !== detail || softId === id) return;  // ignore off topic and self
-  //     const reply = new CustomEvent('set-inventory', { detail, id, inventory, equipment });
-  //     window.dispatchEvent(reply);
-  //   };
-  //   const set = function({ detail, id, inventory, equipment }) {
-  //     if (subject !== detail || softId !== id) return;  // ignore off topic and others
-  //     setInventory(inventory);
-  //     setEquipment(equipment);
-  //   };
-  //   window.addEventListener('get-inventory', get);
-  //   window.addEventListener('set-inventory', set);
-
-  //   const event = new CustomEvent('get-inventory', { detail: subject, id: softId });
-  //   window.dispatchEvent(event);
-  // }, [subject]);
-
   // Respond to 'Buy' event
   useEffect(() => {
-    const buy = function({ detail: { buyer, kind, ...item } }) {
-      if (subject !== buyer) return;
-      const acquire = new CustomEvent('Acquire', { detail: { recipient: subject, kind, item } });
-      // console.log(subject, 'Buy', item);
-      window.dispatchEvent(acquire);
+    const eventName = `Buy.${subject}`;
+    const buy = function({ detail: { kind, ...item } }) {
+      setTimeout(() => {
+        const acquire = new CustomEvent(`Acquire.${subject}`, { detail: { kind, item } });
+        window.dispatchEvent(acquire);
+      }, 0);
     };
-    window.addEventListener('Buy', buy);
-    return () => window.removeEventListener('Buy', buy);
+    window.addEventListener(eventName, buy);
+    return () => window.removeEventListener(eventName, buy);
   }, [subject]);
 
   // Respond to 'Acquire' event, either chained from a 'Buy' or triggered directly
   useEffect(() => {
-    const acquire = function({ detail: { recipient, kind, item } }) {
-      if (subject !== recipient) return;
-      // console.log(recipient, 'Acquire', item);
+    const eventName = `Acquire.${subject}`;
+    const acquire = function({ detail: { kind, item } }) {
       setInventory((inventory) => {
         const maxId = inventory[kind].reduce(
           (max, { id }) => Math.max(max, id),
@@ -78,29 +58,28 @@ export default function useInventory(subject, {
         }
       });
     }
-    window.addEventListener('Acquire', acquire);
-    return () => window.removeEventListener('Acquire', acquire);
+    window.addEventListener(eventName, acquire);
+    return () => window.removeEventListener(eventName, acquire);
   }, [subject]);
 
   // Respond to 'Equip' event
   useEffect(() => {
-    const handler = function({ detail: { holder, kind, id } }) {
-      if (subject !== holder) return;
-      // console.log(holder, 'Equip', kind, id);
+    const eventName = `Equip.${subject}`;
+    const handler = function({ detail: { kind, id } }) {
       setEquipment((equipment) => ({ ...equipment, [kind]: id }));
     };
-    window.addEventListener('Equip', handler);
-    return () => window.removeEventListener('Equip', handler);
+    window.addEventListener(eventName, handler);
+    return () => window.removeEventListener(eventName, handler);
   }, [subject]);
 
   // Convenience triggers
   const equip = function(kind, id) {
-    const equip = new CustomEvent('Equip', { detail: { holder: subject, kind, id } });
+    const equip = new CustomEvent(`Equip.${subject}`, { detail: { kind, id } });
     window.dispatchEvent(equip);
   };
 
   const acquire = function(kind, item) {
-    const acquire = new CustomEvent('Acquire', { detail: { recipient: subject, kind, item } });
+    const acquire = new CustomEvent(`Acquire.${subject}`, { detail: { kind, item } });
     window.dispatchEvent(acquire);
   }
 
