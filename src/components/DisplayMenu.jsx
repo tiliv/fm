@@ -164,7 +164,7 @@ export default function DisplayMenu({
     };
     window.addEventListener('keydown', keyHandler);
     return () => window.removeEventListener('keydown', keyHandler);
-  }, [options, width, _viewportHeight]);
+  }, [options, _viewportHeight]);
 
   // Key release handler for Use key
   useEffect(() => {
