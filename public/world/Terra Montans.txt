@@ -45,7 +45,7 @@
 ㅠ:table
 ---
 22,36=1,1:Debugger/debug.txt
-21,42:Shopkeeper/jacynthe.txt,$weapon/magicstaff/2/Arcane Staff/3,$weapon/spear/1/Mighty Spear/2,$weapon/whip/0/Whip/3,$weapon/flail/0/Flail/6,$body/bandit/3/Bandit's coat/2,$body/loose/0/Loose shirt/1,$feet/boots/2/Boots/2,$feet/dainty/0/Dainty shoes/1,$head/hat/2/Hat/0,$head/helmet/2/Iron helmet/2,$head/warm/1/Warm hat/0,$legs/longskirt/0/Battle skirt/2,$legs/shorts/0/Tattered shorts/0,$shield/board/1/Driftwood/2,$waist/bag/1/Side bag/0
+21,42:Shopkeeper/jacynthe.txt,$ring/fire/2/Magmatic Stone/3,$weapon/magicstaff/2/Arcane Staff/3,$weapon/spear/1/Mighty Spear/2,$weapon/whip/0/Whip/3,$weapon/flail/0/Flail/6,$body/bandit/3/Bandit's coat/2,$body/loose/0/Loose shirt/1,$feet/boots/2/Boots/2,$feet/dainty/0/Dainty shoes/1,$head/hat/2/Hat/0,$head/helmet/2/Iron helmet/2,$head/warm/1/Warm hat/0,$legs/longskirt/0/Battle skirt/2,$legs/shorts/0/Tattered shorts/0,$shield/board/1/Driftwood/2,$waist/bag/1/Side bag/0
 21,38:Bard/bard.txt
 23,38=25,36:Room 1#key=1
 25,36=23,38:Tavern
