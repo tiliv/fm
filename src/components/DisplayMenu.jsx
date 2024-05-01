@@ -149,6 +149,7 @@ export default function DisplayMenu({
             });
             return 0;
           });
+          break;
         default:
           if (e.key.length === 1) {
             const number = !isNaN(e.key);
