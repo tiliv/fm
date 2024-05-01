@@ -8,7 +8,12 @@ const RARITY_COLORS = [
   '#f0f',
 ];
 
-export default function useSpriteLayers({ inventory, equipment, positions, width=6, height=4 }) {
+export default function useSpriteLayers({
+  inventory, equipment, positions,
+  mapKind=null,
+  offsetLeft=0,
+  width, height,  // local width/height, not screen size
+}) {
   const inventoryRef = useRef(inventory);
   const [sprites, setSprites] = useState({});
   const [layers, setLayers] = useState(null);
@@ -20,8 +25,14 @@ export default function useSpriteLayers({ inventory, equipment, positions, width
   useEffect(() => {
     const promises = Object.keys(positions).map((kind) => {
       const id = equipment[kind];
-      const item = inventoryRef.current[kind]?.find((item) => item.id === id);
-      return loadSprite(kind, item || {}, ...positions[kind])
+      const item = inventoryRef.current[kind]?.find((item) => item.id === id) || {};
+      const loadKind = mapKind ? mapKind(kind) : kind;
+      return loadSprite(
+        loadKind,
+        { ...item, kind },
+        { offsetLeft, width, height },
+        ...positions[kind]
+      );
     });
     Promise.all(promises).then((sprites) => {
       const spritesByKind = Object.fromEntries(sprites.map((sprite) => {
@@ -29,7 +40,7 @@ export default function useSpriteLayers({ inventory, equipment, positions, width
       }));
       setSprites(spritesByKind);
     });
-  }, [equipment, positions]);
+  }, [equipment, positions, offsetLeft, width, height]);
 
   // Flatten buffers into a single buffer per rarity
   useEffect(() => {
@@ -59,13 +70,13 @@ export default function useSpriteLayers({ inventory, equipment, positions, width
   };
 }
 
-async function loadSprite(kind, item, ...positions) {
+async function loadSprite(kind, item, { offsetLeft=0, width, height }, ...positions) {
   const { template='none', rarity=0, name='--' } = item;
   const [[row, col], secondPosition=null] = positions;
   return await fetch(`equipment/${kind}/${template}.txt`)
     .then((res) => res.text())
     .then((text) => {
-      const buffer = Array.from({ length: 4 }, () => Array(6).fill(' '));
+      const buffer = Array.from({ length: height }, () => Array(offsetLeft + width).fill(' '));
       const [graphics, stats] = text.trim().split('---');
       const lines = graphics.split('\n');
       let icon = null;
@@ -75,19 +86,19 @@ async function loadSprite(kind, item, ...positions) {
         if (!secondPosition || !sprites.includes(',')) {
           sprites = sprites.split('');
           sprites.forEach((char, i) => {
-            buffer[row + offset][col + i] = char;
+            buffer[row + offset][col + i + offsetLeft] = char;
           });
         } else if (sprites.includes(',')) {
           sprites = sprites.split(',', 2);
-          buffer[row + offset][col] = sprites[0];
-          buffer[secondPosition[0] + offset][secondPosition[1]] = sprites[1];
+          buffer[row + offset][col + offsetLeft] = sprites[0];
+          buffer[secondPosition[0] + offset][secondPosition[1] + offsetLeft] = sprites[1];
         }
         if (!icon) {
           icon = sprites.join('').trim()[0];
         }
     });
       const data = {
-        ...item, kind, template, rarity, name, buffer, icon,
+        ...item, template, rarity, name, buffer, icon,
       };
       stats && stats.split('\n').forEach((line) => {
         const [stat, value] = line.split(':');
