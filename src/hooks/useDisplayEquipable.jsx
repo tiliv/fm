@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 
 import { minifyNumbers, bufferizeList } from '../utils';
 
+const MAP_KIND_SAME = (kind) => kind;
 
 export default function useDisplayEquipable(enabled, {
   inventory, equipment, equip,
@@ -9,6 +10,7 @@ export default function useDisplayEquipable(enabled, {
   spriteLayers,
 
   width, height, keyMap,
+  mapKind=MAP_KIND_SAME,
 }) {
   const [buffers, setBuffers] = useState(null);
 
@@ -37,14 +39,15 @@ export default function useDisplayEquipable(enabled, {
           setSelectedSlot((choice) => ((choice === null ? -1 : choice) + 1) % slotOrder.length);
           break;
         case keyMap.select:
+          if (selectedSlot === null) return;
           setSlotChoice(slotOrder[selectedSlot]);
-          const items = inventory[slotOrder[selectedSlot]];
+          const items = inventory[mapKind(slotOrder[selectedSlot])];
           if (!items) {
             setScrollOffset(0);
             return;
           }
           const currentItem = items.findIndex(
-            ({ id }) => id === equipment[slotOrder[selectedSlot]]
+            ({ id }) => id === equipment[mapKind(slotOrder[selectedSlot])]
           );
           setScrollOffset(currentItem + 1);  // +1 because empty '--' is always prepended
           break;
@@ -52,7 +55,7 @@ export default function useDisplayEquipable(enabled, {
     }
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [enabled, slotChoice, selectedSlot, inventory, equipment]);
+  }, [enabled, slotChoice, mapKind, selectedSlot, inventory, equipment]);
 
   // Keybind list picker selection
   useEffect(() => {
@@ -67,12 +70,14 @@ export default function useDisplayEquipable(enabled, {
           break;
         case keyMap.down:
           setScrollOffset((offset) => {
-            if (offset >= (inventory[slotChoice] || []).length) return offset;
+            if (offset >= (inventory[mapKind(slotChoice)] || []).length) {
+              return offset;
+            }
             return offset + 1;
           });
           break;
         case keyMap.select:
-          equip(slotChoice, inventory[slotChoice][scrollOffset - 1]?.id || null);
+          equip(slotChoice, inventory[mapKind(slotChoice)]?.[scrollOffset - 1]?.id || null);
           setSlotChoice(null);
           break;
         case keyMap.cancel:
@@ -82,7 +87,7 @@ export default function useDisplayEquipable(enabled, {
     }
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [enabled, slotChoice, equip, inventory, scrollOffset, equipment]);
+  }, [enabled, slotChoice, mapKind, equip, inventory, scrollOffset, equipment]);
 
   // Primary view
   // Main display, doesn't update unless equipped items change
@@ -122,10 +127,6 @@ export default function useDisplayEquipable(enabled, {
       buffer[row].splice(col, display.length, ...display.split(''));
     });
 
-    //   buffer.push(...Array.from({ length: selectedSlot % (slotOrder.length / 2) }, () => ''));
-    // buffer.push([...Array.from({ length: selectedSlot >= (slotOrder.length / 2) ? 11 : 0 }, () => ''),
-    //   ...abbreviations[slotOrder[selectedSlot]].split('')
-    // ]);
     setSelectedSlotBuffer(['', '', '', '', ...buffer]);
   }, [enabled, layoutBuffer, selectedSlot]);
 
@@ -135,7 +136,7 @@ export default function useDisplayEquipable(enabled, {
     if (!enabled || !slotChoice) return;
     const list = [
       { id: null, name: '--' }
-    ].concat(inventory[slotChoice] || []).map(({ id, name }) => {
+    ].concat(inventory[mapKind(slotChoice)] || []).map(({ id, name }) => {
       let label = `  ${name}`;
       if (id === equipment[slotChoice]) {
         label = `*${label.slice(1)}`;
@@ -148,7 +149,7 @@ export default function useDisplayEquipable(enabled, {
     setScrollSelectionBuffer(buffer.map(
       (line, i) => i === 6 ? line : ''
     ));
-  }, [enabled, slotChoice, scrollOffset, inventory, equipment, height, width]);
+  }, [enabled, slotChoice, mapKind, scrollOffset, inventory, equipment, height, width]);
 
   // Store active view
   useEffect(() => {
@@ -167,13 +168,18 @@ export default function useDisplayEquipable(enabled, {
         ))
       ].filter(Boolean));
     } else {
+      const name = slotChoice[0].toUpperCase() + slotChoice.slice(1);
+      const statType = slots[slotChoice][2];  // possibly null
+      const statAbbr = statType ? statType[0] : null;
+      const kindList = inventory[mapKind(slotChoice)];
+      const itemInfo = statType
+        ? `${statType} ${minifyNumbers(kindList[scrollOffset - 1]?.stats?.[statAbbr] || 0)}`
+        : '     '
+        ;
       setBuffers([
         { bg: '#888', fg: 'black', buffer: [
           '', '', '', '',
-          `${slotChoice[0].toUpperCase() + slotChoice.slice(1)}:`.padEnd(width - 5, ' ')
-            + (slots[slotChoice][2]
-                ? `${slots[slotChoice][2]} ${minifyNumbers(inventory[slotChoice][scrollOffset - 1]?.stats?.[slots[slotChoice][2][0]] || 0)}`
-                : '')
+          `${name}:`.padEnd(width - 5, ' ') + itemInfo,
         ]},
         scrollBuffer && { fg: '#c7c7c7', buffer: scrollBuffer },
         scrollSelectionBuffer && { bg: '#aaa', fg: 'black', buffer: scrollSelectionBuffer },
