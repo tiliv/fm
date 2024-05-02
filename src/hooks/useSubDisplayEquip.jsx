@@ -25,17 +25,17 @@ export default function useSubDisplayEquip(enabled, {
   width, height, keyMap,
 }) {
   const slots = useMemo(() => ({
-    weapon: ["Wp", [0, 0], 'Atk'],
-    body: ["Bd", [1, 0], 'Def'],
-    legs: ["Lg", [2, 0], 'Def'],
-    feet: ["Ft", [3, 0], 'Def'],
-    head: ["Hd", [0, width - 4], 'Def'],
-    arms: ["Ar", [1, width - 4], 'Def'],
-    shield: ["Sh", [2, width - 4], 'Def'],
-    waist: ["Ws", [3, width - 4], 'Def'],
+    weapon: ["Wp ", [0, 0], 'Atk'],
+    body: ["Bd ", [1, 0], 'Def'],
+    legs: ["Lg ", [2, 0], 'Def'],
+    feet: ["Ft ", [3, 0], 'Def'],
+    head: ["Hd ", [0, width - 4], 'Def'],
+    arms: ["Ar ", [1, width - 4], 'Def'],
+    shield: ["Sh ", [2, width - 4], 'Def'],
+    waist: ["Ws ", [3, width - 4], 'Def'],
   }), [width]);
 
-  const { layers } = useSpriteLayers({
+  const { sprites, layers } = useSpriteLayers({
     inventory,
     equipment,
     positions: SPRITE_POSITIONS,
@@ -48,6 +48,7 @@ export default function useSubDisplayEquip(enabled, {
     width, height, keyMap,
 
     inventory, equipment, equip,
+    sprites,
     spriteLayers: layers,
     slotOrder: SLOT_ORDER,
     slots,

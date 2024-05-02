@@ -38,7 +38,7 @@ export default function useSubDisplayRings(enabled, {
 
   width, height, keyMap,
 }) {
-  const { layers } = useSpriteLayers({
+  const { sprites, layers } = useSpriteLayers({
     inventory,
     equipment,
     positions: SPRITE_POSITIONS,
@@ -51,6 +51,7 @@ export default function useSubDisplayRings(enabled, {
     width, height, keyMap,
 
     inventory, equipment, equip,
+    sprites,
     spriteLayers: layers,
     slotOrder: SLOT_ORDER,
     slots: SLOTS,

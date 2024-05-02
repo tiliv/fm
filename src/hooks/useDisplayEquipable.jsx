@@ -7,7 +7,7 @@ const MAP_KIND_SAME = (kind) => kind;
 export default function useDisplayEquipable(enabled, {
   inventory, equipment, equip,
   slotOrder, slots,
-  spriteLayers,
+  sprites, spriteLayers,
 
   width, height, keyMap,
   mapKind=MAP_KIND_SAME,
@@ -102,7 +102,7 @@ export default function useDisplayEquipable(enabled, {
       const item = inventory[kind]?.find(({ id }) => id === equipment[kind]) || {};
       const { stats: { [statType?statType[0]:null]: stat=null }={} } = item;
       const statValue = statType === null ? '' : stat === null ? '-' : minifyNumbers(stat);
-      const display = `${label}${label ? ' ' : ''}${statValue}`;
+      const display = `${label}${statValue}`;
       buffer[row].splice(col, display.length, ...display.split(''));
     });
 
@@ -111,7 +111,7 @@ export default function useDisplayEquipable(enabled, {
 
   // Based on selected slot, create the highlighter buffer
   useEffect(() => {
-    if (!enabled || selectedSlot === null) {
+    if (!enabled || selectedSlot === null || layoutBuffer === null) {
       setSelectedSlotBuffer(null);
       return;
     }
@@ -120,15 +120,22 @@ export default function useDisplayEquipable(enabled, {
     slotOrder.forEach((kind, i) => {
       if (i !== selectedSlot) return;
       const [label, [row, col], statType=null] = slots[kind];
-      const item = inventory[kind]?.find(({ id }) => id === equipment[kind]) || {};
-      const { stats: { [statType?statType[0]:null]: stat=null }={} } = item;
-      const statValue = statType === null ? '' : stat === null ? '-' : minifyNumbers(stat);
-      const display = `${label}${label ? ' ' : ''}${statValue}`;
-      buffer[row].splice(col, display.length, ...display.split(''));
+
+      // Copy the layoutBuffer at the same [row, col].  This one will be displayed
+      // above it, appearing to invert the colors.
+      const w = label.length + (statType ? 1 : 0);
+      buffer[row].splice(col, w, ...layoutBuffer[4 + row].slice(col, col + w));
+      sprites[kind]?.buffer.forEach((line, y) => {
+        line.forEach((char, x) => {
+          if (char !== ' ') {
+            buffer[y][x] = char;
+          }
+        });
+      });
     });
 
     setSelectedSlotBuffer(['', '', '', '', ...buffer]);
-  }, [enabled, layoutBuffer, selectedSlot]);
+  }, [enabled, sprites, layoutBuffer, selectedSlot]);
 
   // Secondary view
   // Create equipment scroll buffer
@@ -160,7 +167,7 @@ export default function useDisplayEquipable(enabled, {
     if (slotChoice === null) {
       setBuffers([
         layoutBuffer && { fg: '#555', buffer: layoutBuffer },
-        selectedSlotBuffer && { bg: '#888', fg: 'black', buffer: selectedSlotBuffer },
+        selectedSlotBuffer && { bg: '#555', fg: 'black', buffer: selectedSlotBuffer },
         ...(
           [].concat((spriteLayers || []).map(({ fg, buffer }) => ({
             fg: fg, buffer: [].concat(['', '', '', ''], buffer)
