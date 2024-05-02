@@ -27,7 +27,7 @@ export default function useSpriteLayers({
   useEffect(() => {
     const promises = Object.keys(positions).map((kind) => {
       const id = equipment[kind];
-      const item = inventoryRef.current[kind]?.find((item) => item.id === id) || {};
+      const item = inventoryRef.current[mapKind(kind)]?.find((item) => item.id === id) || {};
       const loadKind = mapKind(kind);
       return loadSprite(
         loadKind,
