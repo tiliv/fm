@@ -12,14 +12,14 @@ const SLOT_ORDER = [
   'ring4b',
 ];
 const SLOTS = {
-  ring1a: [" ", [0, 0]],
-  ring1b: [" ", [0, 2]],
-  ring2a: [" ", [1, 0]],
-  ring2b: [" ", [1, 2]],
-  ring3a: [" ", [2, 0]],
-  ring3b: [" ", [2, 2]],
-  ring4a: [" ", [3, 0]],
-  ring4b: [" ", [3, 2]],
+  ring1a: ["", [0, 0]],
+  ring1b: ["", [0, 2]],
+  ring2a: ["", [1, 0]],
+  ring2b: ["", [1, 2]],
+  ring3a: ["", [2, 0]],
+  ring3b: ["", [2, 2]],
+  ring4a: ["", [3, 0]],
+  ring4b: ["", [3, 2]],
 };
 const SPRITE_POSITIONS = {
   ring1a: [[0, 0]],
