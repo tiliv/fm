@@ -9,6 +9,7 @@ const OPTION_KEYS = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 export default function DisplayMenu({
   target,
+  inventory,
 
   width, height, magnification=1,
   keyMap={
@@ -29,11 +30,16 @@ export default function DisplayMenu({
   const [selected, setSelected] = useState(0);
   const [info, setInfo] = useState(null);
   const [events, setEvents] = useState([]);
+  const _inventory = useRef(inventory);
   const useKeyDownRef = useRef(false);
 
   const _viewportHeight = height - menus.length;
   const _page = Math.floor(selected / _viewportHeight);
   const _offset = _page * _viewportHeight;
+
+  useEffect(() => {
+    _inventory.current = inventory;
+  }, [inventory]);
 
   // Set fresh menu on target change
   useEffect(() => {
@@ -63,10 +69,12 @@ export default function DisplayMenu({
 
   // Set options to current menu
   useEffect(() => {
-    const { items=null, text=null } = menus[menus.length - 1] || {};
-    setOptions(items);
+    const { filter=null, items=null, text=null } = menus[menus.length - 1] || {};
+    setOptions(items ? items.filter(
+      (item) => filter ? filter(({ item, inventory: _inventory.current })) : true
+    ) : null);
     setText(text);
-  }, [menus.length, menus[0], width, _viewportHeight]);
+  }, [events, menus.length, menus[0], width, _viewportHeight]);
 
   // Set optionsViewport to current menu page
   useEffect(() => {
@@ -153,9 +161,8 @@ export default function DisplayMenu({
             setMenus((menus) => {
               menus[menus.length - 1].selected = selected;
               return [...menus, {
+                ...option,
                 title: `${OPTION_KEYS[selected]}:${option.name}`,
-                items: option.items,
-                text: option.text,
               }];
             });
             return 0;
@@ -230,11 +237,12 @@ export default function DisplayMenu({
 
   // Update info label for current menu
   useEffect(() => {
-    if (!options) {
+    if (!options || !options.length) {
       setInfo(null);
       return;
     }
-    const { stats: { A, D }={} } = options[selected];
+    const { stats } = options[selected];
+    const { A, D } = stats || {};
     if (A !== undefined) {
       setInfo(`Atk ${minifyNumbers(A)}`);
     } else if (D !== undefined) {

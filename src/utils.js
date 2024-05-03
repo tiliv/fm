@@ -35,6 +35,7 @@ export function parseInteraction(interaction, dataFileText, { name, inventory })
   if (actions[ACTIONS.BUY] !== undefined) {
     Object.assign(actions[ACTIONS.BUY], {
       items: Buy.parse(actions[ACTIONS.BUY]),
+      filter: ({ item, inventory }) => !inventory[item.kind]?.find(({ name }) => name === item.name),
       text: null,
     });
   }
