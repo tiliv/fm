@@ -27,8 +27,9 @@ export default function DisplayMenu({
   const [text, setText] = useState(null);
   const [textViewport, setTextViewport] = useState(null);
   const [selected, setSelected] = useState(0);
-  const useKeyDownRef = useRef(false);
+  const [info, setInfo] = useState(null);
   const [events, setEvents] = useState([]);
+  const useKeyDownRef = useRef(false);
 
   const _viewportHeight = height - menus.length;
   const _page = Math.floor(selected / _viewportHeight);
@@ -227,6 +228,22 @@ export default function DisplayMenu({
     setEvents([]);
   }, [events]);
 
+  // Update info label for current menu
+  useEffect(() => {
+    if (!options) {
+      setInfo(null);
+      return;
+    }
+    const { stats: { A, D }={} } = options[selected];
+    if (A !== undefined) {
+      setInfo(`Atk ${minifyNumbers(A)}`);
+    } else if (D !== undefined) {
+      setInfo(`Def ${minifyNumbers(D)}`);
+    } else {
+      setInfo(null);
+    }
+  }, [options, selected]);
+
   return (
     <ScreenStack
       gutter="#c7c7c7"
@@ -240,7 +257,13 @@ export default function DisplayMenu({
         `(${keyMap.cancel}) to end`,
       ].join('')}
       buffers={[
-        { bg: 'black', fg: '#c7c7c7', buffer: menus.map((menu) => menu.title) },
+        { bg: 'black', fg: '#c7c7c7', buffer: menus.map(
+          (menu, i) => (
+            info === null || i < menus.length - 1 ? menu.title : (
+              [...menu.title, ...Array(Math.max(0, width - menu.title.length - info.length)).fill(''), ...info]
+            )
+          )
+        )},
         (menus.length && optionsViewport) && { bg: '#c7c7c7', fg: 'black', buffer: [
           ...(' '.repeat(menus.length - 1).split(' ')),
           ...optionsViewport.map(
