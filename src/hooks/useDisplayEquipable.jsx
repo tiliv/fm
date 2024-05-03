@@ -51,6 +51,9 @@ export default function useDisplayEquipable(enabled, {
           );
           setScrollOffset(currentItem + 1);  // +1 because empty '--' is always prepended
           break;
+        case keyMap.cancel:
+          setSelectedSlot(null);
+          break;
       }
     }
     window.addEventListener('keydown', keydown);
