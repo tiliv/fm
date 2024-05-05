@@ -33,7 +33,7 @@ export default function DisplayMenu({
   const _inventory = useRef(inventory);
   const useKeyDownRef = useRef(false);
 
-  const _viewportHeight = height - menus.length;
+  const _viewportHeight = height - menus.length - (info ? 1 : 0);
   const _page = Math.floor(selected / _viewportHeight);
   const _offset = _page * _viewportHeight;
 
@@ -83,6 +83,7 @@ export default function DisplayMenu({
       setOptionsViewport(null);
       return;
     }
+    const reservedRow = (options[0]?.stats !== undefined) ? 1 : 0;
     setOptionsViewport(options.slice(_offset, _offset + _viewportHeight));
   }, [options, _viewportHeight, _offset]);
 
@@ -273,13 +274,7 @@ export default function DisplayMenu({
         `(${keyMap.cancel}) to end`,
       ].join('')}
       buffers={[
-        { bg: 'black', fg: '#c7c7c7', buffer: menus.map(
-          (menu, i) => (
-            info === null || i < menus.length - 1 ? menu.title : (
-              [...menu.title, ...Array(Math.max(0, width - menu.title.length - info.length)).fill(''), ...info]
-            )
-          )
-        )},
+        { bg: 'black', fg: '#c7c7c7', buffer: menus.map(({ title }) => title)},
         (menus.length && optionsViewport) && { bg: '#c7c7c7', fg: 'black', buffer: [
           ...(' '.repeat(menus.length - 1).split(' ')),
           ...optionsViewport.map(
@@ -291,6 +286,11 @@ export default function DisplayMenu({
           ...optionsViewport.map(
             (_, i) => selected === _offset + i ? `${OPTION_KEYS[_offset + i]}:` : ''
           ),
+
+        ]},
+        (menus.length && info) && { bg: 'black', fg: '#c7c7c7', buffer: [
+          ...(' '.repeat(height - 2).split(' ')),
+          info,
         ]},
         (menus.length && textViewport) && { fg: 'black', buffer: textViewport}
       ].filter(Boolean)}
