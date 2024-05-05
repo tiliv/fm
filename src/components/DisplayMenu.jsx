@@ -83,7 +83,6 @@ export default function DisplayMenu({
       setOptionsViewport(null);
       return;
     }
-    const reservedRow = (options[0]?.stats !== undefined) ? 1 : 0;
     setOptionsViewport(options.slice(_offset, _offset + _viewportHeight));
   }, [options, _viewportHeight, _offset]);
 
