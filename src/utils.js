@@ -33,9 +33,16 @@ export function parseInteraction(interaction, dataFileText, { name, inventory })
     };
   });
   if (actions[ACTIONS.BUY] !== undefined) {
+    const { text: textBuy } = actions[ACTIONS.BUY];
     Object.assign(actions[ACTIONS.BUY], {
-      items: Buy.parse(actions[ACTIONS.BUY]),
-      filter: ({ item, inventory }) => !inventory[item.kind]?.find(({ name }) => name === item.name),
+      items: ({ inventory }) => Buy.parse({ text: textBuy }, { inventory }),
+      text: null,
+    });
+  }
+  if (actions[ACTIONS.SELL] !== undefined) {
+    const { text: textSell } = actions[ACTIONS.SELL];
+    Object.assign(actions[ACTIONS.SELL], {
+      items: ({ inventory }) => Sell.parse({ text: textSell }, { inventory }),
       text: null,
     });
   }
@@ -45,12 +52,6 @@ export function parseInteraction(interaction, dataFileText, { name, inventory })
   if (actions.Load !== undefined) {
     Object.assign(actions.Load, {
       items: Load.list().map((slot) => ({ slot, name: slot, event: 'Load' })),
-      text: null,
-    });
-  }
-  if (actions.Sell !== undefined) {
-    Object.assign(actions.Sell, {
-      items: Sell.parse(actions.Sell, { interaction, inventory }),
       text: null,
     });
   }

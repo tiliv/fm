@@ -69,12 +69,13 @@ export default function DisplayMenu({
 
   // Set options to current menu
   useEffect(() => {
-    const { filter=null, items=null, text=null } = menus[menus.length - 1] || {};
-    setOptions(items ? items.filter(
-      (item) => filter ? filter(({ item, inventory: _inventory.current })) : true
-    ) : null);
+    const { items=null, text=null, selected } = menus[menus.length - 1] || {};
+    setOptions(typeof items === 'function' ? items({ inventory: _inventory.current }) : items);
     setText(text);
-  }, [events, menus.length, menus[0], width, _viewportHeight]);
+    if (selected !== undefined) {
+      setSelected(selected);
+    }
+  }, [menus.length, menus[0], width, _viewportHeight]);
 
   // Set optionsViewport to current menu page
   useEffect(() => {
@@ -135,7 +136,7 @@ export default function DisplayMenu({
           if (useKeyDownRef.current) return;
           setSelected((selected) => {
             useKeyDownRef.current = true;
-            const option = options[selected];
+            const option = options[selected] || {};
             if (option.event) {
               const event = new CustomEvent(
                 option.event,
@@ -153,6 +154,13 @@ export default function DisplayMenu({
               setEvents((events) => [...events, event]);
 
               useKeyDownRef.current = false;
+
+              if (option.consume) {
+                setOptions((options) => {
+                  return options.filter((o) => o !== option);
+                });
+              }
+
               // Bail now if option was event-only
               if (!option.items && !option.text) {
                 return selected;
@@ -241,7 +249,7 @@ export default function DisplayMenu({
       setInfo(null);
       return;
     }
-    const { stats } = options[selected];
+    const { stats } = options[selected] || {};
     const { A, D } = stats || {};
     if (A !== undefined) {
       setInfo(`Atk ${minifyNumbers(A)}`);

@@ -9,10 +9,24 @@ export const EQUIPMENT = {
   waist: "Waist gear",
 }
 
-export function parse({ text }, { interaction, inventory }) {
+export function parse({ text }, { inventory }) {
   return text.split(',').map((kind) => {
     if (EQUIPMENT[kind] !== undefined) {
-      return { name: EQUIPMENT[kind], items: inventory[kind] || [] };
+      return {
+        name: EQUIPMENT[kind],
+        items: (inventory[kind] || []).map((item) => {
+          const price = item.rarity * Object.values(item.stats || {}).reduce((a, b) => a + b, 0);
+          return {
+            name: item.name,
+            stats: item.stats,
+            item,
+            kind,
+            price,
+            event: `Sell.player`,
+            consume: true,
+          }
+        }),
+      };
     }
     return { name: kind };
   });

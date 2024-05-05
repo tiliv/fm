@@ -1,14 +1,25 @@
-export function parse({ text }) {
+export function parse({ text }, { inventory }) {
   return text.split('\n').map((item) => {
     const [kind, template, rarity, name, stat, id=null] = item.split('/');
+    if (inventory[kind]?.find((item) => item.name === name)) {
+      return null;
+    }
+    const statValue = parseInt(stat, 10);
+    const stats = { [kind === 'weapon' ? 'A' : 'D']: statValue };
     return {
       name,
       kind,
       template,
       event: 'Buy.player',
-      id: id !== null ? parseInt(id, 10) : null,
-      rarity: parseInt(rarity, 10),
-      stats: { [kind === 'weapon' ? 'A' : 'D']: parseInt(stat, 10) },
+      price: (rarity + 1) * statValue,
+      consume: true,
+      stats,
+      item: {
+        name,
+        id: id !== null ? parseInt(id, 10) : null,
+        rarity: parseInt(rarity, 10),
+        stats,
+      },
     };
-  });
+  }).filter(Boolean);
 };
