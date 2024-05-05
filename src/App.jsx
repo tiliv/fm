@@ -34,7 +34,7 @@ export default function App({
   const [startY, setStartY] = useState(beginY);
 
   const [interaction, setInteraction] = useState(null);
-  const { inventory, equipment, equip, acquire } = useInventory('player');
+  const { inventory, equipment, gold, equip, acquire } = useInventory('player');
 
   const statsKeyMap = {
     up: 'w',
@@ -120,6 +120,7 @@ export default function App({
 
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
         <DisplayStats
+          gold={gold}
           inventory={inventory}
           equipment={equipment}
           equip={equip}

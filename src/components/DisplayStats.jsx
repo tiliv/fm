@@ -10,7 +10,7 @@ const TABS_ORDER = ['Equip', 'Rings', 'Log'];
 const TABS = Object.fromEntries(TABS_ORDER.map((tab) => [tab.toUpperCase(), tab]));
 
 export default function DisplayStats({
-  inventory, equipment, equip,
+  inventory, equipment, equip, gold,
 
   width, height, magnification=1,
   keyMap={
@@ -22,7 +22,7 @@ export default function DisplayStats({
     cancel: 'Escape',
   },
 }) {
-  const { name, hp, maxHp, gold, strength, defense, speed } = useStats();
+  const { name, hp, maxHp, strength, defense, speed } = useStats();
   const [menuChoice, setMenuChoice] = useState(0);
 
   // Change horizontal menu category
