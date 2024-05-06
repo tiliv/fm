@@ -12,6 +12,7 @@ weapon,body
 ---
 Buy
 ring/fire/2/Magmatic Stone/3
+ring/key/0/Bat-shaped key/0
 weapon/magicstaff/2/Arcane Staff/3
 weapon/spear/1/Mighty Spear/2
 weapon/whip/0/Whip/3
