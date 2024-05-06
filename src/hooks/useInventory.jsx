@@ -40,14 +40,22 @@ export default function useInventory(subject, {
   const acquire = useAcquire({ subject, setInventory });
   const drop = useDrop({ subject, setInventory });
 
-  const possesses = useCallback(function(kind, id) {
-    if (kind.startsWith('ring')) {
-      return Object.entries(inventory).find(([category, items]) => (
-        category.startsWith('ring') && items.find(({ id: ringId }) => ringId === id)
+  const possesses = useCallback(function(kind, identifier) {
+    function findEquipped(slot, kind=null) {
+      return inventory[kind || slot].find(({ id, name }) => {
+        return (equipment[slot] === id) && [id, name].includes(
+          parseInt(identifier, 10) || identifier
+        );
+      });
+    }
+
+    if (kind === 'ring') {
+      return Object.keys(equipment).find((slot) => (
+        slot.startsWith('ring') && findEquipped(slot, kind)
       ));
     }
-    return equipment[kind] === id;
-  }, [inventory]);
+    return findEquipped(kind);
+  }, [equipment, inventory]);
 
   return {
     gold, inventory, equipment, possesses,
