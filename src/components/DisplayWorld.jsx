@@ -57,7 +57,8 @@ export default function DisplayWorld({
       const event = new CustomEvent('interaction', { detail: null });
       window.dispatchEvent(event);
     } else {
-      const context = { name, inventory, possesses };
+      const attributes = interaction.attributes || {};
+      const context = { ...attributes, name, possesses };
       const { label, dataFile } = interaction;
       if (!label || !dataFile) {
         const amendedInteraction = parseInteraction(interaction, '', context);
@@ -74,7 +75,7 @@ export default function DisplayWorld({
           window.dispatchEvent(event);
         });
     }
-  }, [interaction, name, inventory, possesses]);
+  }, [interaction, name, possesses]);
 
   // Build the full-screen opacity buffer and copy over player & target sprites.
   useEffect(() => {
