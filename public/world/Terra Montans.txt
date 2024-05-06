@@ -38,8 +38,8 @@
 ---
 █:wall
 ⬚:door
-|:counter
-ー:counter
+|:~counter
+ー:~counter
 ⌸:bed
 ■:chest
 ㅠ:table

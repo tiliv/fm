@@ -32,14 +32,26 @@ export default function useInteraction({
         if (interaction) {
           foundInteraction = interaction;
         } else {
-          // Reach one space farther to see if something is on the other side.
-          const xDiff = bx - x;
-          const yDiff = by - y;
-          if (inViewport(y, x, [by + yDiff, bx + xDiff], h, w)) {
-            interaction = interactions[`${by + yDiff + 1},${bx + xDiff + 1}`];
-            if (interaction) {
-              foundInteraction = interaction;
-              buffer[lby + yDiff][lbx + xDiff] = marker;
+          const sprite = layers.solid[lby][lbx];
+          if (walls[sprite].startsWith('~')) {
+            // Reach one space farther to see if something is on the other side.
+            const xDiff = bx - x;
+            const yDiff = by - y;
+            if (inViewport(y, x, [by + yDiff, bx + xDiff], h, w)) {
+              interaction = interactions[`${by + yDiff + 1},${bx + xDiff + 1}`];
+              if (interaction) {
+                foundInteraction = interaction;
+                buffer[lby + yDiff][lbx + xDiff] = marker;
+              }
+            }
+          }
+
+          if (!foundInteraction) {
+            foundInteraction = {
+              sprite,
+              incidental: true,  // don't dim screen for this
+              label: walls[sprite].replace(/^~/, ''),
+              coordinates: [by, bx],
             }
           }
         }
