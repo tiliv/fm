@@ -130,9 +130,13 @@ function amendNPC(target, { inventory }) {
   }
 }
 
-function amendDoor(target, { inventory }) {
-  const { destination } = target;
-  target.Open = { name: 'Open', text: null, event: 'destination', destination };
+function amendDoor(target, { possesses }) {
+  const { destination, attributes: { key, text }={} } = target;
+  if (!key || possesses('ring', key)) {
+    target.Open = { name: 'Open', text: null, event: 'destination', destination };
+  } else {
+    target.Open = { name: 'Open', text: text || "This door seems locked." };
+  }
 }
 
 function amendWorld(target, { inventory }) {

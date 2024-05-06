@@ -51,8 +51,11 @@ export default function usePosition({
       } else if (`${bump}` === `${newY},${newX}`) {  // same bump twice in a row
         const interaction = interactions[`${newY + 1},${newX + 1}`];
         if (interaction?.destination) {
-          const event = new CustomEvent('destination', { detail: interaction });
-          window.dispatchEvent(event);
+          const { key } = interaction.attributes || {};
+          if (!key || possesses('ring', key)) {
+            const event = new CustomEvent('destination', { detail: interaction });
+            window.dispatchEvent(event);
+          }
         }
       } else {
         setBump([newY, newX]);
