@@ -78,7 +78,7 @@ export default function DisplayWorld({
 
   // Build the full-screen opacity buffer and copy over player & target sprites.
   useEffect(() => {
-    if (!target) {
+    if (!target || target.incidental) {
       setActiveBuffer(null);
       return;
     }
