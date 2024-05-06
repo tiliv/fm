@@ -75,7 +75,7 @@ export default function useSpriteLayers({
 async function loadSprite(kind, item, { offsetLeft=0, width, height }, ...positions) {
   const { template='none', rarity=0, name='--' } = item;
   const [[row, col], secondPosition=null] = positions;
-  return await fetch(`equipment/${kind}/${template}.txt`)
+  return await fetch(`equipment/${kind}/${template}.txt?${item.kind}`)
     .then((res) => res.text())
     .then((text) => {
       const buffer = Array.from({ length: height }, () => Array(offsetLeft + width).fill(' '));
