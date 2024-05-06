@@ -15,6 +15,29 @@ const START_X = 35;
 const VIEWPORT_WIDTH = 16;
 const VIEWPORT_HEIGHT = 8;
 
+const KEYMAP_STATS = {
+  up: 'w',
+  down: 's',
+  left: 'a',
+  right: 'd',
+  select: ' ',
+  cancel: 'Escape',
+};
+const KEYMAP_WORLD = {
+  up: 'ArrowUp',
+  down: 'ArrowDown',
+  left: 'ArrowLeft',
+  right: 'ArrowRight',
+};
+const KEYMAP_MENU = {
+  down: 'j',
+  up: 'k',
+  pageDown: '=',
+  pageUp: '-',
+  use: 'Enter',
+  cancel: 'Backspace',
+};
+
 export default function App({
   startMagnification=2,
   beginWorld=START_WORLD,
@@ -35,29 +58,6 @@ export default function App({
 
   const [interaction, setInteraction] = useState(null);
   const { inventory, equipment, gold, equip, acquire } = useInventory('player');
-
-  const statsKeyMap = {
-    up: 'w',
-    down: 's',
-    left: 'a',
-    right: 'd',
-    select: ' ',
-    cancel: 'Escape',
-  };
-  const worldKeyMap = {
-    up: 'ArrowUp',
-    down: 'ArrowDown',
-    left: 'ArrowLeft',
-    right: 'ArrowRight',
-  };
-  const menuKeyMap = {
-    down: 'j',
-    up: 'k',
-    pageDown: '=',
-    pageUp: '-',
-    use: 'Enter',
-    cancel: 'Backspace',
-  };
 
   useSave({
     magnification: [magnification, setMagnification],
@@ -128,7 +128,7 @@ export default function App({
           width={width}
           height={height}
           magnification={magnification}
-          keyMap={statsKeyMap}
+          keyMap={KEYMAP_STATS}
         />
         <DisplayWorld
           target={interaction}
@@ -144,7 +144,7 @@ export default function App({
           width={width}
           height={height}
           magnification={magnification}
-          keyMap={worldKeyMap}
+          keyMap={KEYMAP_WORLD}
         />
         <DisplayMenu
           target={interaction}
@@ -156,7 +156,7 @@ export default function App({
           width={width}
           height={height}
           magnification={magnification}
-          keyMap={menuKeyMap}
+          keyMap={KEYMAP_MENU}
         />
       </div>
       {/* <div style={{display: 'flex', flexDirection: 'row', alignItems: 'stretch'}}>
