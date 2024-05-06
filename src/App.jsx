@@ -60,6 +60,7 @@ export default function App({
   const { inventory, equipment, gold, equip, acquire } = useInventory('player');
 
   useSave({
+    interaction: [interaction, setInteraction],
     magnification: [magnification, setMagnification],
     width: [width, setWidth],
     height: [height, setHeight],
