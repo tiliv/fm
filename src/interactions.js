@@ -95,7 +95,7 @@ export function parseInteraction(interaction, dataFileText, context) {
 }
 
 
-function amendNPC(target, { inventory }) {
+function amendNPC(target, {}) {
   // We save `text` from original before overwriting it so that we have a
   // reference in a closure for the `items` functions.  We clear text from the
   // object so that `items` takes clear precedence when displayed.
@@ -139,12 +139,12 @@ function amendDoor(target, { possesses }) {
   }
 }
 
-function amendWorld(target, { inventory }) {
+function amendWorld(target, {}) {
   const { destination, dataFile } = target;
   target.Enter = { name: 'Enter', text: null, event: 'destination', destination, dataFile };
 }
 
-function amendObj(target, { inventory }) {
+function amendObj(target, {}) {
   const { attributes={} } = target;
   Object.entries(attributes)
     .filter(([name]) => /^[A-Z]/.test(name))
