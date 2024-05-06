@@ -9,13 +9,13 @@ export function parse({ text }, { inventory }) {
     return {
       name,
       kind,
-      template,
+      stats,
       event: 'Buy.player',
       price: (rarity + 1) * statValue,
       consume: true,
-      stats,
       item: {
         name,
+        template,
         id: id !== null ? parseInt(id, 10) : null,
         rarity: parseInt(rarity, 10),
         stats,
