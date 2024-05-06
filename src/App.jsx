@@ -132,9 +132,6 @@ export default function App({
           target={interaction}
 
           inventory={inventory}
-          equipment={equipment}
-          equip={equip}
-          acquire={acquire}
 
           startWorld={startWorld}
           startX={startX}
