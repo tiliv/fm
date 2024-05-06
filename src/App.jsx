@@ -80,13 +80,10 @@ export default function App({
 
   // Respond to 'destination' event from world double bump
   useEffect(() => {
-    const destinationHandler = (e) => {
-      const newY = e.detail.destination[0] - 1;
-      const newX = e.detail.destination[1] - 1;
-      const newWorld = e.detail.dataFile && e.detail.dataFile;
-      setStartWorld(newWorld || startWorld);
-      setStartX(newX);
-      setStartY(newY);
+    const destinationHandler = ({ detail: { destination: [r, c], dataFile }}) => {
+      setStartWorld(dataFile || startWorld);
+      setStartY(r - 1);
+      setStartX(c - 1);
     };
     window.addEventListener('destination', destinationHandler);
     return () => window.removeEventListener('destination', destinationHandler);
