@@ -51,6 +51,7 @@ export default function useLocation({ world, x, y, width, height, possesses, key
       passable,
       objects,
     },
+    walls,
     marker,
     bump,
     interactions,

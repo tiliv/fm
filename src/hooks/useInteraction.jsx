@@ -11,7 +11,7 @@ function inViewport(y, x, bump, h, w) {
 
 export default function useInteraction({
   x, y, w, h,
-  bump, interactions,
+  bump, walls, layers, interactions,
   marker='▒', emptyMarker='⬚',
   invisibleMarker='ˣ',  // this glyph is mapped to a blank character in the font
 }) {

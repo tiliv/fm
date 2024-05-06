@@ -40,14 +40,14 @@ export default function DisplayWorld({
   });
 
   const { name } = useStats();
-  const { marker, layers, bump, local, position, interactions } = useLocation({
+  const { marker, walls, layers, bump, local, position, interactions } = useLocation({
     world: startWorld, x: startX, y: startY, width, height,
     possesses,
     keyMap,
   });
   const { interaction, interactionBuffer } = useInteraction({
     bump,
-    interactions,
+    walls, layers, interactions,
     x: position.x, y: position.y, w: width, h: height,
   });
 
