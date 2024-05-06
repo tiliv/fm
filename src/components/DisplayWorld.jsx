@@ -41,7 +41,7 @@ export default function DisplayWorld({
 
   const { name } = useStats();
   const { marker, layers, bump, local, position, interactions } = useLocation({
-    world: startWorld, x: startX, y: startY, w: width, h: height,
+    world: startWorld, x: startX, y: startY, width, height,
     possesses,
     keyMap,
   });
