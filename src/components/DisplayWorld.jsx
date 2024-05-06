@@ -57,7 +57,8 @@ export default function DisplayWorld({
     } else {
       const { label, dataFile } = interaction;
       if (!label || !dataFile) {
-        const event = new CustomEvent('interaction', { detail: interaction });
+        const amendedInteraction = parseInteraction(interaction, '', { name, inventory });
+        const event = new CustomEvent('interaction', { detail: amendedInteraction });
         window.dispatchEvent(event);
         return;
       };
