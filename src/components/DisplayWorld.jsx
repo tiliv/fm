@@ -39,20 +39,13 @@ export default function DisplayWorld({
 
   const { name } = useStats();
   const { marker, layers, bump, local, position, interactions } = useLocation({
-    world: startWorld,
-    x: startX,
-    y: startY,
-    w: width,
-    h: height,
+    world: startWorld, x: startX, y: startY, w: width, h: height,
     keyMap,
   });
   const { interaction, interactionBuffer } = useInteraction({
     bump,
     interactions,
-    x: position.x,
-    y: position.y,
-    w: width,
-    h: height,
+    x: position.x, y: position.y, w: width, h: height,
   });
 
   // Try to hydrate a bumped 'interaction' with a corresponding dataFile.
