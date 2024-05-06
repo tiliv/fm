@@ -1,11 +1,11 @@
 import usePosition from './usePosition';
 import useWorld from './useWorld';
 
-export default function useLocation({ world, x, y, w, h, keyMap={} }) {
+export default function useLocation({ world, x, y, w, h, possesses, keyMap={} }) {
   const { map, walls, interactions } = useWorld({ world });
   const { marker, bump, x: posX, y: posY } = usePosition({
     defaultX: x, defaultY: y,
-    map, walls, interactions,
+    map, walls, interactions, possesses,
     keyMap,
   });
 

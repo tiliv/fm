@@ -12,6 +12,7 @@ export default function DisplayWorld({
   target,
 
   inventory,
+  possesses,
 
   width, height,
   startWorld, startX, startY,
@@ -41,6 +42,7 @@ export default function DisplayWorld({
   const { name } = useStats();
   const { marker, layers, bump, local, position, interactions } = useLocation({
     world: startWorld, x: startX, y: startY, w: width, h: height,
+    possesses,
     keyMap,
   });
   const { interaction, interactionBuffer } = useInteraction({
@@ -72,7 +74,7 @@ export default function DisplayWorld({
           window.dispatchEvent(event);
         });
     }
-  }, [interaction, name, inventory]);
+  }, [interaction, name, inventory, possesses]);
 
   // Build the full-screen opacity buffer and copy over player & target sprites.
   useEffect(() => {

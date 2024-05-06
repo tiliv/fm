@@ -40,9 +40,18 @@ export default function useInventory(subject, {
   const acquire = useAcquire({ subject, setInventory });
   const drop = useDrop({ subject, setInventory });
 
+  const possesses = useCallback(function(kind, id) {
+    if (kind.startsWith('ring')) {
+      return Object.entries(inventory).find(([category, items]) => (
+        category.startsWith('ring') && items.find(({ id: ringId }) => ringId === id)
+      ));
+    }
+    return equipment[kind] === id;
+  }, [inventory]);
+
   return {
-    gold, inventory, equipment,
-    buy, sell, equip, acquire, drop
+    gold, inventory, equipment, possesses,
+    buy, sell, equip, acquire, drop,
   };
 }
 

@@ -9,6 +9,7 @@ export default function usePosition({
   map,
   walls,
   interactions,
+  possesses,
   keyMap={
     up: 'ArrowUp',
     down: 'ArrowDown',
