@@ -5,7 +5,8 @@ import useLocation from '../hooks/useLocation';
 import useInteraction from '../hooks/useInteraction';
 import useStats from '../hooks/useStats';
 import useSave from '../hooks/useSave';
-import { keyAlias, parseInteraction } from '../utils';
+import { parseInteraction } from '../interactions';
+import { keyAlias } from '../utils';
 
 export default function DisplayWorld({
   target,
