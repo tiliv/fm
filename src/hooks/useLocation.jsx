@@ -28,8 +28,8 @@ export default function useLocation({ world, x, y, width, height, possesses, key
   }, [map, originX, originY]);
 
   useEffect(() => {
-    setSolid(area.map((row) => row.map((cell) => walls.includes(cell) ? cell : ' ')));
-    setPassable(area.map((row) => row.map((cell) => walls.includes(cell) ? ' ' : cell)));
+    setSolid(area.map((row) => row.map((cell) => walls[cell] ? cell : ' ')));
+    setPassable(area.map((row) => row.map((cell) => walls[cell] ? ' ' : cell)));
   }, [area, interactions, height, width]);
 
   useEffect(() => {

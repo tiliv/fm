@@ -44,7 +44,7 @@ export default function usePosition({
         case keyMap.right: newX++; break;
         default: return;
       }
-      if (!walls.includes(map[newY]?.[newX]) && !interactions[`${newY + 1},${newX + 1}`]) {
+      if (!walls[map[newY]?.[newX]] && !interactions[`${newY + 1},${newX + 1}`]) {
         setX(newX);
         setY(newY);
         setBump(null);

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { classifyObjectSpec } from '../interactions';
 
 export default function useWorld({ world }) {
-  const [walls, setWalls] = useState([]);
+  const [walls, setWalls] = useState({});
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [map, setMap] = useState([]);
   const [interactions, setInteractions] = useState({});
@@ -16,7 +16,7 @@ export default function useWorld({ world }) {
         const rows = loadedMap.trim().split('\n');
         setMap(rows.map((row) => row.split('')));
         setSize({ width: rows[0].length, height: rows.length });
-        setWalls((zoneKey || '').split('\n').map((line) => line[0]));
+        setWalls(Object.fromEntries((zoneKey || '').split('\n').map((line) => line.trim().split(':'))));
         setInteractions(Object.fromEntries(
           (objects || '').split('\n').filter(line => line.length).map((line) => {
             const data = classifyObjectSpec(line);
