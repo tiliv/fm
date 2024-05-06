@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import ScreenStack from './ScreenStack';
 import useSave from '../hooks/useSave';
 import { ACTIONS_ORDER } from '../Actions';
-import { minifyNumbers, bufferize } from '../utils';
+import { renderTemplate, minifyNumbers, bufferize } from '../utils';
 
 const OPTION_KEYS = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -71,7 +71,7 @@ export default function DisplayMenu({
   useEffect(() => {
     const { items=null, text=null, selected } = menus[menus.length - 1] || {};
     setOptions(typeof items === 'function' ? items({ inventory: _inventory.current }) : items);
-    setText(text);
+    setText(text ? renderTemplate(text, target?.attributes || {}) : text);
     if (selected !== undefined) {
       setSelected(selected);
     }
