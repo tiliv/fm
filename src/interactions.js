@@ -64,16 +64,15 @@ export function classifyObjectSpec(line) {
 }
 
 
-export function parseInteraction(interaction, dataFileText, { name, inventory }) {
+export function parseInteraction(interaction, dataFileText, context) {
   const target = JSON.parse(JSON.stringify(interaction));
-  const context = { inventory };
 
   // Split data file into initial text categories
   dataFileText.split('---').forEach((item) => {
     const [category] = item.trim().split('\n', 1);
     target[category] = {
       name: category,
-      text: renderTemplate(item, { name }).slice(category.length + 1).trim()
+      text: renderTemplate(item, context).slice(category.length + 1).trim()
     };
   });
 

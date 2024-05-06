@@ -55,9 +55,10 @@ export default function DisplayWorld({
       const event = new CustomEvent('interaction', { detail: null });
       window.dispatchEvent(event);
     } else {
+      const context = { name, inventory, possesses };
       const { label, dataFile } = interaction;
       if (!label || !dataFile) {
-        const amendedInteraction = parseInteraction(interaction, '', { name, inventory });
+        const amendedInteraction = parseInteraction(interaction, '', context);
         const event = new CustomEvent('interaction', { detail: amendedInteraction });
         window.dispatchEvent(event);
         return;
@@ -65,7 +66,7 @@ export default function DisplayWorld({
       fetch(`interactions/${label}/${dataFile}`)
         .then((res) => res.text())
         .catch((err) => `Look:\n${err}`)
-        .then((text) => parseInteraction(interaction, text, { name, inventory }))
+        .then((text) => parseInteraction(interaction, text, context))
         .then((newInteraction) => {
           const event = new CustomEvent('interaction', { detail: newInteraction });
           window.dispatchEvent(event);
