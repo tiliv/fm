@@ -54,5 +54,5 @@
 23,40=25,42:Room 3
 25,42=23,40:Tavern
 28,36:bed
-31,39:bed
+31,39:bed#Look=The bed seems nice.
 28,42:bed

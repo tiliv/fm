@@ -13,8 +13,8 @@ const OptionalAttributes = "(?<attributes>(#[^=]+=[^#]+)*)";
 
 const WORLD_SPEC = RegExp(`^${RowCol}=${NewRowCol}:${Label}/${DataFile}$`);
 const DOOR_SPEC  = RegExp(`^${RowCol}=${NewRowCol}:${Label}${OptionalAttributes}$`);
-const NPC_SPEC   = RegExp(`^${RowCol}:${Label}/${DataFile}${OptionalInventory}$`);
-const OBJ_SPEC   = RegExp(`^${RowCol}:${Label}$`);
+const NPC_SPEC   = RegExp(`^${RowCol}:${Label}/${DataFile}$`);
+const OBJ_SPEC   = RegExp(`^${RowCol}:${Label}${OptionalInventory}${OptionalAttributes}$`);
 
 const TYPE_SPECS = {
   world: WORLD_SPEC,
@@ -145,6 +145,13 @@ function amendWorld(target, { inventory }) {
 }
 
 function amendObj(target, { inventory }) {
-  target.Inspect = { name: 'Inspect', text: null };
+  const { attributes={} } = target;
+  Object.entries(attributes)
+    .filter(([name]) => /^[A-Z]/.test(name))
+    .map(([name, text]) => {
+      target[name] = { name, text };
+    })
+    ;
+  // target.Inspect = { name: 'Inspect', text: null };
   return;
 }
