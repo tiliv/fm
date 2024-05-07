@@ -1,3 +1,17 @@
+export const EQUIPMENT = {
+  weapon: "Weapons",
+  body: "Body armor",
+  legs: "Leggings",
+  feet: "Footwear",
+  head: "Headgear",
+  arms: "Sleeves",
+  shield: "Shields",
+  waist: "Waist gear",
+  ring: "Rings",
+};
+export const EQUIPMENT_ORDER = Object.keys(EQUIPMENT);
+
+
 export const RARITY_COLORS = [
   '#888',
   '#c7c7c7',

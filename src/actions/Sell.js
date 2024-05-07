@@ -1,15 +1,4 @@
-import { price } from '../utils';
-
-export const EQUIPMENT = {
-  weapon: "Weapons",
-  body: "Body armor",
-  legs: "Leggings",
-  feet: "Footwear",
-  head: "Headgear",
-  arms: "Sleeves",
-  shield: "Shields",
-  waist: "Waist gear",
-}
+import { price, EQUIPMENT } from '../utils';
 
 export function parse({ text }, { inventory }) {
   return text.split(',').map((kind) => {

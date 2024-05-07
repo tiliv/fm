@@ -1,7 +1,7 @@
-import { price } from '../utils';
+import { price, EQUIPMENT, EQUIPMENT_ORDER } from '../utils';
 
 export function parse({ text }, { inventory }) {
-  return text.split('\n').map((item) => {
+  const entries = text.split('\n').map((item) => {
     const [kind, template, rarity, name, stat, id=null] = item.split('/');
     if (inventory[kind]?.find((item) => item.name === name)) {
       return null;
@@ -24,4 +24,18 @@ export function parse({ text }, { inventory }) {
       },
     };
   }).filter(Boolean);
+
+  // Break into groups by kind
+  const options = Object.values(entries.reduce((acc, entry) => {
+    const { kind } = entry;
+    if (!acc[kind]) {
+      acc[kind] = { name: EQUIPMENT[kind], _items: [], kind };
+    }
+    acc[kind]._items.push(entry);
+    return acc;
+  }, {})).sort((a, b) => {
+    return EQUIPMENT_ORDER.indexOf(a.kind) - EQUIPMENT_ORDER.indexOf(b.kind);
+  });
+
+  return options;
 };
