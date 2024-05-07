@@ -69,8 +69,7 @@ export default function DisplayStats({
       buffers={[
         { fg: '#c7c7c7', buffer: [
           `➧${name}`,
-          ['HP:', `${hp}`.padStart(3, ' '), 'ヽ', `${minifyNumbers(maxHp)}`.padStart(3, ' '),
-          ' G:', gold].join(''),
+          [`HP:${hp}`.padStart(3, ' ').padEnd(width - (`G:${gold}`.length), ' ') + `G:${gold}`].join(''),
           [
             'A:', `${strength}`.padStart(2, ' '),
             '  D:', `${defense}`.padStart(2, ' '),
