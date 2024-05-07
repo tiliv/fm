@@ -251,16 +251,47 @@ export default function DisplayMenu({
       setInfo(null);
       return;
     }
-    const { stats } = options[selected] || {};
+    const { price, item: { kind, rarity, stats }={} } = options[selected] || {};
     const { A, D } = stats || {};
+    const info = [];
     if (A !== undefined) {
-      setInfo(`Atk ${minifyNumbers(A)}`);
+      info.push([null, `Atk ${minifyNumbers(A)}`]);
     } else if (D !== undefined) {
-      setInfo(`Def ${minifyNumbers(D)}`);
-    } else {
-      setInfo(null);
+      info.push([null, `Def ${minifyNumbers(D)}`]);
     }
-  }, [options, selected]);
+    if (price !== undefined) {
+      info.push([(gold + price >= 0 ? null : 'red'), `G ${Math.abs(price)}`]);
+    }
+
+    if (!info.length) {
+      setInfo(null);
+      return;
+    }
+    const layers = [
+      [null, { bg: '#333', fg: '#c7c7c7', buffer: [
+        ...(' '.repeat(height - 2).split(' ')),
+        [],
+      ]}],
+      ...(
+        info.filter(([color]) => color !== null).map(([color]) => [
+          color,
+          { bg: '#333', fg: color, buffer: [
+            ...(' '.repeat(height - 2).split(' ')),
+            [],
+          ]},
+        ])
+      ),
+    ];
+
+    info.forEach(([color, text]) => {
+      layers.forEach(([thisColor, layer]) => {
+        const { buffer } = layer;
+        const insert = color === thisColor ? text.split('').concat(['']) : Array(text.length + 1).fill('');
+        buffer[buffer.length - 1].push(...insert);
+      });
+    });
+    setInfo(layers.map(([, layer]) => layer));
+  }, [sprites, options, gold, selected, _viewportHeight, height]);
 
   return (
     <ScreenStack
@@ -289,10 +320,7 @@ export default function DisplayMenu({
           ),
 
         ]},
-        (menus.length && info) && { bg: 'black', fg: '#c7c7c7', buffer: [
-          ...(' '.repeat(height - 2).split(' ')),
-          info,
-        ]},
+        ...((menus.length && info) || []),
         (menus.length && textViewport) && { fg: 'black', buffer: textViewport}
       ].filter(Boolean)}
     />
