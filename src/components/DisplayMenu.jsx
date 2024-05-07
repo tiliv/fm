@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import ScreenStack from './ScreenStack';
 import useSave from '../hooks/useSave';
 import { ACTIONS_ORDER } from '../Actions';
-import { renderTemplate, minifyNumbers, bufferize } from '../utils';
+import { renderTemplate, minifyNumbers, bufferize, loadSprite, RARITY_COLORS } from '../utils';
 
 const OPTION_KEYS = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -31,6 +31,7 @@ export default function DisplayMenu({
   const [selected, setSelected] = useState(0);
   const [info, setInfo] = useState(null);
   const [events, setEvents] = useState([]);
+  const [sprites, setSprites] = useState({});
   const _inventory = useRef(inventory);
   const useKeyDownRef = useRef(false);
 
@@ -86,6 +87,25 @@ export default function DisplayMenu({
     }
     setOptionsViewport(options.slice(_offset, _offset + _viewportHeight));
   }, [options, _viewportHeight, _offset]);
+
+  // Load sprites for current optionsViewport
+  useEffect(() => {
+    if (!optionsViewport) {
+      setSprites({});
+      return;
+    }
+    Promise.all(optionsViewport
+      .map(async ({ kind, item }, i) => {
+        if (!kind || !item?.template) {
+          return [i, null];
+        }
+        const { icon } = await loadSprite(kind, item, { width: 4, height: 4 }, [1, 1]);
+        return [i, icon];
+      })
+    ).then((sprites) => {
+      setSprites(Object.fromEntries(sprites));
+    });
+  }, [optionsViewport]);
 
   // Set textViewport to current menu text at offset
   useEffect(() => {
@@ -254,6 +274,10 @@ export default function DisplayMenu({
     const { price, item: { kind, rarity, stats }={} } = options[selected] || {};
     const { A, D } = stats || {};
     const info = [];
+    const index = selected % _viewportHeight;
+    if (sprites[index]) {
+      info.push([RARITY_COLORS[rarity], `➧${sprites[index]}`]);
+    }
     if (A !== undefined) {
       info.push([null, `Atk ${minifyNumbers(A)}`]);
     } else if (D !== undefined) {
