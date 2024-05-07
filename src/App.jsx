@@ -144,6 +144,7 @@ export default function App({
         />
         <DisplayMenu
           target={interaction}
+          gold={gold}
 
           inventory={inventory}
           equipment={equipment}

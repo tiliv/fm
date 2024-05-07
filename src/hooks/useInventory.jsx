@@ -94,11 +94,14 @@ function useBuy({ subject, setGold }) {
   useEffect(() => {
     const eventName = `Buy.${subject}`;
     const buy = function({ detail: { kind, price, item } }) {
-      setGold((gold) => gold - price);
-      setTimeout(() => {
-        const acquire = new CustomEvent(`Acquire.${subject}`, { detail: { kind, item } });
-        window.dispatchEvent(acquire);
-      }, 0);
+      setGold((gold) => {
+        if (gold + price < 0) return gold;
+        setTimeout(() => {
+          const acquire = new CustomEvent(`Acquire.${subject}`, { detail: { kind, item } });
+          window.dispatchEvent(acquire);
+        }, 0);
+        return gold + price;
+      });
     };
     window.addEventListener(eventName, buy);
     return () => window.removeEventListener(eventName, buy);

@@ -10,6 +10,7 @@ const OPTION_KEYS = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 export default function DisplayMenu({
   target,
   inventory,
+  gold,
 
   width, height, magnification=1,
   keyMap={
@@ -134,6 +135,7 @@ export default function DisplayMenu({
           break;
         case keyMap.use:
           if (useKeyDownRef.current) return;
+          if (options[selected]?.price && gold + options[selected].price < 0) return;
           setSelected((selected) => {
             useKeyDownRef.current = true;
             const option = options[selected] || {};
