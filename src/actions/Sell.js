@@ -1,3 +1,5 @@
+import { price } from '../utils';
+
 export const EQUIPMENT = {
   weapon: "Weapons",
   body: "Body armor",
@@ -15,13 +17,12 @@ export function parse({ text }, { inventory }) {
       return {
         name: EQUIPMENT[kind],
         items: (inventory[kind] || []).map((item) => {
-          const price = item.rarity * Object.values(item.stats || {}).reduce((a, b) => a + b, 0);
           return {
             name: item.name,
             stats: item.stats,
             item,
             kind,
-            price,
+            price: price(item),
             event: `Sell.player`,
             consume: true,
           }

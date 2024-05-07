@@ -1,3 +1,5 @@
+import { price } from '../utils';
+
 export function parse({ text }, { inventory }) {
   return text.split('\n').map((item) => {
     const [kind, template, rarity, name, stat, id=null] = item.split('/');
@@ -11,7 +13,7 @@ export function parse({ text }, { inventory }) {
       kind,
       stats,
       event: 'Buy.player',
-      price: (rarity + 1) * statValue,
+      price: -price({ rarity: parseInt(rarity, 10), stats }),
       consume: true,
       item: {
         name,

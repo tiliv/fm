@@ -18,6 +18,12 @@ export function keyAlias(key) {
 }
 
 
+export function price({ rarity=0, stats={} }) {
+  const statValue = Object.values(stats || {}).reduce((a, b) => a + b, 0);
+  return (rarity + 1) * (statValue + 1);
+}
+
+
 const MINI_NUMBERS = '₀₁₂₃₄₅₆₇₈₉⏨'
 export function minifyNumbers(str) {
   return `${str}`.replace(/\d/g, (match) => MINI_NUMBERS[match]);
