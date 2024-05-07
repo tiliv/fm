@@ -37,5 +37,11 @@ export function parse({ text }, { inventory }) {
     return EQUIPMENT_ORDER.indexOf(a.kind) - EQUIPMENT_ORDER.indexOf(b.kind);
   });
 
+  // Turn sub-menu into callable based on built list
+  options.forEach((option) => {
+    option.items = ({ inventory }) => option._items.filter(({ name }) => {
+      return !inventory[option.kind]?.find((item) => item.name === name)
+    });
+  });
   return options;
 };

@@ -5,7 +5,7 @@ export function parse({ text }, { inventory }) {
     if (EQUIPMENT[kind] !== undefined) {
       return {
         name: EQUIPMENT[kind],
-        items: (inventory[kind] || []).map((item) => {
+        items: ({ inventory }) => (inventory[kind] || []).map((item) => {
           return {
             name: item.name,
             stats: item.stats,
