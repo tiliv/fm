@@ -15,7 +15,7 @@ const CATEGORIES = [
   'ring',
 ];
 
-const EMPTY_GOLD = 0;
+const EMPTY_GOLD = 30;
 const EMPTY_INVENTORY = Object.fromEntries(CATEGORIES.map((category) => [category, []]));
 const EMPTY_EQUIPMENT = Object.fromEntries(CATEGORIES.map((category) => [category, null]));
 
