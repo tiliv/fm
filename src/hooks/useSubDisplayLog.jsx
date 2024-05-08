@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { bufferize, bufferizeList } from '../utils';
+import { bufferize, bufferizeList, minifyNumbers } from '../utils';
 import useSave from './useSave';
 
 
@@ -82,7 +82,7 @@ export default function useSubDisplayLog(enabled, {
 
   useEffect(() => {
     if (!enabled) return;
-    const list = log.map((msg, i) => `${log.length - i}. ${msg}`.padEnd(width, ' '));
+    const list = log.map((msg, i) => `${minifyNumbers(log.length - i)} ${msg}`.padEnd(width, ' '));
     const buffer = bufferizeList(topOffset, [''].concat(list, ['']), width, height, scrollOffset || 0);
     setScrollBuffer(buffer);
     setScrollSelectionBuffer(buffer.map(
