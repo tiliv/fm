@@ -4,13 +4,14 @@ import ScreenStack from './ScreenStack';
 import useStats from '../hooks/useStats';
 import useSubDisplayEquip from '../hooks/useSubDisplayEquip';
 import useSubDisplayRings from '../hooks/useSubDisplayRings';
-import { keyAlias, minifyNumbers } from '../utils';
+import useSubDisplayLog from '../hooks/useSubDisplayLog';
+import { keyAlias } from '../utils';
 
 const TABS_ORDER = ['Equip', 'Rings', 'Log'];
 const TABS = Object.fromEntries(TABS_ORDER.map((tab) => [tab.toUpperCase(), tab]));
 
 export default function DisplayStats({
-  inventory, equipment, equip, gold,
+  inventory, equipment, equip, gold, log,
 
   width, height, magnification=1,
   keyMap={
@@ -45,11 +46,14 @@ export default function DisplayStats({
     inventory, equipment, equip,
     width, height, keyMap,
   });
-  const logBuffers = [{ fg: 'green', buffer: ['', '', '', '', TABS.LOG]}];
+  const logBuffers = useSubDisplayLog(menuChoice === 2, {
+    log,
+    width, height, keyMap,
+  });
   const lowerBuffers = [
     ...(equipmentBuffers || []),
     ...(ringsBuffers || []),
-    ...(menuChoice === 2 ? logBuffers : []),
+    ...(logBuffers || []),
   ];
 
   return (
