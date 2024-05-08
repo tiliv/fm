@@ -48,6 +48,7 @@ export default function usePosition({
         setX(newX);
         setY(newY);
         setBump(null);
+        window.dispatchEvent(new CustomEvent('interaction', { detail: null }));
       } else if (`${bump}` === `${newY},${newX}`) {  // same bump twice in a row
         const interaction = interactions[`${newY + 1},${newX + 1}`];
         if (interaction?.destination) {
