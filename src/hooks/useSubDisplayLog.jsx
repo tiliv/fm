@@ -26,7 +26,7 @@ export default function useSubDisplayLog(enabled, {
     logScrollOffset: [scrollOffset, setScrollOffset],
     logText: [text, setText],
     logTextOffset: [textOffset, setTextOffset],
-  })
+  });
 
   useEffect(() => {
     setLogLength((length) => {
