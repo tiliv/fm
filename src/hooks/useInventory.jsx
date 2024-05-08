@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 import useSave from './useSave';
 
@@ -20,6 +20,8 @@ const EMPTY_INVENTORY = Object.fromEntries(CATEGORIES.map((category) => [categor
 const EMPTY_EQUIPMENT = Object.fromEntries(CATEGORIES.map((category) => [category, null]));
 
 export default function useInventory(subject, {
+  world,
+  startLog=[],
   startGold=EMPTY_GOLD,
   startInventory=EMPTY_INVENTORY,
   startEquipment=EMPTY_EQUIPMENT,
@@ -27,17 +29,28 @@ export default function useInventory(subject, {
   const [gold, setGold] = useState(startGold);
   const [inventory, setInventory] = useState(startInventory);
   const [equipment, setEquipment] = useState(startEquipment);
+  const [log, setLog] = useState(startLog);
+
+  const _world = useRef(world);
+  useEffect(() => {
+    _world.current = world;
+  }, [world]);
 
   useSave({
     [`${subject}/gold`]: [gold, setGold],
     [`${subject}/inventory`]: [inventory, setInventory],
     [`${subject}/equipment`]: [equipment, setEquipment],
+    [`${subject}/log`]: [log, setLog],
   });
 
-  const buy = useBuy({ subject, setGold });
-  const sell = useSell({ subject, setGold });
+  const addLog = useCallback(function(msg) {
+    setLog((log) => [msg, ...log]);
+  }, []);
+
+  const buy = useBuy({ subject, setGold, addLog });
+  const sell = useSell({ subject, setGold, addLog });
   const equip = useEquip({ subject, setEquipment });
-  const acquire = useAcquire({ subject, setInventory });
+  const acquire = useAcquire({ subject, setInventory, addLog });
   const drop = useDrop({ subject, setInventory });
 
   const possesses = useCallback(function(kind, identifier) {
@@ -60,6 +73,7 @@ export default function useInventory(subject, {
   return {
     gold, inventory, equipment, possesses,
     buy, sell, equip, acquire, drop,
+    log,
   };
 }
 
@@ -70,6 +84,7 @@ function useSell({ subject, setGold }) {
     const sell = function({ detail: { kind, price, target, item } }) {
       // console.log('Selling', item, 'for', price, 'to', target);
       setGold((gold) => gold + price);
+      addLog(`Sold ${item.name}`);
       setTimeout(() => {
         const drop = new CustomEvent(`Drop.${subject}`, { detail: { kind, item } });
         window.dispatchEvent(drop);
@@ -90,12 +105,13 @@ function useSell({ subject, setGold }) {
 };
 
 
-function useBuy({ subject, setGold }) {
+function useBuy({ subject, setGold, addLog }) {
   useEffect(() => {
     const eventName = `Buy.${subject}`;
     const buy = function({ detail: { kind, price, item } }) {
       setGold((gold) => {
         if (gold + price < 0) return gold;
+        addLog(`Bought ${item.name}`);
         setTimeout(() => {
           const acquire = new CustomEvent(`Acquire.${subject}`, { detail: { kind, item } });
           window.dispatchEvent(acquire);

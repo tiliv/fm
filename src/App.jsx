@@ -57,7 +57,10 @@ export default function App({
   const [startY, setStartY] = useState(beginY);
 
   const [interaction, setInteraction] = useState(null);
-  const { inventory, equipment, gold, equip, acquire, possesses } = useInventory('player');
+  const {
+    inventory, equipment, gold, log,
+    equip, acquire, possesses,
+  } = useInventory('player', { world: startWorld, startLog: START_LOG });
 
   useSave({
     interaction: [interaction, setInteraction],
@@ -122,6 +125,7 @@ export default function App({
           inventory={inventory}
           equipment={equipment}
           equip={equip}
+          log={log}
 
           width={width}
           height={height}
