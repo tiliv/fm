@@ -102,6 +102,9 @@ function amendNPC(target, {}) {
   // The text may be relevant because it can be parsed as configuration for
   // the items functions.
 
+  target.name = target.dataFile.replace(/\.txt$/, '');
+  target.name = target.name[0].toUpperCase() + target.name.slice(1);
+
   if (target[ACTIONS.BUY] !== undefined) {
     let action = JSON.parse(JSON.stringify(target[ACTIONS.BUY]));
     Object.assign(target[ACTIONS.BUY], {
