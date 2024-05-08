@@ -5,6 +5,7 @@ import useStats from '../hooks/useStats';
 import useSubDisplayEquip from '../hooks/useSubDisplayEquip';
 import useSubDisplayRings from '../hooks/useSubDisplayRings';
 import useSubDisplayLog from '../hooks/useSubDisplayLog';
+import useSave from '../hooks/useSave';
 import { keyAlias } from '../utils';
 
 const TABS_ORDER = ['Equip', 'Rings', 'Log'];
@@ -23,8 +24,12 @@ export default function DisplayStats({
     cancel: 'Escape',
   },
 }) {
-  const { name, hp, maxHp, strength, defense, speed } = useStats();
+  const { name, hp, strength, defense, speed } = useStats();
   const [menuChoice, setMenuChoice] = useState(0);
+
+  useSave({
+    menuChoice: [menuChoice, setMenuChoice],
+  });
 
   // Change horizontal menu category
   useEffect(() => {

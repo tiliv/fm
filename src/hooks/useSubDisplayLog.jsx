@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { bufferize, bufferizeList } from '../utils';
+import useSave from './useSave';
 
 
 export default function useSubDisplayLog(enabled, {
@@ -19,6 +20,13 @@ export default function useSubDisplayLog(enabled, {
   const [textOffset, setTextOffset] = useState(0);
 
   const [logLength, setLogLength] = useState(log.length);
+
+  useSave({
+    logLength: [logLength, setLogLength],
+    logScrollOffset: [scrollOffset, setScrollOffset],
+    logText: [text, setText],
+    logTextOffset: [textOffset, setTextOffset],
+  })
 
   useEffect(() => {
     setLogLength((length) => {
