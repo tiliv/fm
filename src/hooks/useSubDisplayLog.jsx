@@ -50,7 +50,7 @@ export default function useSubDisplayLog(enabled, {
     }
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [enabled, text]);
+  }, [enabled, log, text]);
 
   useEffect(() => {
     if (!enabled === null || !textViewport) return;
