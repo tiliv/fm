@@ -137,7 +137,10 @@ export default function DisplayMenu({
     const keyHandler = (e) => {
       if (e.key === keyMap.cancel) {
         setMenus((menus) => {
-          if (menus.length > 1) {
+          if (menus[0].autoStart || menus.length === 1) {
+            window.dispatchEvent(new CustomEvent('interaction', { detail: null }));
+            return [];
+          } else if (menus.length > 1) {
             const newMenus = menus.slice(0, -1);
             setSelected(newMenus[newMenus.length - 1].selected);
             return newMenus;
