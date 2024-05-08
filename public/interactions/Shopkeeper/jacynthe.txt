@@ -28,3 +28,6 @@ legs/longskirt/0/Battle skirt/2
 legs/shorts/0/Tattered shorts/0
 shield/board/1/Driftwood/2
 waist/bag/1/Side bag/0
+---
+Shout
+"Hey! Will ye keep it down?  What's-a matter wit you?"
