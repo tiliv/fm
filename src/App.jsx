@@ -77,8 +77,18 @@ export default function App({
 
   // Respond to 'interaction' event from world by saving it for other displays
   useEffect(() => {
-    const interactionHandler = (e) => {
-      setInteraction(e.detail);
+    const interactionHandler = ({ detail: interaction }) => {
+      if (!interaction) {
+        setInteraction(null);
+        return;
+      }
+      const { start=null, ...startInteraction } = interaction;
+      if (start) {
+        Object.assign(startInteraction, {
+          [start]: { ...startInteraction[start], start: true },
+        });
+      }
+      setInteraction(startInteraction);
     };
     window.addEventListener('interaction', interactionHandler);
     return () => window.removeEventListener('interaction', interactionHandler);

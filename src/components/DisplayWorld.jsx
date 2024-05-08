@@ -6,6 +6,7 @@ import useInteraction from '../hooks/useInteraction';
 import useStats from '../hooks/useStats';
 import useSave from '../hooks/useSave';
 import { keyAlias } from '../utils';
+import { TYPES } from '../interactions';
 
 export default function DisplayWorld({
   target,
@@ -52,6 +53,22 @@ export default function DisplayWorld({
     const event = new CustomEvent('interaction', { detail: interaction });
     window.dispatchEvent(event);
   }, [interaction]);
+
+  // Find responders to ambient events
+  useEffect(() => {
+    const ambientHandler = ({ detail: { name }}) => {
+      Object.entries(interactions)
+        .filter(([, { type, [name]: data }]) => type === TYPES.NPC && data)
+        .forEach(([, interaction]) => {
+          const event = new CustomEvent('interaction', {
+            detail: { ...interaction, start: name },
+          });
+          window.dispatchEvent(event);
+        });
+    };
+    window.addEventListener('Ambient', ambientHandler);
+    return () => window.removeEventListener('Ambient', ambientHandler);
+  }, [interactions]);
 
   // Build the full-screen opacity buffer and copy over player & target sprites.
   useEffect(() => {

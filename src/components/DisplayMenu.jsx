@@ -54,20 +54,35 @@ export default function DisplayMenu({
       return;
     }
 
-    // const items = ACTIONS_ORDER.filter((option) => target[option]);
-    const items = Object.entries(target)
-      .filter(([k]) => ACTIONS_ORDER.includes(k))
-      .sort(([k1], [k2]) => ACTIONS_ORDER.indexOf(k1) - ACTIONS_ORDER.indexOf(k2))
-      ;
-    items.push(...Object.entries(target).filter(([k]) => {
-      if (items.find(([k2]) => k2 === k)) return false;
-      return /^[A-Z]$/.test(k[0]);
-    }));
+    let items = Object.entries(target)
+    let autoMenu = null;
 
+    const autoAction = items.find(([, option]) => {
+      return option.start;
+    });
+    if (!autoAction) {
+      items = items
+        .filter(([k]) => ACTIONS_ORDER.includes(k))
+        .sort(([k1], [k2]) => ACTIONS_ORDER.indexOf(k1) - ACTIONS_ORDER.indexOf(k2))
+        ;
+      items.push(...Object.entries(target).filter(([k]) => {
+        if (items.find(([k2]) => k2 === k)) return false;
+        return /[A-Z]/.test(k[0]);
+      }));
+      items = items.map(([_, v]) => v);
+    } else {
+      items = [autoAction[1]];
+      autoMenu = {
+        title: `${autoAction[0]}`,
+        ...autoAction[1],
+      };
+    }
+    // console.log('items', items, autoMenu);
     setMenus([{
       title: `→${target.sprite} ${target.label}`,
-      items: items.map(([_, v]) => v),
-    }])
+      items,
+      autoStart: Boolean(autoMenu),
+    }, autoMenu].filter(Boolean));
   }, [`${target?.coordinates}`, width]);  // fixme: target 'updates' when player inventory changes
 
   // Set options to current menu
