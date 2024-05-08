@@ -67,7 +67,6 @@ export default function App({
   } = useInventory('player', { world: startWorld, startLog: START_LOG });
 
   useSave({
-    interaction: [interaction, setInteraction],
     magnification: [magnification, setMagnification],
     width: [width, setWidth],
     height: [height, setHeight],

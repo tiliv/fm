@@ -28,7 +28,6 @@ export default function DisplayWorld({
   // race condition to save data before it's unmounted and re-mounted. This one
   // saves data fine, but won't load anything, as the setters are no-op.
   useSave({
-    interaction: [target, () => {}],
     magnification: [magnification, () => {}],
     width: [width, () => {}],
     height: [height, () => {}],
