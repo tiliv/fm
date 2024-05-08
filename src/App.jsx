@@ -58,6 +58,7 @@ export default function App({
   const [startWorld, setStartWorld] = useState(beginWorld);
   const [startX, setStartX] = useState(beginX);
   const [startY, setStartY] = useState(beginY);
+  const [ambientMenu, setAmbientMenu] = useState([]);
 
   const [interaction, setInteraction] = useState(null);
   const {
@@ -86,6 +87,14 @@ export default function App({
 
   // Respond to 'destination' event from world double bump
   useEffect(() => {
+    setAmbientMenu([{
+      title: startWorld.replace(/\.txt$/, '').toUpperCase(),
+      items: [
+        {name: 'Shout', event: 'Ambient'},
+        {name: 'Hide', event: 'Ambient'},
+      ],
+    }]);
+
     const destinationHandler = ({ detail: { destination: [r, c], dataFile }}) => {
       setStartWorld(dataFile || startWorld);
       setStartY(r - 1);
@@ -138,7 +147,6 @@ export default function App({
         <DisplayWorld
           target={interaction}
 
-          inventory={inventory}
           possesses={possesses}
 
           startWorld={startWorld}
@@ -152,6 +160,7 @@ export default function App({
         <DisplayMenu
           target={interaction}
           gold={gold}
+          ambientMenu={ambientMenu}
 
           inventory={inventory}
           equipment={equipment}

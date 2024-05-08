@@ -11,6 +11,7 @@ export default function DisplayMenu({
   target,
   inventory,
   gold,
+  ambientMenu,
 
   width, height, magnification=1,
   keyMap={
@@ -49,7 +50,7 @@ export default function DisplayMenu({
       setSelected(0);
       setOptionsViewport(null);
       setTextViewport(null);
-      setMenus([]);
+      setMenus(ambientMenu);
       return;
     }
 
@@ -67,7 +68,7 @@ export default function DisplayMenu({
       title: `→${target.sprite} ${target.label}`,
       items: items.map(([_, v]) => v),
     }])
-  }, [`${target?.coordinates}`]);  // fixme: target 'updates' when player inventory changes
+  }, [`${target?.coordinates}`, width]);  // fixme: target 'updates' when player inventory changes
 
   // Set options to current menu
   useEffect(() => {
