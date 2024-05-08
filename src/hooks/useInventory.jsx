@@ -78,7 +78,7 @@ export default function useInventory(subject, {
 }
 
 
-function useSell({ subject, setGold }) {
+function useSell({ subject, setGold, addLog }) {
   useEffect(() => {
     const eventName = `Sell.${subject}`;
     const sell = function({ detail: { kind, price, target, item } }) {
