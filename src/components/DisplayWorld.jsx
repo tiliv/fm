@@ -5,13 +5,11 @@ import useLocation from '../hooks/useLocation';
 import useInteraction from '../hooks/useInteraction';
 import useStats from '../hooks/useStats';
 import useSave from '../hooks/useSave';
-import { parseInteraction } from '../interactions';
 import { keyAlias } from '../utils';
 
 export default function DisplayWorld({
   target,
 
-  inventory,
   possesses,
 
   width, height,
@@ -42,7 +40,7 @@ export default function DisplayWorld({
   const { name } = useStats();
   const { marker, walls, layers, bump, local, position, interactions } = useLocation({
     world: startWorld, x: startX, y: startY, width, height,
-    possesses,
+    name, possesses,
     keyMap,
   });
   const { interaction, interactionBuffer } = useInteraction({
@@ -51,31 +49,10 @@ export default function DisplayWorld({
     x: position.x, y: position.y, w: width, h: height,
   });
 
-  // Try to hydrate a bumped 'interaction' with a corresponding dataFile.
   useEffect(() => {
-    if (!interaction) {
-      const event = new CustomEvent('interaction', { detail: null });
-      window.dispatchEvent(event);
-    } else {
-      const attributes = interaction.attributes || {};
-      const context = { ...attributes, name, possesses };
-      const { label, dataFile } = interaction;
-      if (!label || !dataFile) {
-        const amendedInteraction = parseInteraction(interaction, '', context);
-        const event = new CustomEvent('interaction', { detail: amendedInteraction });
-        window.dispatchEvent(event);
-        return;
-      };
-      fetch(`interactions/${label}/${dataFile}`)
-        .then((res) => res.text())
-        .catch((err) => `Look:\n${err}`)
-        .then((text) => parseInteraction(interaction, text, context))
-        .then((newInteraction) => {
-          const event = new CustomEvent('interaction', { detail: newInteraction });
-          window.dispatchEvent(event);
-        });
-    }
-  }, [interaction, name, possesses]);
+    const event = new CustomEvent('interaction', { detail: interaction });
+    window.dispatchEvent(event);
+  }, [interaction]);
 
   // Build the full-screen opacity buffer and copy over player & target sprites.
   useEffect(() => {

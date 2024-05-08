@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 
 import usePosition from './usePosition';
 import useWorld from './useWorld';
+import { parseInteraction } from '../interactions';
 
-export default function useLocation({ world, x, y, width, height, possesses, keyMap={} }) {
+export default function useLocation({ world, x, y, width, height, name, possesses, keyMap={} }) {
   const { map, walls, interactions } = useWorld({ world });
   const { marker, bump, x: posX, y: posY } = usePosition({
     defaultX: x, defaultY: y,
@@ -15,6 +16,7 @@ export default function useLocation({ world, x, y, width, height, possesses, key
   const [solid, setSolid] = useState([]);
   const [passable, setPassable] = useState([]);
   const [objects, setObjects] = useState([]);
+  const [hydratedInteractions, setHydratedInteractions] = useState({});
 
   const localX = posX % width;
   const localY = posY % height;
@@ -25,7 +27,30 @@ export default function useLocation({ world, x, y, width, height, possesses, key
     setArea(map.slice(originY, originY + height).map(
       (row) => row.slice(originX, originX + width)
     ));
-  }, [map, originX, originY]);
+
+    // Hydrate interactions on this viewport
+    Promise.all(
+      Object.entries(interactions).map(async ([location, interaction]) => {
+        const [y, x] = location.split(',').map(Number);
+        if ((x < originX || x >= originX + width) || (y < originY || y >= originY + height)) {
+          return [null, null];
+        }
+        const attributes = interaction.attributes || {};
+        const context = { ...attributes, name, possesses };
+        const { label, dataFile } = interaction;
+        let text = '';
+        if (label && dataFile) {
+          text = await fetch(`interactions/${label}/${dataFile}`)
+            .then((res) => res.text())
+            .catch((err) => `Err\n${err}`);
+        }
+        const hydrated = parseInteraction(interaction, text, context);
+        return [location, hydrated];
+      })
+    ).then((entries) => {
+      setHydratedInteractions(Object.fromEntries(entries.filter(([_]) => Boolean(_))));
+    });
+  }, [map, originX, originY, width, height, possesses]);
 
   useEffect(() => {
     setSolid(area.map((row) => row.map((cell) => walls[cell] ? cell : ' ')));
@@ -54,7 +79,7 @@ export default function useLocation({ world, x, y, width, height, possesses, key
     walls,
     marker,
     bump,
-    interactions,
+    interactions: hydratedInteractions,
     position: { x: posX, y: posY },
     local: { x: localX, y: localY },
     origin: { x: originX, y: originY },
