@@ -84,11 +84,11 @@ function useSell({ subject, setGold, addLog }) {
     const sell = function({ detail: { kind, price, target, item } }) {
       // console.log('Selling', item, 'for', price, 'to', target);
       setGold((gold) => gold + price);
-      addLog(`Sold ${item.name}`);
+      addLog(`Sold ${item.name} to ${target.name}.`);
       setTimeout(() => {
         const drop = new CustomEvent(`Drop.${subject}`, { detail: { kind, item } });
         window.dispatchEvent(drop);
-        const acquire = new CustomEvent(`Acquire.${target}`, { detail: { kind, item } });
+        const acquire = new CustomEvent(`Acquire.${target.name}`, { detail: { kind, item } });
         window.dispatchEvent(acquire);
       }, 0);
     }
@@ -108,10 +108,10 @@ function useSell({ subject, setGold, addLog }) {
 function useBuy({ subject, setGold, addLog }) {
   useEffect(() => {
     const eventName = `Buy.${subject}`;
-    const buy = function({ detail: { kind, price, item } }) {
+    const buy = function({ detail: { kind, price, target, item } }) {
       setGold((gold) => {
         if (gold + price < 0) return gold;
-        addLog(`Bought ${item.name}`);
+        addLog(`Bought ${item.name} from ${target.name}.`);
         setTimeout(() => {
           const acquire = new CustomEvent(`Acquire.${subject}`, { detail: { kind, item } });
           window.dispatchEvent(acquire);
@@ -123,8 +123,8 @@ function useBuy({ subject, setGold, addLog }) {
     return () => window.removeEventListener(eventName, buy);
   }, [subject]);
 
-  const buy = useCallback(function(kind, item) {
-    const event = new CustomEvent(`Buy.${subject}`, { detail: { kind, item } });
+  const buy = useCallback(function(kind, price, item, target) {
+    const event = new CustomEvent(`Buy.${subject}`, { detail: { kind, price, target, item } });
     window.dispatchEvent(event);
   }, [subject]);
 
