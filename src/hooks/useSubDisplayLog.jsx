@@ -12,7 +12,7 @@ export default function useSubDisplayLog(enabled, {
   const [buffers, setBuffers] = useState(null);
   const [scrollBuffer, setScrollBuffer] = useState(null);
   const [scrollSelectionBuffer, setScrollSelectionBuffer] = useState(null);
-  const [scrollOffset, setScrollOffset] = useState(0);
+  const [scrollOffset, setScrollOffset] = useState(null);
 
   const [text, setText] = useState(null);
   const [textViewport, setTextViewport] = useState(null);
@@ -22,7 +22,7 @@ export default function useSubDisplayLog(enabled, {
 
   useEffect(() => {
     setLogLength((length) => {
-      setScrollOffset((offset) => offset + (log.length - length));
+      setScrollOffset((offset) => offset === null ? null : offset + (log.length - length));
       return log.length;
     });
   }, [log.length]);
@@ -35,10 +35,10 @@ export default function useSubDisplayLog(enabled, {
           setScrollOffset((offset) => (offset <= 0) ? 0 : offset - 1);
           break;
         case keyMap.down:
-          setScrollOffset((offset) => (offset >= log.length - 1) ? offset : offset + 1);
+          setScrollOffset((offset) => (offset >= log.length - 1) ? offset : (offset === null ? 0 : offset + 1));
           break;
         case keyMap.cancel:
-          setScrollOffset(0);
+          setScrollOffset(null);
           break;
         case keyMap.select:
           setScrollOffset((offset) => {
@@ -75,7 +75,7 @@ export default function useSubDisplayLog(enabled, {
   useEffect(() => {
     if (!enabled) return;
     const list = log.map((msg, i) => `${log.length - i}. ${msg}`.padEnd(width, ' '));
-    const buffer = bufferizeList(topOffset, [''].concat(list, ['']), width, height, scrollOffset);
+    const buffer = bufferizeList(topOffset, [''].concat(list, ['']), width, height, scrollOffset || 0);
     setScrollBuffer(buffer);
     setScrollSelectionBuffer(buffer.map(
       (line, i) => i === topOffset + 1 ? line : ''
@@ -98,13 +98,13 @@ export default function useSubDisplayLog(enabled, {
     if (!textViewport) {
       setBuffers([
         scrollBuffer && { fg: '#555', buffer: scrollBuffer },
-        scrollSelectionBuffer && { bg: '#555', fg: 'black', buffer: scrollSelectionBuffer },
+        (scrollOffset !== null && scrollSelectionBuffer) && { bg: '#555', fg: 'black', buffer: scrollSelectionBuffer },
       ].filter(Boolean));
     } else {
       setBuffers([
         { bg: '#888', fg: 'black', buffer: [
           '', '', '', '',
-          `Entry ${log.length - scrollOffset}:`.padEnd(width, ' '),
+          `Entry ${log.length - (scrollOffset || 0)}:`.padEnd(width, ' '),
         ]},
         { bg: '#c7c7c7', fg: '#c7c7c7', buffer: [
           '', '', '', '', '',
