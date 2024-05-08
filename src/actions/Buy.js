@@ -1,6 +1,6 @@
 import { price, EQUIPMENT, EQUIPMENT_ORDER } from '../utils';
 
-export function parse({ text }, { inventory }) {
+export function parse(target, { text }, { inventory }) {
   const entries = text.split('\n').map((item) => {
     const [kind, template, rarity, name, stat, id=null] = item.split('/');
     if (inventory[kind]?.find((item) => item.name === name)) {
@@ -13,6 +13,7 @@ export function parse({ text }, { inventory }) {
       kind,
       stats,
       event: 'Buy.player',
+      target,
       price: -price({ rarity: parseInt(rarity, 10), stats }),
       consume: true,
       item: {

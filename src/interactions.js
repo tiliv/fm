@@ -96,24 +96,24 @@ export function parseInteraction(interaction, dataFileText, context) {
 
 
 function amendNPC(target, {}) {
-  // We save `text` from original before overwriting it so that we have a
+  // We save the original action before overwriting it so that we have a
   // reference in a closure for the `items` functions.  We clear text from the
   // object so that `items` takes clear precedence when displayed.
   // The text may be relevant because it can be parsed as configuration for
   // the items functions.
 
   if (target[ACTIONS.BUY] !== undefined) {
-    let { text } = target[ACTIONS.BUY];
+    let action = JSON.parse(JSON.stringify(target[ACTIONS.BUY]));
     Object.assign(target[ACTIONS.BUY], {
-      items: ({ inventory }) => Buy.parse({ text }, { inventory }),
+      items: ({ inventory }) => Buy.parse(target, action, { inventory }),
       text: null,
     });
   }
 
   if (target[ACTIONS.SELL] !== undefined) {
-    let { text } = target[ACTIONS.SELL];
+    let action = JSON.parse(JSON.stringify(target[ACTIONS.SELL]));
     Object.assign(target[ACTIONS.SELL], {
-      items: ({ inventory }) => Sell.parse({ text }, { inventory }),
+      items: ({ inventory }) => Sell.parse(target, action, { inventory }),
       text: null,
     });
   }
