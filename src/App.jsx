@@ -84,7 +84,6 @@ export default function App({
     return () => window.removeEventListener('interaction', interactionHandler);
   }, []);
 
-  // Respond to 'destination' event from world double bump
   useEffect(() => {
     setAmbientMenu([{
       title: startWorld.replace(/\.txt$/, '').toUpperCase(),
@@ -94,6 +93,7 @@ export default function App({
       ],
     }]);
 
+    // Respond to 'destination' event from world double bump
     const destinationHandler = ({ detail: { destination: [r, c], dataFile }}) => {
       setStartWorld(dataFile || startWorld);
       setStartY(r - 1);
