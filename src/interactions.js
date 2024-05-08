@@ -22,7 +22,7 @@ const TYPE_SPECS = {
   door: DOOR_SPEC,
   obj: OBJ_SPEC,
 };
-const TYPES = Object.fromEntries(
+export const TYPES = Object.fromEntries(
   Object.keys(TYPE_SPECS).map((type) => [type.toUpperCase(), type])
 );
 

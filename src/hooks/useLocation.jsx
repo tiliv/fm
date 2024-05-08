@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 import usePosition from './usePosition';
 import useWorld from './useWorld';
-import { parseInteraction } from '../interactions';
+import { parseInteraction, TYPES } from '../interactions';
 
 export default function useLocation({ world, x, y, width, height, name, possesses, keyMap={} }) {
   const { map, walls, interactions } = useWorld({ world });
@@ -37,9 +37,9 @@ export default function useLocation({ world, x, y, width, height, name, possesse
         }
         const attributes = interaction.attributes || {};
         const context = { ...attributes, name, possesses };
-        const { label, dataFile } = interaction;
+        const { type, label, dataFile } = interaction;
         let text = '';
-        if (label && dataFile) {
+        if (type === TYPES.NPC) {
           text = await fetch(`interactions/${label}/${dataFile}`)
             .then((res) => res.text())
             .catch((err) => `Err\n${err}`);
