@@ -72,7 +72,7 @@ export default function usePosition({
 
   useEffect(() => {
     Object.entries(zones || {}).forEach(([box, data]) => {
-      const [r, c, r2, c2] = box.split(',').map(Number);
+      const [r, c, r2, c2] = box.split(',').map(Number).map((v) => v - 1);
       if (y >= r && y < r2 && x >= c && x < c2) {
         setZone(data);
       } else {
