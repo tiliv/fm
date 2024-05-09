@@ -45,7 +45,7 @@ export default function useWorld({ world }) {
         await Promise.all(boxGroups.map(async (data) => {
           const { boxes, dataFile } = data;
           const overlay = await fetch(`overlays/${dataFile}`).then((res) => res.text());
-          data.buffer = overlay.trim().split('\n');
+          data.buffer = overlay.replace(/\n+$/, '').split('\n');
           boxes.forEach((box) => {
             zones.push([`${box}`, { ...data, box }]);
           });
