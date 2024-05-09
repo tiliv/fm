@@ -71,14 +71,15 @@ export default function usePosition({
   }, [map, zones, x, y, bump, keyMap]);
 
   useEffect(() => {
-    Object.entries(zones || {}).forEach(([box, data]) => {
+    const items = Object.entries(zones || {});
+    let newZone = null;
+    for (const [box, data] of items) {
       const [r, c, r2, c2] = box.split(',').map(Number).map((v) => v - 1);
       if (y >= r && y < r2 && x >= c && x < c2) {
-        setZone(data);
-      } else {
-        setZone(null);
+        newZone = data;
       }
-    });
+    }
+    setZone(newZone);
   }, [zones, x, y]);
 
   return { marker, bump, zone, x, y };
