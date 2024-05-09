@@ -65,7 +65,7 @@ export default function usePosition({
         setBump([newY, newX]);
       }
 
-      Object.entries(zones).forEach(([box, data]) => {
+      Object.entries(zones || {}).forEach(([box, data]) => {
         const [r, c, r2, c2] = box.split(',').map(Number);
         if (newY >= r && newY < r2 && newX >= c && newX < c2) {
           setZone(data);
