@@ -7,6 +7,7 @@ export default function useWorld({ world }) {
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [map, setMap] = useState([]);
   const [interactions, setInteractions] = useState({});
+  const [zones, setZones] = useState({});
 
   useEffect(() => {
     fetch(`world/${world}`)
@@ -40,8 +41,19 @@ export default function useWorld({ world }) {
 
         return boxGroups;
       }).then(async (boxGroups) => {
+        const zones = [];
+        await Promise.all(boxGroups.map(async (data) => {
+          const { boxes, dataFile } = data;
+          const overlay = await fetch(`overlays/${dataFile}`).then((res) => res.text());
+          data.buffer = overlay.trim().split('\n');
+          boxes.forEach((box) => {
+            zones.push([`${box}`, { ...data, box }]);
+          });
+        }));
+        const zoneInteractions = Object.fromEntries(zones);
+        setZones(zoneInteractions);
       });
   }, [world]);
 
-  return { map, size, walls, interactions };
+  return { map, size, walls, interactions, zones };
 }
