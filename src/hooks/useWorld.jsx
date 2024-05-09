@@ -17,14 +17,29 @@ export default function useWorld({ world }) {
         setMap(rows.map((row) => row.split('')));
         setSize({ width: rows[0].length, height: rows.length });
         setWalls(Object.fromEntries((zoneKey || '').split('\n').map((line) => line.trim().split(':'))));
+
+        const lines = (objects || '').split('\n').map((line) => {
+          if (!line.length) return false;
+          try {
+            return classifyObjectSpec(line);
+          } catch (e) {
+            console.error(e);
+            return false;
+          }
+        }).filter(Boolean);
+
+        const points = lines.filter((data) => data.coordinates);
+        const boxGroups = lines.filter((data) => data.boxes);
         setInteractions(Object.fromEntries(
-          (objects || '').split('\n').filter(line => line.length).map((line) => {
-            const data = classifyObjectSpec(line);
-            const [r, c] = data.coordinates;
+          points.map((data) => {
+            const { coordinates: [r, c] } = data;
             data.sprite = rows[r - 1][c - 1];
             return [`${r},${c}`, data];
-          })
-        ));
+          }
+        )));
+
+        return boxGroups;
+      }).then(async (boxGroups) => {
       });
   }, [world]);
 
