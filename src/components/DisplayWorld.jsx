@@ -25,6 +25,7 @@ export default function DisplayWorld({
 }) {
   const [activeBuffer, setActiveBuffer] = useState(null);
   const [zoneBuffer, setZoneBuffer] = useState(null);
+  const [animation, setAnimation] = useState(0);
 
   // This is redundant to the outer App.jsx useSave, because that one fails a
   // race condition to save data before it's unmounted and re-mounted. This one
@@ -58,23 +59,52 @@ export default function DisplayWorld({
   }, [interaction]);
 
   useEffect(() => {
+    const interval = setInterval(() => setAnimation(a => a + 1), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
     if (!zone) {
       setZoneBuffer(null);
       return;
     }
-    const { box, buffer } = zone;
-    const [h, w] = [box[2] - box[0], box[3] - box[1]];
+    const { box, buffer, directions, attributes: { fg='f00', bg=null }={} } = zone;
+    const [startY, startX] = [box[0] - origin.y - 1, box[1] - origin.x - 1];
+
+    // `animation` counts across each frame then repeats, but we want to total
+    // up all prior frames as well.
+    let offset = [0, 0];
+    if (directions) {
+      const loops = Math.floor(animation / directions.length);
+      const frames = directions.slice(0, (animation % directions.length) + 1);
+      const priorOffset = directions
+        .map(([dy, dx]) => [dy * loops, dx * loops])
+        .reduce(([y, x], [dy, dx]) => [y + dy, x + dx], [0, 0])
+        ;
+      offset = frames.reduce(([y, x], [dy, dx]) => [y + dy, x + dx], priorOffset);
+    }
+
     const rendered = Array.from(
       { length: height },
-      (y) => Array.from({ length: width }, (x) => {
-        // console.log(origin);
-        // const row = buffer[origin.y + y % h];
-        // return row[origin.x + x % w];
-        return '~';
+      (_, y) => Array.from({ length: width }, (_, x) => {
+        const [r, c] = [y + origin.y + 1, x + origin.x + 1];
+        if (r < box[0] || r >= box[2] || c < box[1] || c >= box[3]) return '';
+        const br = ((y - startY + offset[0]) % size[0] + size[0]) % size[0];
+        const bc = ((x - startX + offset[1]) % size[1] + size[1]) % size[1];
+        const row = buffer[br % buffer.length];
+        if (row === undefined) {
+          console.log({ br, bc, size });
+        }
+        const col = row[bc % row.length];
+        return col || ' ';
       })
     );
-    setZoneBuffer(rendered);
-  }, [zone, origin]);
+    setZoneBuffer({
+      bg: bg ? `#${bg}` : null,
+      fg: `#${fg}`,
+      buffer: rendered,
+    });
+  }, [zone, origin, size, animation]);
 
   // Find responders to ambient events
   useEffect(() => {
@@ -111,7 +141,7 @@ export default function DisplayWorld({
     { fg: '#f50', buffer: interactionBuffer },
     { fg: '#000', buffer: layers.objects },
     activeBuffer && { bg: '#ccc7', fg: '#000', buffer: activeBuffer },
-    zoneBuffer && { bg: '#ddd5', fg: '#5558', buffer: zoneBuffer },
+    zoneBuffer,
   ].filter(Boolean);
 
   return (
