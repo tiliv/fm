@@ -18,6 +18,10 @@ export default function useLocation({ world, x, y, width, height, name, possesse
   const [objects, setObjects] = useState([]);
   const [hydratedInteractions, setHydratedInteractions] = useState({});
 
+  const [position, setPosition] = useState({ x: posX, y: posY });
+  const [local, setLocal] = useState({ x: 0, y: 0 });
+  const [origin, setOrigin] = useState({ x: 0, y: 0 });
+
   const localX = posX % width;
   const localY = posY % height;
   const originX = posX - localX;
@@ -70,6 +74,18 @@ export default function useLocation({ world, x, y, width, height, name, possesse
     setObjects(objects);
   }, [map, interactions, posX, posY, marker, width, height]);
 
+  useEffect(() => {
+    setLocal({ x: localX, y: localY });
+  }, [localX, localY]);
+
+  useEffect(() => {
+    setPosition({ x: posX, y: posY });
+  }, [posX, posY]);
+
+  useEffect(() => {
+    setOrigin({ x: originX, y: originY });
+  }, [originX, originY]);
+
   return {
     layers: {
       solid,
@@ -80,8 +96,8 @@ export default function useLocation({ world, x, y, width, height, name, possesse
     marker,
     bump,
     interactions: hydratedInteractions,
-    position: { x: posX, y: posY },
-    local: { x: localX, y: localY },
-    origin: { x: originX, y: originY },
+    position,
+    local,
+    origin,
   };
 }
