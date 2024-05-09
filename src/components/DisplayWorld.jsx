@@ -24,6 +24,7 @@ export default function DisplayWorld({
   },
 }) {
   const [activeBuffer, setActiveBuffer] = useState(null);
+  const [zoneBuffer, setZoneBuffer] = useState(null);
 
   // This is redundant to the outer App.jsx useSave, because that one fails a
   // race condition to save data before it's unmounted and re-mounted. This one
@@ -38,7 +39,9 @@ export default function DisplayWorld({
   });
 
   const { name } = useStats();
-  const { marker, walls, layers, bump, local, position, interactions } = useLocation({
+  const {
+    marker, walls, layers, bump, zone, local, origin, position, interactions,
+  } = useLocation({
     world: startWorld, x: startX, y: startY, width, height,
     name, possesses,
     keyMap,
@@ -53,6 +56,25 @@ export default function DisplayWorld({
     const event = new CustomEvent('interaction', { detail: interaction });
     window.dispatchEvent(event);
   }, [interaction]);
+
+  useEffect(() => {
+    if (!zone) {
+      setZoneBuffer(null);
+      return;
+    }
+    const { box, buffer } = zone;
+    const [h, w] = [box[2] - box[0], box[3] - box[1]];
+    const rendered = Array.from(
+      { length: height },
+      (y) => Array.from({ length: width }, (x) => {
+        // console.log(origin);
+        // const row = buffer[origin.y + y % h];
+        // return row[origin.x + x % w];
+        return '~';
+      })
+    );
+    setZoneBuffer(rendered);
+  }, [zone, origin]);
 
   // Find responders to ambient events
   useEffect(() => {
@@ -89,6 +111,7 @@ export default function DisplayWorld({
     { fg: '#f50', buffer: interactionBuffer },
     { fg: '#000', buffer: layers.objects },
     activeBuffer && { bg: '#ccc7', fg: '#000', buffer: activeBuffer },
+    zoneBuffer && { bg: '#ddd5', fg: '#5558', buffer: zoneBuffer },
   ].filter(Boolean);
 
   return (
