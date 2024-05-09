@@ -4,19 +4,23 @@ import * as Buy from './actions/Buy';
 import * as Sell from './actions/Sell';
 import { renderTemplate } from './utils';
 
-const RowCol = "(?<row>\\d+),(?<col>\\d+)";
-const NewRowCol = "(?<newRow>\\d+),(?<newCol>\\d+)";
-const Label = "(?<label>[^/#]+)";
-const DataFile = "(?<dataFile>\\w+\\.txt)";
-const OptionalInventory = "(?<inventory>(,\\$[^,]+)*)";
-const OptionalAttributes = "(?<attributes>(#[^=]+=[^#]+)*)";
+const Boxes = /(?<boxes>(\[\d+,\d+,\d+,\d+\];?)*)/.source;
+const Directions = /(?<directions>([<>^v]\d+,?)+)/.source;
+const RowCol = /\((?<row>\d+),(?<col>\d+)\)/.source;
+const NewRowCol = /\((?<newRow>\d+),(?<newCol>\d+)\)/.source;
+const Label = /(?<label>[^/#]+)/.source;
+const DataFile = /(?<dataFile>\w+\.txt)/.source;
+const OptionalInventory = /(?<inventory>(,\$[^,]+)*)/.source;
+const OptionalAttributes = /(?<attributes>(#[^=]+=[^#]+)*)/.source;
 
+const ZONE_SPEC = RegExp(`^${DataFile}@${Directions}:${Boxes}${OptionalAttributes}$`);
 const WORLD_SPEC = RegExp(`^${RowCol}=${NewRowCol}:${Label}/${DataFile}$`);
 const DOOR_SPEC  = RegExp(`^${RowCol}=${NewRowCol}:${Label}${OptionalAttributes}$`);
 const NPC_SPEC   = RegExp(`^${RowCol}:${Label}/${DataFile}$`);
 const OBJ_SPEC   = RegExp(`^${RowCol}:${Label}${OptionalInventory}${OptionalAttributes}$`);
 
 const TYPE_SPECS = {
+  zone: ZONE_SPEC,
   world: WORLD_SPEC,
   npc: NPC_SPEC,
   door: DOOR_SPEC,
@@ -45,16 +49,33 @@ export function classifyObjectSpec(line) {
         .map((attr) => attr.split('='))
       );
 
-      // Move row & col into `coordinates`
-      groups.coordinates = [groups.row, groups.col];
-      delete groups.row;
-      delete groups.col;
+      // Move boxes into formatted `rects`
+      if (groups.boxes !== undefined) {
+        groups.boxes = groups.boxes.split(';').map((box) => {
+          if (!box) return null;
+          return box.slice(1, -1).split(',').map(Number);
+        }).filter(Boolean);
+        groups.directions = groups.directions.split(',').map((s) => {
+          const [dir, amount] = [s[0], Number(s.slice(1))];
+          if (dir === '<') return [0, -amount];
+          if (dir === '>') return [0, amount];
+          if (dir === '^') return [-amount, 0];
+          if (dir === 'v') return [amount, 0];
+        });
+      }
 
-      // Move newRow & newCol into `destination`
-      if (groups.newRow !== undefined) {
-        groups.destination = [groups.newRow, groups.newCol];
-        delete groups.newRow;
-        delete groups.newCol;
+      if (groups.row !== undefined) {
+        // Move row & col into `coordinates`
+        groups.coordinates = [groups.row, groups.col];
+        delete groups.row;
+        delete groups.col;
+
+        // Move newRow & newCol into `destination`
+        if (groups.newRow !== undefined) {
+          groups.destination = [groups.newRow, groups.newCol];
+          delete groups.newRow;
+          delete groups.newCol;
+        }
       }
 
       return groups;

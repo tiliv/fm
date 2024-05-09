@@ -44,15 +44,17 @@
 ■:chest
 ㅠ:table
 ---
-22,36=1,1:Debugger/debug.txt
-21,42:Shopkeeper/jacynthe.txt
-21,38:Bard/bard.txt
-23,38=25,36:Room 1#key=Bat-shaped key#text=It's locked. You need a ${key} to get inside.
-25,36=23,38:Tavern
-23,39=25,39:Room 2
-25,39=23,39:Tavern
-23,40=25,42:Room 3
-25,42=23,40:Tavern
-28,36:bed
-31,39:bed#Look=The bed seems nice.
-28,42:bed
+clouds.txt@^1,>2:
+dust.txt@v1,^1:[19,37,23,44]
+(22,36)=(1,1):Debugger/debug.txt
+(21,42):Shopkeeper/jacynthe.txt
+(21,38):Bard/bard.txt
+(23,38)=(25,36):Room 1#key=Bat-shaped key#text=It's locked. You need a ${key} to get inside.
+(25,36)=(23,38):Tavern
+(23,39)=(25,39):Room 2
+(25,39)=(23,39):Tavern
+(23,40)=(25,42):Room 3
+(25,42)=(23,40):Tavern
+(28,36):bed
+(31,39):bed#Look=The bed seems nice.
+(28,42):bed
