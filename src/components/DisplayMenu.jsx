@@ -77,7 +77,6 @@ export default function DisplayMenu({
         ...autoAction[1],
       };
     }
-    // console.log('items', items, autoMenu);
     setMenus([{
       title: `→${target.sprite} ${target.label}`,
       items,
