@@ -64,20 +64,22 @@ export default function usePosition({
       } else {
         setBump([newY, newX]);
       }
-
-      Object.entries(zones || {}).forEach(([box, data]) => {
-        const [r, c, r2, c2] = box.split(',').map(Number);
-        if (newY >= r && newY < r2 && newX >= c && newX < c2) {
-          setZone(data);
-        } else {
-          setZone(null);
-        }
-      });
     };
 
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
   }, [map, zones, x, y, bump, keyMap]);
+
+  useEffect(() => {
+    Object.entries(zones || {}).forEach(([box, data]) => {
+      const [r, c, r2, c2] = box.split(',').map(Number);
+      if (y >= r && y < r2 && x >= c && x < c2) {
+        setZone(data);
+      } else {
+        setZone(null);
+      }
+    });
+  }, [zones, x, y]);
 
   return { marker, bump, zone, x, y };
 }
