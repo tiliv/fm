@@ -4,7 +4,7 @@ import { classifyObjectSpec } from '../interactions';
 
 export default function useWorld({ world }) {
   const [walls, setWalls] = useState({});
-  const [size, setSize] = useState({ width: 0, height: 0 });
+  const [size, setSize] = useState([0, 0]);
   const [map, setMap] = useState([]);
   const [interactions, setInteractions] = useState({});
   const [zones, setZones] = useState({});
@@ -16,7 +16,8 @@ export default function useWorld({ world }) {
         const [loadedMap, zoneKey, objects] = text.trim().split('---\n');
         const rows = loadedMap.trim().split('\n');
         setMap(rows.map((row) => row.split('')));
-        setSize({ width: rows[0].length, height: rows.length });
+        const size = [rows.length, rows[0].length];
+        setSize(size);
         setWalls(Object.fromEntries((zoneKey || '').split('\n').map((line) => line.trim().split(':'))));
 
         const lines = (objects || '').split('\n').map((line) => {
@@ -39,16 +40,20 @@ export default function useWorld({ world }) {
           }
         )));
 
-        return boxGroups;
-      }).then(async (boxGroups) => {
+        return [size, boxGroups];
+      }).then(async ([size, boxGroups]) => {
         const zones = [];
         await Promise.all(boxGroups.map(async (data) => {
           const { boxes, dataFile } = data;
           const overlay = await fetch(`overlays/${dataFile}`).then((res) => res.text());
           data.buffer = overlay.replace(/\n+$/, '').split('\n');
-          boxes.forEach((box) => {
-            zones.push([`${box}`, { ...data, box }]);
-          });
+          if (!boxes.length) {
+            zones.push([`0,0,${size}`, { ...data, box: [0, 0, ...size] }])
+          } else {
+            boxes.forEach((box) => {
+              zones.push([`${box}`, { ...data, box }]);
+            });
+          }
         }));
         const zoneInteractions = Object.fromEntries(zones);
         setZones(zoneInteractions);

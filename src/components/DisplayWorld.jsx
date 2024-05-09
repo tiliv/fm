@@ -40,7 +40,7 @@ export default function DisplayWorld({
 
   const { name } = useStats();
   const {
-    marker, walls, layers, bump, zone, local, origin, position, interactions,
+    marker, size, walls, layers, bump, zone, local, origin, position, interactions,
   } = useLocation({
     world: startWorld, x: startX, y: startY, width, height,
     name, possesses,
