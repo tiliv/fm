@@ -5,10 +5,10 @@ import useWorld from './useWorld';
 import { parseInteraction, TYPES } from '../interactions';
 
 export default function useLocation({ world, x, y, width, height, name, possesses, keyMap={} }) {
-  const { map, walls, interactions } = useWorld({ world });
-  const { marker, bump, x: posX, y: posY } = usePosition({
+  const { map, walls, interactions, zones } = useWorld({ world });
+  const { marker, zone, bump, x: posX, y: posY } = usePosition({
     defaultX: x, defaultY: y,
-    map, walls, interactions, possesses,
+    map, walls, interactions, zones, possesses,
     keyMap,
   });
 
@@ -95,6 +95,7 @@ export default function useLocation({ world, x, y, width, height, name, possesse
     walls,
     marker,
     bump,
+    zone,
     interactions: hydratedInteractions,
     position,
     local,

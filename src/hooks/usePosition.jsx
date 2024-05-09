@@ -9,6 +9,7 @@ export default function usePosition({
   map,
   walls,
   interactions,
+  zones,
   possesses,
   keyMap={
     up: 'ArrowUp',
@@ -21,10 +22,12 @@ export default function usePosition({
   const [x, setX] = useState(defaultX);
   const [y, setY] = useState(defaultY);
   const [bump, setBump] = useState(null);
+  const [zone, setZone] = useState(null);
 
   useSave({
     x: [x, (v) => setTimeout(() => setX(v), 50)],
     y: [y, (v) => setTimeout(() => setY(v), 50)],
+    zone: [zone, setZone],
   });
 
   useEffect(() => {
@@ -61,11 +64,20 @@ export default function usePosition({
       } else {
         setBump([newY, newX]);
       }
+
+      Object.entries(zones).forEach(([box, data]) => {
+        const [r, c, r2, c2] = box.split(',').map(Number);
+        if (newY >= r && newY < r2 && newX >= c && newX < c2) {
+          setZone(data);
+        } else {
+          setZone(null);
+        }
+      });
     };
 
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [map, x, y, bump, keyMap]);
+  }, [map, zones, x, y, bump, keyMap]);
 
-  return { marker, bump, x, y };
+  return { marker, bump, zone, x, y };
 }
