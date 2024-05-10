@@ -173,10 +173,10 @@ export default function DisplayMenu({
           break;
         case keyMap.use:
           if (useKeyDownRef.current) return;
-          if (options[selected]?.price && gold + options[selected].price < 0) return;
           setSelected((selected) => {
             useKeyDownRef.current = true;
             const option = options[selected] || {};
+            if (option?.price && gold + option.price < 0) return selected;
             if (option.event) {
               const event = new CustomEvent(
                 option.event,
