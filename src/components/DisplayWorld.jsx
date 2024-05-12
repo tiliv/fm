@@ -88,7 +88,7 @@ export default function DisplayWorld({
       { length: height },
       (_, y) => Array.from({ length: width }, (_, x) => {
         const [r, c] = [y + origin.y + 1, x + origin.x + 1];
-        if (r < box[0] || r >= box[2] || c < box[1] || c >= box[3]) return '';
+        if (r < box[0] || r > box[2] || c < box[1] || c > box[3]) return '';
         const br = ((y - startY + offset[0]) % size[0] + size[0]) % size[0];
         const bc = ((x - startX + offset[1]) % size[1] + size[1]) % size[1];
         const row = buffer[br % buffer.length];

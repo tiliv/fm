@@ -75,7 +75,7 @@ export default function usePosition({
     let newZone = null;
     for (const [box, data] of items) {
       const [r, c, r2, c2] = box.split(',').map(Number).map((v) => v - 1);
-      if (y >= r && y < r2 && x >= c && x < c2) {
+      if (y >= r && y <= r2 && x >= c && x <= c2) {
         newZone = data;
       }
     }
