@@ -82,7 +82,7 @@ export default function DisplayMenu({
       items,
       autoStart: Boolean(autoMenu),
     }, autoMenu].filter(Boolean));
-  }, [`${target?.coordinates}`, width]);  // fixme: target 'updates' when player inventory changes
+  }, [`${target?.coordinates}`, ambientMenu, width]);  // fixme: target 'updates' when player inventory changes
 
   // Set options to current menu
   useEffect(() => {
