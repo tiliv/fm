@@ -54,27 +54,17 @@ export default function DisplayMenu({
       return;
     }
 
-    let items = Object.entries(target)
+    let items;
     let autoMenu = null;
 
-    const autoAction = items.find(([, option]) => {
-      return option.start;
-    });
+    const autoAction = Object.values(target).find(({ start }) => start);
     if (!autoAction) {
-      items = items
-        .filter(([k]) => ACTIONS_ORDER.includes(k))
-        .sort(([k1], [k2]) => ACTIONS_ORDER.indexOf(k1) - ACTIONS_ORDER.indexOf(k2))
-        ;
-      items.push(...Object.entries(target).filter(([k]) => {
-        if (items.find(([k2]) => k2 === k)) return false;
-        return /[A-Z]/.test(k[0]);
-      }));
-      items = items.map(([_, v]) => v);
+      items = Object.values(target).filter(({ name, hidden }) => name && !hidden);
     } else {
-      items = [autoAction[1]];
+      items = [autoAction];
       autoMenu = {
-        title: `${autoAction[0]}`,
-        ...autoAction[1],
+        title: autoAction.name,
+        ...autoAction,
       };
     }
     setMenus([{
