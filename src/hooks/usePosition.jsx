@@ -68,7 +68,7 @@ export default function usePosition({
 
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [map, zones, x, y, bump, keyMap]);
+  }, [map, walls, zones, x, y, bump, keyMap]);
 
   useEffect(() => {
     const items = Object.entries(zones || {});

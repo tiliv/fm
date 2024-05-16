@@ -91,6 +91,7 @@ export function parseInteraction(interaction, dataFileText, context) {
   // Split data file into initial text categories
   dataFileText.split('---').forEach((item) => {
     const [category] = item.trim().split('\n', 1);
+    if (!category) return;
     target[category] = {
       name: category,
       text: renderTemplate(item, context).slice(category.length + 1).trim()
