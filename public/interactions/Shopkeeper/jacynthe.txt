@@ -4,12 +4,6 @@ Jacinthe is a tavern owner.  She is a human woman and is 5'6" tall.  She has lon
 Greet
 "Welcome in.  Not much to sell, but buy up a drink and rest a bit if you're needin' it."
 ---
-Save
-"Your story's safe with me, ${name}."
----
-Sell
-weapon,body
----
 Buy
 ring/fire/2/Magmatic Stone/3
 ring/key/0/Bat-shaped key/0
@@ -28,6 +22,12 @@ legs/longskirt/0/Battle skirt/2
 legs/shorts/0/Tattered shorts/0
 shield/board/1/Driftwood/2
 waist/bag/1/Side bag/0
+---
+Sell
+weapon,body
+---
+Save
+"Your story's safe with me, ${name}."
 ---
 ?Shout
 "Hey! Will ye keep it down?  What's-a matter wit you?"
