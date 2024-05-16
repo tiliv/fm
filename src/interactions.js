@@ -3,7 +3,7 @@ import { renderTemplate } from './utils';
 
 const Sprite = /(?<sprite>.)/.source;
 const Boxes = /(?<boxes>(\[\d+,\d+,\d+,\d+\];?)*)/.source;
-const Directions = /(?<directions>([<>^v]\d+,?)+)/.source;
+const Directions = /(?<directions>([<>^v]\d+)+)/.source;
 const RowCol = /\((?<row>\d+),(?<col>\d+)\)/.source;
 const NewRowCol = /\((?<newRow>\d+),(?<newCol>\d+)\)/.source;
 const Label = /(?<label>[^/#]+)/.source;
@@ -55,7 +55,7 @@ export function classifyObjectSpec(line) {
           if (!box) return null;
           return box.slice(1, -1).split(',').map(Number);
         }).filter(Boolean);
-        groups.directions = groups.directions.split(',').map((s) => {
+        groups.directions = groups.directions.split(/(?<=\d)\b/).map((s) => {
           const [dir, amount] = [s[0], Number(s.slice(1))];
           if (dir === '<') return [0, -amount];
           if (dir === '>') return [0, amount];
