@@ -114,15 +114,10 @@ export function parseInteraction(interaction, dataFileText, context) {
 
 
 function amendNPC(target, {}) {
-  // We save the original action before overwriting it so that we have a
-  // reference in a closure for the `items` functions.  We clear text from the
-  // object so that `items` takes clear precedence when displayed.
-  // The text may be relevant because it can be parsed as configuration for
-  // the items functions.
-
   target.name = target.dataFile.replace(/\.txt$/, '');
   target.name = target.name[0].toUpperCase() + target.name.slice(1);
 
+  // Convert ?-prefixed items to hidden items
   Object.keys(target).forEach((rawName) => {
     if (rawName.startsWith('?')) {
       const adjustedName = rawName.replace(/^\?/, '');
@@ -140,9 +135,9 @@ function amendNPC(target, {}) {
     if (Actions[key] === undefined) {
       return;
     }
-    const action = JSON.parse(JSON.stringify(value));
-    const parsed = Actions[key].parse(target, action);
-    Object.assign(target[key], parsed);
+    const original = JSON.parse(JSON.stringify(value));
+    const parsed = Actions[key].parse(target, original);
+    Object.assign(value, parsed);
   });
 }
 
