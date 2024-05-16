@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { classifyObjectSpec } from '../interactions';
+import { classifyObjectSpec, TYPES } from '../interactions';
 
 export default function useWorld({ world }) {
   const [walls, setWalls] = useState({});
@@ -13,12 +13,11 @@ export default function useWorld({ world }) {
     fetch(`world/${world}`)
       .then((res) => res.text())
       .then((text) => {
-        const [loadedMap, zoneKey, objects] = text.trim().split('---\n');
+        const [loadedMap, objects] = text.trim().split('---\n');
         const rows = loadedMap.trim().split('\n');
         setMap(rows.map((row) => row.split('')));
         const size = [rows.length, rows[0].length];
         setSize(size);
-        setWalls(Object.fromEntries((zoneKey || '').split('\n').map((line) => line.trim().split(':'))));
 
         const lines = (objects || '').split('\n').map((line) => {
           if (!line.length) return false;
@@ -29,6 +28,12 @@ export default function useWorld({ world }) {
             return false;
           }
         }).filter(Boolean);
+
+        setWalls(Object.fromEntries(
+          lines
+            .filter(({ type }) => type === TYPES.SPRITE)
+            .map((data) => [data.sprite, data])
+        ));
 
         const points = lines.filter((data) => data.coordinates);
         const boxGroups = lines.filter((data) => data.boxes);

@@ -33,7 +33,7 @@ export default function useInteraction({
           foundInteraction = interaction;
         } else {
           const sprite = layers.solid[lby][lbx];
-          if (walls[sprite].startsWith('~')) {
+          if (interactions[sprite].short) {
             // Reach one space farther to see if something is on the other side.
             const xDiff = bx - x;
             const yDiff = by - y;
@@ -49,9 +49,8 @@ export default function useInteraction({
           if (!foundInteraction) {
             foundInteraction = {
               sprite,
-              incidental: true,  // don't dim screen for this
-              label: walls[sprite].replace(/^~/, ''),
               coordinates: [by, bx],
+              ...interactions[sprite],
             }
           }
         }

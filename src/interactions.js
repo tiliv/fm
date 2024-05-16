@@ -1,6 +1,7 @@
 import * as Actions from './actions';
 import { renderTemplate } from './utils';
 
+const Sprite = /(?<sprite>.)/.source;
 const Boxes = /(?<boxes>(\[\d+,\d+,\d+,\d+\];?)*)/.source;
 const Directions = /(?<directions>([<>^v]\d+,?)+)/.source;
 const RowCol = /\((?<row>\d+),(?<col>\d+)\)/.source;
@@ -10,6 +11,7 @@ const DataFile = /(?<dataFile>\w+\.txt)/.source;
 const OptionalInventory = /(?<inventory>(,\$[^,]+)*)/.source;
 const OptionalAttributes = /(?<attributes>(#[^=]+=[^#]+)*)/.source;
 
+const SPRITE_SPEC = RegExp(`^${Sprite}:${Label}${OptionalAttributes}$`);
 const ZONE_SPEC = RegExp(`^${DataFile}@${Directions}:${Boxes}${OptionalAttributes}$`);
 const WORLD_SPEC = RegExp(`^${RowCol}=${NewRowCol}:${Label}/${DataFile}$`);
 const DOOR_SPEC  = RegExp(`^${RowCol}=${NewRowCol}:${Label}${OptionalAttributes}$`);
@@ -17,6 +19,7 @@ const NPC_SPEC   = RegExp(`^${RowCol}:${Label}/${DataFile}$`);
 const OBJ_SPEC   = RegExp(`^${RowCol}:${Label}${OptionalInventory}${OptionalAttributes}$`);
 
 const TYPE_SPECS = {
+  sprite: SPRITE_SPEC,
   zone: ZONE_SPEC,
   world: WORLD_SPEC,
   npc: NPC_SPEC,
@@ -95,18 +98,11 @@ export function parseInteraction(interaction, dataFileText, context) {
   });
 
   switch (target.type) {
-    case (TYPES.NPC):
-      amendNPC(target, context);
-      break;
-    case (TYPES.DOOR):
-      amendDoor(target, context);
-      break;
-    case (TYPES.WORLD):
-      amendWorld(target, context);
-      break;
-    case (TYPES.OBJ):
-      amendObj(target, context);
-      break;
+    case (TYPES.SPRITE): amendSprite(target, context); break;
+    case (TYPES.NPC): amendNPC(target, context); break;
+    case (TYPES.DOOR): amendDoor(target, context); break;
+    case (TYPES.WORLD): amendWorld(target, context); break;
+    case (TYPES.OBJ): amendObj(target, context); break;
   }
 
   return target;
@@ -159,10 +155,25 @@ function amendObj(target, {}) {
   const { attributes={} } = target;
   Object.entries(attributes)
     .filter(([name]) => /^[A-Z]/.test(name))
-    .map(([name, text]) => {
+    .forEach(([name, text]) => {
       target[name] = { name, text };
-    })
-    ;
-  // target.Inspect = { name: 'Inspect', text: null };
+    });
+  return;
+}
+
+function amendSprite(target, {}) {
+  const { attributes={} } = target;
+  Object.entries(attributes)
+    .filter(([name]) => /^[A-Z]/.test(name))
+    .forEach(([name, text]) => {
+      target[name] = { name, text };
+    });
+
+  target.incidental = true;  // don't dim screen for this
+  if (target.label.startsWith('~')) {
+    target.label = target.label.replace(/^~/, '');
+    target.short = true;
+  }
+
   return;
 }

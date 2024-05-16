@@ -34,10 +34,13 @@ export default function useLocation({ world, x, y, width, height, name, possesse
 
     // Hydrate interactions on this viewport
     Promise.all(
-      Object.entries(interactions).map(async ([location, interaction]) => {
-        const [y, x] = location.split(',').map(Number);
-        if ((x < originX || x >= originX + width) || (y < originY || y >= originY + height)) {
-          return [null, null];
+      Object.entries(interactions).concat(Object.entries(walls))
+      .map(async ([key, interaction]) => {
+        if (key.includes(',')) {
+          const [y, x] = key.split(',').map(Number);
+          if ((x < originX || x >= originX + width) || (y < originY || y >= originY + height)) {
+            return [null, null];
+          }
         }
         const attributes = interaction.attributes || {};
         const context = { ...attributes, name, possesses };
@@ -49,12 +52,12 @@ export default function useLocation({ world, x, y, width, height, name, possesse
             .catch((err) => `Err\n${err}`);
         }
         const hydrated = parseInteraction(interaction, text, context);
-        return [location, hydrated];
+        return [key, hydrated];
       })
     ).then((entries) => {
       setHydratedInteractions(Object.fromEntries(entries.filter(([_]) => Boolean(_))));
     });
-  }, [map, originX, originY, width, height, possesses]);
+  }, [map, walls, originX, originY, width, height, possesses]);
 
   useEffect(() => {
     setSolid(area.map((row) => row.map((cell) => walls[cell] ? cell : ' ')));
