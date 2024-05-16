@@ -1,4 +1,11 @@
-export function list() {
+export function parse() {
+  return {
+    items: makeItems,
+    text: null,
+  }
+}
+
+function makeItems() {
   const slotNames = [];
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);

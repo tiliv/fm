@@ -1,7 +1,4 @@
-import { ACTIONS } from './Actions';
-import * as Load from './actions/Load';
-import * as Buy from './actions/Buy';
-import * as Sell from './actions/Sell';
+import * as Actions from './actions';
 import { renderTemplate } from './utils';
 
 const Boxes = /(?<boxes>(\[\d+,\d+,\d+,\d+\];?)*)/.source;
@@ -126,32 +123,27 @@ function amendNPC(target, {}) {
   target.name = target.dataFile.replace(/\.txt$/, '');
   target.name = target.name[0].toUpperCase() + target.name.slice(1);
 
-  if (target[ACTIONS.BUY] !== undefined) {
-    let action = JSON.parse(JSON.stringify(target[ACTIONS.BUY]));
-    Object.assign(target[ACTIONS.BUY], {
-      items: ({ inventory }) => Buy.parse(target, action, { inventory }),
-      text: null,
-    });
-  }
+  Object.keys(target).forEach((rawName) => {
+    if (rawName.startsWith('?')) {
+      const adjustedName = rawName.replace(/^\?/, '');
+      Object.assign(target, {
+        [adjustedName]: Object.assign(target[rawName], {
+          name: adjustedName,
+          hidden: true,
+        }),
+      });
+      delete target[rawName];
+    }
+  });
 
-  if (target[ACTIONS.SELL] !== undefined) {
-    let action = JSON.parse(JSON.stringify(target[ACTIONS.SELL]));
-    Object.assign(target[ACTIONS.SELL], {
-      items: ({ inventory }) => Sell.parse(target, action, { inventory }),
-      text: null,
-    });
-  }
-
-  if (target.Save !== undefined) {
-    target.Save.event = 'Save';
-  }
-
-  if (target.Load !== undefined) {
-    Object.assign(target.Load, {
-      items: Load.list().map((slot) => ({ slot, name: slot, event: 'Load' })),
-      text: null,
-    });
-  }
+  Object.entries(target).forEach(([key, value]) => {
+    if (Actions[key] === undefined) {
+      return;
+    }
+    const action = JSON.parse(JSON.stringify(value));
+    const parsed = Actions[key].parse(target, action);
+    Object.assign(target[key], parsed);
+  });
 }
 
 function amendDoor(target, { possesses }) {

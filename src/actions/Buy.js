@@ -1,6 +1,13 @@
 import { price, EQUIPMENT, EQUIPMENT_ORDER } from '../utils';
 
-export function parse(target, { text }, { inventory }) {
+export function parse(target, action) {
+  return {
+    items: ({ inventory }) => makeItems(target, action, { inventory }),
+    text: null,
+  };
+}
+
+function makeItems(target, { text }, { inventory }) {
   const entries = text.split('\n').map((item) => {
     const [kind, template, rarity, name, stat, id=null] = item.split('/');
     if (inventory[kind]?.find((item) => item.name === name)) {

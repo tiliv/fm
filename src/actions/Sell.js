@@ -1,6 +1,13 @@
 import { price, EQUIPMENT } from '../utils';
 
-export function parse(target, { text }) {
+export function parse(target, action) {
+  return {
+    items: (context) => makeItems(target, action, context),
+    text: null,
+  };
+}
+
+function makeItems(target, { text }, context) {
   return text.split(',').map((kind) => {
     if (EQUIPMENT[kind] !== undefined) {
       return {
@@ -13,7 +20,7 @@ export function parse(target, { text }) {
             kind,
             target,
             price: price(item),
-            event: `Sell.player`,
+            event: 'Sell.player',
             consume: true,
           }
         }),

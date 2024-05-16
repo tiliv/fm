@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 
 import ScreenStack from './ScreenStack';
 import useSave from '../hooks/useSave';
-import { ACTIONS_ORDER } from '../Actions';
+import { ACTIONS_ORDER } from '../actions';
 import { renderTemplate, minifyNumbers, bufferize, loadSprite, RARITY_COLORS } from '../utils';
 
 const OPTION_KEYS = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
