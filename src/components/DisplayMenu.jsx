@@ -128,7 +128,7 @@ export default function DisplayMenu({
         setMenus((menus) => {
           if (menus[0].autoStart || menus.length === 1) {
             window.dispatchEvent(new CustomEvent('interaction', { detail: null }));
-            return [];
+            return menus;
           } else if (menus.length > 1) {
             const newMenus = menus.slice(0, -1);
             setSelected(newMenus[newMenus.length - 1].selected);
