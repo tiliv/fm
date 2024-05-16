@@ -94,6 +94,7 @@ export default function DisplayWorld({
         const row = buffer[br % buffer.length];
         if (row === undefined) {
           console.log({ br, bc, size, y, startY, offset });
+          return '?';
         }
         const col = row[bc % row.length];
         return col || ' ';
