@@ -85,5 +85,16 @@ export default function usePosition({
     setZone(newZone);
   }, [zones, x, y]);
 
+  // Respond to interaction events
+  useEffect(() => {
+    if (!bump) return;
+    const climb = function() {
+      setX(bump[1]);
+      setY(bump[0]);
+    };
+    window.addEventListener('Climb', climb);
+    return () => window.removeEventListener('Climb', climb);
+  }, [bump]);
+
   return { marker, bump, zone, x, y };
 }
