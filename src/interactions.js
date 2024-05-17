@@ -167,7 +167,7 @@ function amendSprite(target, {}) {
   Object.entries(attributes)
     .filter(([name]) => /^[A-Z]/.test(name))
     .forEach(([name, text]) => {
-      target[name] = { name, text };
+      target[name] = { name, text, event: name };
     });
 
   target.incidental = true;  // don't dim screen for this
