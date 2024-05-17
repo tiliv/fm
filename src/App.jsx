@@ -9,7 +9,7 @@ import useInventory from './hooks/useInventory';
 import useSave from './hooks/useSave';
 
 const START_WORLD = 'Terra Montans.txt'
-const [START_Y, START_X] = [17, 35];
+const [START_Y, START_X] = [20, 39];
 const START_LOG = [
   "You've never been this tired before.",
   'You wake up in a small room, the walls are made of stone and the floor is dirt.',
