@@ -39,7 +39,7 @@
 █:wall
 ▒:brick wall
 ⬚:door
-|:~counter#Climb=You shamble onto the counter.
+|:~counter
 ー:~counter
 ⌸:~bed
 ■:~chest

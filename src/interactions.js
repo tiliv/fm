@@ -174,6 +174,9 @@ function amendSprite(target, {}) {
   if (target.label.startsWith('~')) {
     target.label = target.label.replace(/^~/, '');
     target.short = true;
+    if (!target.Climb) {
+      target.Climb = { name: 'Climb', text: `You shamble onto the ${target.label}.`, event: 'Climb' };
+    }
   }
 
   return;
