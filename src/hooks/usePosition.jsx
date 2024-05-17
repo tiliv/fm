@@ -30,12 +30,14 @@ export default function usePosition({
     zone: [zone, setZone],
   });
 
+  // Reset position when map changes
   useEffect(() => {
     setBump(null);
     setX(defaultX);
     setY(defaultY);
   }, [defaultX, defaultY]);
 
+  // Player movement & bump detection
   useEffect(() => {
     const keydown = (e) => {
       let newX = x;
@@ -70,6 +72,7 @@ export default function usePosition({
     return () => window.removeEventListener('keydown', keydown);
   }, [map, walls, zones, x, y, bump, keyMap]);
 
+  // Detect current zone
   useEffect(() => {
     const items = Object.entries(zones || {});
     let newZone = null;
