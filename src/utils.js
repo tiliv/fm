@@ -29,7 +29,7 @@ const KEY_ALIASES = {
 }
 
 export function renderTemplate (tmpl, data) {
-  const keys = Object.keys(data);
+  const keys = Object.keys(data).map((k) => k.split('{')[0]);  // avoid parameters in key names
   const values = Object.values(data);
   const func = new Function(...keys, `return \`${tmpl}\`;`);
   return func(...values);

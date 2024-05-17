@@ -39,11 +39,11 @@
 █:wall
 ▒:brick wall
 ⬚:door
-|:~counter
-ー:~counter
-⌸:~bed
-■:~chest
-ㅠ:~table
+|:~counter#Climb=You climb onto the counter.
+ー:~counter#Climb=You climb onto the counter.
+⌸:~bed#Climb=You shamble onto the bed.#Sleep{quality:120}=You lie down and close your eyes.
+■:~chest#Climb=You shamble awkwardly atop the chest.
+ㅠ:~table#Climb=You climb atop the table.
 clouds.txt@^1>2:#fg=fff8
 dust.txt@v1^1:[19,37,23,44]#fg=8888
 (22,36)=(1,1):Debugger/debug.txt
@@ -55,6 +55,3 @@ dust.txt@v1^1:[19,37,23,44]#fg=8888
 (25,39)=(23,39):Tavern
 (23,40)=(25,42):Room 3
 (25,42)=(23,40):Tavern
-(28,36):bed
-(31,39):bed#Look=The bed seems nice.
-(28,42):bed

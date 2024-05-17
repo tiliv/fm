@@ -166,17 +166,15 @@ function amendSprite(target, {}) {
   const { attributes={} } = target;
   Object.entries(attributes)
     .filter(([name]) => /^[A-Z]/.test(name))
-    .forEach(([name, text]) => {
-      target[name] = { name, text, event: name };
+    .forEach(([rawName, text]) => {
+      const { name, data='{}' } = /^(?<name>[^{]+)(?<data>\{.*\})?$/.exec(rawName).groups;
+      target[name] = { name, text, event: name, ...eval(`(${data})`) };
     });
 
   target.incidental = true;  // don't dim screen for this
   if (target.label.startsWith('~')) {
     target.label = target.label.replace(/^~/, '');
     target.short = true;
-    if (!target.Climb) {
-      target.Climb = { name: 'Climb', text: `You shamble onto the ${target.label}.`, event: 'Climb' };
-    }
   }
 
   return;
