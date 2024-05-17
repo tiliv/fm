@@ -60,6 +60,8 @@ export default function useInventory(subject, {
   const acquire = useAcquire({ subject, setInventory, addLog });
   const drop = useDrop({ subject, setInventory });
 
+  useSleep({ subject, hp, setHp, addLog });
+
   const possesses = useCallback(function(kind, identifier) {
     function findEquipped(slot, kind=null) {
       return inventory[kind || slot].find(({ id, name }) => {
@@ -220,4 +222,31 @@ function useEquip({ subject, setEquipment }) {
   }, [subject]);
 
   return equip;
+}
+
+
+function useSleep({ subject, hp, setHp, addLog }) {
+  useEffect(() => {
+    const eventName = `Sleep.${subject}`;
+    const handler = function({ detail: { quality } }) {
+      setHp((hp) => {
+        const newHp = Math.max(hp, quality);
+        if (hp >= quality) {
+          addLog(`Slept, but you feel about the same.`)
+        } else {
+          addLog(`Slept well, and healed to ${quality}.`);
+        }
+        return newHp;
+      });
+    };
+    window.addEventListener(eventName, handler);
+    return () => window.removeEventListener(eventName, handler);
+  }, [subject]);
+
+  const sleep = useCallback(function(quality) {
+    const event = new CustomEvent(`Sleep.${subject}`, { detail: { quality } });
+    window.dispatchEvent(event);
+  }, [subject]);
+
+  return sleep;
 }
