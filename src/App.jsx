@@ -62,9 +62,10 @@ export default function App({
 
   const [interaction, setInteraction] = useState(null);
   const {
-    inventory, equipment, gold, log,
-    equip, acquire, possesses,
-  } = useInventory('player', { world: startWorld, startLog: START_LOG });
+    stats,
+    inventory, equipment, log,
+    handlers,
+  } = useInventory('player', { startLog: START_LOG });
 
   useSave({
     magnification: [magnification, setMagnification],
@@ -142,10 +143,10 @@ export default function App({
 
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
         <DisplayStats
-          gold={gold}
+          {...stats.current}
           inventory={inventory}
           equipment={equipment}
-          equip={equip}
+          equip={handlers.current.equip}
           log={log}
 
           width={width}
@@ -156,7 +157,7 @@ export default function App({
         <DisplayWorld
           target={interaction}
 
-          possesses={possesses}
+          possesses={handlers.current.possesses}
 
           startWorld={startWorld}
           startX={startX}
@@ -168,12 +169,12 @@ export default function App({
         />
         <DisplayMenu
           target={interaction}
-          gold={gold}
+          gold={stats.current.gold}
           ambientMenu={ambientMenu}
 
           inventory={inventory}
           equipment={equipment}
-          acquire={acquire}
+          acquire={handlers.current.acquire}
 
           width={width}
           height={height}

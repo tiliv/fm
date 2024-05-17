@@ -20,23 +20,30 @@ const EMPTY_INVENTORY = Object.fromEntries(CATEGORIES.map((category) => [categor
 const EMPTY_EQUIPMENT = Object.fromEntries(CATEGORIES.map((category) => [category, null]));
 
 export default function useInventory(subject, {
-  world,
   startLog=[],
   startGold=EMPTY_GOLD,
   startInventory=EMPTY_INVENTORY,
   startEquipment=EMPTY_EQUIPMENT,
 }={}) {
+  const [hp, setHp] = useState(100);
+  const [strength, setStrength] = useState(10);
+  const [defense, setDefense] = useState(5);
+  const [speed, setSpeed] = useState(5);
   const [gold, setGold] = useState(startGold);
   const [inventory, setInventory] = useState(startInventory);
   const [equipment, setEquipment] = useState(startEquipment);
   const [log, setLog] = useState(startLog);
 
-  const _world = useRef(world);
-  useEffect(() => {
-    _world.current = world;
-  }, [world]);
+  const name = localStorage.getItem('latest');
+
+  const stats = useRef({});
+  const handlers = useRef({});
 
   useSave({
+    [`${subject}/hp`]: [hp, setHp],
+    [`${subject}/strength`]: [strength, setStrength],
+    [`${subject}/defense`]: [defense, setDefense],
+    [`${subject}/speed`]: [speed, setSpeed],
     [`${subject}/gold`]: [gold, setGold],
     [`${subject}/inventory`]: [inventory, setInventory],
     [`${subject}/equipment`]: [equipment, setEquipment],
@@ -70,10 +77,18 @@ export default function useInventory(subject, {
     return findEquipped(kind);
   }, [equipment, inventory]);
 
+  useEffect(() => {
+    stats.current = { name, hp, strength, defense, speed, gold };
+  }, [name, hp, strength, defense, speed, gold]);
+
+  useEffect(() => {
+    handlers.current = { buy, sell, equip, acquire, drop, possesses };
+  }, [buy, sell, equip, acquire, drop, possesses])
+
   return {
-    gold, inventory, equipment, possesses,
-    buy, sell, equip, acquire, drop,
-    log,
+    stats,
+    handlers,
+    inventory, equipment, log,
   };
 }
 

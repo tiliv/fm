@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
 import ScreenStack from './ScreenStack';
-import useStats from '../hooks/useStats';
 import useSubDisplayEquip from '../hooks/useSubDisplayEquip';
 import useSubDisplayRings from '../hooks/useSubDisplayRings';
 import useSubDisplayLog from '../hooks/useSubDisplayLog';
@@ -9,9 +8,9 @@ import useSave from '../hooks/useSave';
 import { keyAlias } from '../utils';
 
 const TABS_ORDER = ['Equip', 'Rings', 'Log'];
-const TABS = Object.fromEntries(TABS_ORDER.map((tab) => [tab.toUpperCase(), tab]));
 
 export default function DisplayStats({
+  name, hp, strength, defense, speed,
   inventory, equipment, equip, gold, log,
 
   width, height, magnification=1,
@@ -24,7 +23,6 @@ export default function DisplayStats({
     cancel: 'Escape',
   },
 }) {
-  const { name, hp, strength, defense, speed } = useStats();
   const [menuChoice, setMenuChoice] = useState(0);
 
   useSave({

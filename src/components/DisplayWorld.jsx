@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import ScreenStack from './ScreenStack';
 import useLocation from '../hooks/useLocation';
 import useInteraction from '../hooks/useInteraction';
-import useStats from '../hooks/useStats';
 import useSave from '../hooks/useSave';
 import { keyAlias } from '../utils';
 import { TYPES } from '../interactions';
@@ -39,12 +38,11 @@ export default function DisplayWorld({
     startY: [startY, () => {}],
   });
 
-  const { name } = useStats();
   const {
     marker, size, walls, layers, bump, zone, local, origin, position, interactions,
   } = useLocation({
     world: startWorld, x: startX, y: startY, width, height,
-    name, possesses,
+    possesses,
     keyMap,
   });
   const { interaction, interactionBuffer } = useInteraction({

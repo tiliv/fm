@@ -4,7 +4,7 @@ import usePosition from './usePosition';
 import useWorld from './useWorld';
 import { parseInteraction, TYPES } from '../interactions';
 
-export default function useLocation({ world, x, y, width, height, name, possesses, keyMap={} }) {
+export default function useLocation({ world, x, y, width, height, possesses, keyMap={} }) {
   const { map, size, walls, interactions, zones } = useWorld({ world });
   const { marker, zone, bump, x: posX, y: posY } = usePosition({
     defaultX: x, defaultY: y,
@@ -31,6 +31,8 @@ export default function useLocation({ world, x, y, width, height, name, possesse
     setArea(map.slice(originY, originY + height).map(
       (row) => row.slice(originX, originX + width)
     ));
+
+    const name = localStorage.getItem('latest');
 
     // Hydrate interactions on this viewport
     Promise.all(
