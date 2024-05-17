@@ -168,7 +168,7 @@ function amendSprite(target, {}) {
     .filter(([name]) => /^[A-Z]/.test(name))
     .forEach(([rawName, text]) => {
       const { name, data='{}' } = /^(?<name>[^{]+)(?<data>\{.*\})?$/.exec(rawName).groups;
-      target[name] = { name, text, event: name, ...eval(`(${data})`) };
+      target[name] = { name, text, event: `${name}.player`, ...eval(`(${data})`) };
     });
 
   target.incidental = true;  // don't dim screen for this

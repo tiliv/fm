@@ -92,8 +92,8 @@ export default function usePosition({
       setX(bump[1]);
       setY(bump[0]);
     };
-    window.addEventListener('Climb', climb);
-    return () => window.removeEventListener('Climb', climb);
+    window.addEventListener('Climb.player', climb);
+    return () => window.removeEventListener('Climb.player', climb);
   }, [bump]);
 
   return { marker, bump, zone, x, y };
