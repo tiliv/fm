@@ -162,7 +162,7 @@ export default function DisplayMenu({
           setSelected((selected) => Math.max(0, selected - _viewportHeight));
           break;
         case keyMap.use:
-          if (useKeyDownRef.current) return;
+          if (useKeyDownRef.current || !options.length) return;
           setSelected((selected) => {
             useKeyDownRef.current = true;
             const option = options[selected] || {};
