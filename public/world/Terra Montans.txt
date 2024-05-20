@@ -44,7 +44,8 @@
 ⌸:~bed#Climb=You shamble onto the bed.#Sleep{quality:120}=You lie down and close your eyes.
 ■:~chest#Climb=You shamble awkwardly atop the chest.
 ㅠ:~table#Climb=You climb atop the table.
-clouds.txt@^1>2:#fg=fff8
+rain.txt@v2:#fg=fff8#100-100=clouds.txt
+clouds.txt@^1>2:#fg=fff8#50-50=rain.txt
 dust.txt@v1^1:[19,37,23,44]#fg=8888
 (22,36)=(1,1):Debugger/debug.txt
 (21,42):Shopkeeper/jacynthe.txt
