@@ -123,7 +123,7 @@ export async function loadSprite(kind, item, { offsetLeft=0, width, height }, ..
 }
 
 
-export function groupEquipment(source, { target, omit }, extra={}) {
+export function groupEquipment(source, { target, omit={} }, extra={}) {
   const entries = source.split('\n').map((item) => {
     const [kind, template, rarity, name, stat, id=null] = item.split('/');
     if (omit[kind]?.find((item) => item.name === name)) {
@@ -156,7 +156,9 @@ export function groupEquipment(source, { target, omit }, extra={}) {
     }
     acc[kind].items.push(entry);
     return acc;
-  }, {}))
+  }, {})).sort((a, b) => {
+    return EQUIPMENT_ORDER.indexOf(a.kind) - EQUIPMENT_ORDER.indexOf(b.kind);
+  });
 
   return groups;
 }

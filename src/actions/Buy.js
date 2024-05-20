@@ -1,4 +1,4 @@
-import { price, EQUIPMENT, groupEquipment, EQUIPMENT_ORDER } from '../utils';
+import { groupEquipment } from '../utils';
 
 export function parse(target, action) {
   return {
@@ -12,9 +12,7 @@ function makeItems(target, { text }, { inventory }) {
     text,
     { target, omit: inventory },
     { event: 'Buy.player', consume: true }
-  ).sort((a, b) => {
-    return EQUIPMENT_ORDER.indexOf(a.kind) - EQUIPMENT_ORDER.indexOf(b.kind);
-  });
+  );
 
   // Turn sub-menu into callable based on built list
   equipmentGroups.forEach((option) => {
