@@ -1,4 +1,4 @@
-import { price, EQUIPMENT, EQUIPMENT_ORDER } from '../utils';
+import { price, EQUIPMENT, groupEquipment, EQUIPMENT_ORDER } from '../utils';
 
 export function parse(target, action) {
   return {
@@ -8,48 +8,20 @@ export function parse(target, action) {
 }
 
 function makeItems(target, { text }, { inventory }) {
-  const entries = text.split('\n').map((item) => {
-    const [kind, template, rarity, name, stat, id=null] = item.split('/');
-    if (inventory[kind]?.find((item) => item.name === name)) {
-      return null;
-    }
-    const statValue = parseInt(stat, 10);
-    const stats = { [kind === 'weapon' ? 'A' : 'D']: statValue };
-    return {
-      name,
-      kind,
-      stats,
-      event: 'Buy.player',
-      target,
-      price: -price({ rarity: parseInt(rarity, 10), stats }),
-      consume: true,
-      item: {
-        name,
-        template,
-        id: id !== null ? parseInt(id, 10) : null,
-        rarity: parseInt(rarity, 10),
-        stats,
-      },
-    };
-  }).filter(Boolean);
-
-  // Break into groups by kind
-  const options = Object.values(entries.reduce((acc, entry) => {
-    const { kind } = entry;
-    if (!acc[kind]) {
-      acc[kind] = { name: EQUIPMENT[kind], _items: [], kind };
-    }
-    acc[kind]._items.push(entry);
-    return acc;
-  }, {})).sort((a, b) => {
+  const equipmentGroups = groupEquipment(
+    text,
+    { target, omit: inventory },
+    { event: 'Buy.player', consume: true }
+  ).sort((a, b) => {
     return EQUIPMENT_ORDER.indexOf(a.kind) - EQUIPMENT_ORDER.indexOf(b.kind);
   });
 
   // Turn sub-menu into callable based on built list
-  options.forEach((option) => {
-    option.items = ({ inventory }) => option._items.filter(({ name }) => {
+  equipmentGroups.forEach((option) => {
+    const originals = option.items;
+    option.items = ({ inventory }) => originals.filter(({ name }) => {
       return !inventory[option.kind]?.find((item) => item.name === name)
     });
   });
-  return options;
+  return equipmentGroups;
 };

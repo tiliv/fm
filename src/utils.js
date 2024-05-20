@@ -121,3 +121,42 @@ export async function loadSprite(kind, item, { offsetLeft=0, width, height }, ..
       return data;
     });
 }
+
+
+export function groupEquipment(source, { target, omit }, extra={}) {
+  const entries = source.split('\n').map((item) => {
+    const [kind, template, rarity, name, stat, id=null] = item.split('/');
+    if (omit[kind]?.find((item) => item.name === name)) {
+      return null;
+    }
+    const statValue = parseInt(stat, 10);
+    const stats = { [kind === 'weapon' ? 'A' : 'D']: statValue };
+    return {
+      name,
+      kind,
+      stats,
+      target,
+      price: -price({ rarity: parseInt(rarity, 10), stats }),
+      item: {
+        name,
+        template,
+        id: id !== null ? parseInt(id, 10) : null,
+        rarity: parseInt(rarity, 10),
+        stats,
+      },
+      ...extra,
+    };
+  }).filter(Boolean);
+
+  // Break into groups by kind
+  const groups = Object.values(entries.reduce((acc, entry) => {
+    const { kind } = entry;
+    if (!acc[kind]) {
+      acc[kind] = { name: EQUIPMENT[kind], items: [], kind };
+    }
+    acc[kind].items.push(entry);
+    return acc;
+  }, {}))
+
+  return groups;
+}
