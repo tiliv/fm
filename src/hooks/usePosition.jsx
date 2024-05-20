@@ -23,6 +23,7 @@ export default function usePosition({
   const [y, setY] = useState(defaultY);
   const [bump, setBump] = useState(null);
   const [zone, setZone] = useState(null);
+  const [priorBox, setPriorBox] = useState(null);
 
   useSave({
     x: [x, (v) => setTimeout(() => setX(v), 50)],
@@ -81,7 +82,10 @@ export default function usePosition({
         newZone = data;
       }
     }
-    setZone(newZone);
+    if (priorBox !== newZone?.box) {
+      setZone(newZone);
+      setPriorBox(newZone?.box || null);
+    }
   }, [zones, x, y]);
 
   // Try to change weather zones
