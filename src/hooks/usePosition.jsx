@@ -74,16 +74,38 @@ export default function usePosition({
 
   // Detect current zone
   useEffect(() => {
-    const items = Object.entries(zones || {});
     let newZone = null;
-    for (const [box, data] of items) {
-      const [r, c, r2, c2] = box.split(',').map(Number).map((v) => v - 1);
+    for (const data of zones) {
+      const [r, c, r2, c2] = data.box.map((v) => v - 1);
       if (y >= r && y <= r2 && x >= c && x <= c2) {
         newZone = data;
       }
     }
     setZone(newZone);
   }, [zones, x, y]);
+
+  // Try to change weather zones
+  useEffect(() => {
+    const ranges = Object.entries(zone?.attributes || {}).map(([name, newZone]) => {
+      const { min, max } = /(?<min>\d+)-(?<max>\d+)/.exec(name)?.groups || {};
+      if (min === undefined) return false;
+      return [Number(min), Number(max), newZone];
+    }).filter(Boolean);
+
+    if (ranges.length) {
+      // get max value from ranges arrays
+      const [, max] = ranges.reduce((a, b) => a[1] > b[1] ? a : b);
+      // pick a random number from 0 to max
+      const value = Math.floor(Math.random() * max) + 1;
+      // find the range that includes the random number
+      const [,,nextZone] = ranges.find(([min, max]) => value >= min && value <= max) || [];
+      if (nextZone) {
+        setZone(
+          zones.find(({ dataFile }) => dataFile === nextZone)
+        );
+      }
+    }
+  });
 
   // Respond to interaction events
   useEffect(() => {

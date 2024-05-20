@@ -7,7 +7,7 @@ export default function useWorld({ world }) {
   const [size, setSize] = useState([0, 0]);
   const [map, setMap] = useState([]);
   const [interactions, setInteractions] = useState({});
-  const [zones, setZones] = useState({});
+  const [zones, setZones] = useState([]);
 
   useEffect(() => {
     fetch(`world/${world}`)
@@ -53,15 +53,14 @@ export default function useWorld({ world }) {
           const overlay = await fetch(`overlays/${dataFile}`).then((res) => res.text());
           data.buffer = overlay.replace(/\n+$/, '').split('\n');
           if (!boxes.length) {
-            zones.push([`0,0,${size}`, { ...data, box: [0, 0, ...size] }])
+            zones.push({ ...data, box: [1, 1, ...size] })
           } else {
             boxes.forEach((box) => {
-              zones.push([`${box}`, { ...data, box }]);
+              zones.push({ ...data, box });
             });
           }
         }));
-        const zoneInteractions = Object.fromEntries(zones);
-        setZones(zoneInteractions);
+        setZones(zones);
       });
   }, [world]);
 

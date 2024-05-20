@@ -44,8 +44,8 @@ const KEYMAP_MENU = {
 export default function App({
   startMagnification=2,
   beginWorld=START_WORLD,
-  beginX=START_X,
-  beginY=START_Y,
+  beginX=START_X - 1,
+  beginY=START_Y - 1,
   startWidth=VIEWPORT_WIDTH,
   startHeight=VIEWPORT_HEIGHT,
 }) {

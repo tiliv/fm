@@ -33,29 +33,29 @@ export const TYPES = Object.fromEntries(
 export function classifyObjectSpec(line) {
   for (const [type, spec] of Object.entries(TYPE_SPECS)) {
     if (spec.test(line)) {
-      const groups = spec.exec(line).groups;
+      const settings = spec.exec(line).groups;
       for (const key of ['row', 'col', 'newRow', 'newCol']) {
-        if (groups[key] !== undefined) {
-          groups[key] = Number(groups[key]);
+        if (settings[key] !== undefined) {
+          settings[key] = Number(settings[key]);
         }
       }
 
-      groups.type = type;
+      settings.type = type;
 
-      groups.attributes = Object.fromEntries(
-        (groups.attributes || '')
+      settings.attributes = Object.fromEntries(
+        (settings.attributes || '')
         .split('#')
         .filter((attr) => attr.length)
         .map((attr) => attr.split('='))
       );
 
       // Move boxes into formatted `rects`
-      if (groups.boxes !== undefined) {
-        groups.boxes = groups.boxes.split(';').map((box) => {
+      if (settings.boxes !== undefined) {
+        settings.boxes = settings.boxes.split(';').map((box) => {
           if (!box) return null;
           return box.slice(1, -1).split(',').map(Number);
         }).filter(Boolean);
-        groups.directions = groups.directions.split(/(?<=\d)\b/).map((s) => {
+        settings.directions = settings.directions.split(/(?<=\d)\b/).map((s) => {
           const [dir, amount] = [s[0], Number(s.slice(1))];
           if (dir === '<') return [0, -amount];
           if (dir === '>') return [0, amount];
@@ -64,21 +64,21 @@ export function classifyObjectSpec(line) {
         });
       }
 
-      if (groups.row !== undefined) {
+      if (settings.row !== undefined) {
         // Move row & col into `coordinates`
-        groups.coordinates = [groups.row, groups.col];
-        delete groups.row;
-        delete groups.col;
+        settings.coordinates = [settings.row, settings.col];
+        delete settings.row;
+        delete settings.col;
 
         // Move newRow & newCol into `destination`
-        if (groups.newRow !== undefined) {
-          groups.destination = [groups.newRow, groups.newCol];
-          delete groups.newRow;
-          delete groups.newCol;
+        if (settings.newRow !== undefined) {
+          settings.destination = [settings.newRow, settings.newCol];
+          delete settings.newRow;
+          delete settings.newCol;
         }
       }
 
-      return groups;
+      return settings;
     }
   }
   throw new Error(`Invalid object spec: ${line}`);
