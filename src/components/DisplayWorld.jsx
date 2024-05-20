@@ -66,7 +66,7 @@ export default function DisplayWorld({
       setZoneBuffer(null);
       return;
     }
-    const { box, buffer, directions, attributes: { fg='f00', bg=null }={} } = zone;
+    const { box, buffer, maxWidth, directions, attributes: { fg='f00', bg=null }={} } = zone;
     const [startY, startX] = [box[0] - origin.y - 1, box[1] - origin.x - 1];
 
     // `animation` counts across each frame then repeats, but we want to total
@@ -94,8 +94,7 @@ export default function DisplayWorld({
           console.log({ br, bc, size, y, startY, offset });
           return '?';
         }
-        const col = row[bc % row.length];
-        return col || ' ';
+        return row[bc % maxWidth] || ' ';
       })
     );
     setZoneBuffer({

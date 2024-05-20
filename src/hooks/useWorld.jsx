@@ -52,11 +52,12 @@ export default function useWorld({ world }) {
           const { boxes, dataFile } = data;
           const overlay = await fetch(`overlays/${dataFile}`).then((res) => res.text());
           data.buffer = overlay.replace(/\n+$/, '').split('\n');
+          const maxWidth = Math.max(...data.buffer.map((row) => row.length));
           if (!boxes.length) {
-            zones.push({ ...data, box: [1, 1, ...size] })
+            zones.push({ ...data, box: [1, 1, ...size], maxWidth })
           } else {
             boxes.forEach((box) => {
-              zones.push({ ...data, box });
+              zones.push({ ...data, box, maxWidth });
             });
           }
         }));
