@@ -51,16 +51,19 @@ export default function DisplayWorld({
     x: position.x, y: position.y, w: width, h: height,
   });
 
+  // Start interaction event
   useEffect(() => {
     const event = new CustomEvent('interaction', { detail: interaction });
     window.dispatchEvent(event);
   }, [interaction]);
 
+  // Animation counter
   useEffect(() => {
     const interval = setInterval(() => setAnimation(a => a + 1), 1000);
     return () => clearInterval(interval);
   }, []);
 
+  // Build the zone overlay, if applicable
   useEffect(() => {
     if (!zone) {
       setZoneBuffer(null);
