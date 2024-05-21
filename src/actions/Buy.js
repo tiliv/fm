@@ -10,8 +10,8 @@ export function parse(target, action) {
 function makeItems(target, { text }, { inventory }) {
   const equipmentGroups = groupEquipment(
     text,
-    { target, omit: inventory },
-    { event: 'Buy.player', consume: true }
+    inventory,
+    { target, event: 'Buy.player', consume: true }
   );
 
   // Turn sub-menu into callable based on built list

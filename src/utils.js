@@ -123,7 +123,7 @@ export async function loadSprite(kind, item, { offsetLeft=0, width, height }, ..
 }
 
 
-export function groupEquipment(source, { target, omit={} }, extra={}) {
+export function groupEquipment(source, omit={}, extra={}) {
   const entries = source.split('\n').map((item) => {
     const [kind, template, rarity, name, stat, id=null] = item.split('/');
     if (omit[kind]?.find((item) => item.name === name)) {
@@ -135,7 +135,6 @@ export function groupEquipment(source, { target, omit={} }, extra={}) {
       name,
       kind,
       stats,
-      target,
       price: -price({ rarity: parseInt(rarity, 10), stats }),
       item: {
         name,
