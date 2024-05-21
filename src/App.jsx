@@ -59,6 +59,7 @@ export default function App({
   const [startX, setStartX] = useState(beginX);
   const [startY, setStartY] = useState(beginY);
   const [ambientMenu, setAmbientMenu] = useState([]);
+  const [battle, setBattle] = useState(null);
 
   const [interaction, setInteraction] = useState(null);
   const {
@@ -95,6 +96,15 @@ export default function App({
     return () => window.removeEventListener('interaction', interactionHandler);
   }, []);
 
+  // Respond to 'Fight' event
+  useEffect(() => {
+    const fightHandler = ({ detail }) => {
+      setBattle(detail);
+      setInteraction(null);
+    };
+    window.addEventListener('Fight', fightHandler);
+    return () => window.removeEventListener('Fight', fightHandler);
+  }, []);
   useEffect(() => {
     setAmbientMenu([{
       title: startWorld.replace(/\.txt$/, '').toUpperCase(),
