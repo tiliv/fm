@@ -27,6 +27,8 @@ export default function useLocation({ world, x, y, width, height, possesses, key
   const originX = posX - localX;
   const originY = posY - localY;
 
+  // Determine 'area' from current viewport and do a deeper load of visible
+  // interactions.
   useEffect(() => {
     setArea(map.slice(originY, originY + height).map(
       (row) => row.slice(originX, originX + width)
@@ -61,11 +63,13 @@ export default function useLocation({ world, x, y, width, height, possesses, key
     });
   }, [map, walls, originX, originY, width, height, possesses]);
 
+  // Set 'solid' and 'passable' layers based on walls table
   useEffect(() => {
     setSolid(area.map((row) => row.map((cell) => walls[cell] ? cell : ' ')));
     setPassable(area.map((row) => row.map((cell) => walls[cell] ? ' ' : cell)));
-  }, [area, interactions, height, width]);
+  }, [area]);
 
+  // Set 'objects' layer from interactions
   useEffect(() => {
     const objects = Array.from({ length: height }, () => ' '.repeat(width).split(''));
     Object.entries(interactions).forEach(([location]) => {
@@ -79,6 +83,7 @@ export default function useLocation({ world, x, y, width, height, possesses, key
     setObjects(objects);
   }, [map, interactions, posX, posY, marker, width, height]);
 
+  // Package local, position, and origin into objects
   useEffect(() => {
     setLocal({ x: localX, y: localY });
   }, [localX, localY]);
