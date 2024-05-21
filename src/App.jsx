@@ -105,6 +105,8 @@ export default function App({
     window.addEventListener('Fight', fightHandler);
     return () => window.removeEventListener('Fight', fightHandler);
   }, []);
+
+  // Set up world
   useEffect(() => {
     setAmbientMenu([{
       title: startWorld.replace(/\.txt$/, '').toUpperCase(),
