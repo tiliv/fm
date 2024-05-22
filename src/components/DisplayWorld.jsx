@@ -9,6 +9,7 @@ import { TYPES } from '../interactions';
 
 export default function DisplayWorld({
   target,
+  battle,
 
   possesses,
 
@@ -25,6 +26,7 @@ export default function DisplayWorld({
   const [activeBuffer, setActiveBuffer] = useState(null);
   const [zoneBuffer, setZoneBuffer] = useState(null);
   const [animation, setAnimation] = useState(0);
+  const [buffers, setBuffers] = useState([]);
 
   // This is redundant to the outer App.jsx useSave, because that one fails a
   // race condition to save data before it's unmounted and re-mounted. This one
@@ -136,14 +138,30 @@ export default function DisplayWorld({
     setActiveBuffer(buffer);
   }, [target, width, height]);
 
-  const buffers = [
-    { fg: '#555', buffer: layers.solid },
-    { fg: '#888', buffer: layers.passable },
-    { fg: '#f50', buffer: interactionBuffer },
-    { fg: '#000', buffer: layers.objects },
-    activeBuffer && { bg: '#ccc7', fg: '#000', buffer: activeBuffer },
-    zoneBuffer,
-  ].filter(Boolean);
+  useEffect(() => {
+    const buffers = [];
+
+    if (battle) {
+    } else {
+      buffers.push(...[
+        { fg: '#555', buffer: layers.solid },
+        { fg: '#888', buffer: layers.passable },
+        { fg: '#f50', buffer: interactionBuffer },
+        { fg: '#000', buffer: layers.objects },
+        { fg: '#000', buffer: [
+          ...Array.from({ length: local.y }, () => ''),
+          ' '.repeat(local.x) + marker,
+        ]},
+        activeBuffer && { bg: '#ccc7', fg: '#000', buffer: activeBuffer },
+        zoneBuffer,
+      ].filter(Boolean));
+    }
+
+    setBuffers(buffers);
+  }, [
+    battle, local, layers.solid, layers.passable, layers.objects,
+    interactionBuffer, activeBuffer, zoneBuffer,
+  ]);
 
   return (
     <ScreenStack

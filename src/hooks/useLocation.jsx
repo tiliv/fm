@@ -79,22 +79,18 @@ export default function useLocation({ world, x, y, width, height, possesses, key
         objects[ly - originY][lx - originX] = map[ly][lx];
       }
     });
-    objects[localY][localX] = marker;
     setObjects(objects);
-  }, [map, interactions, posX, posY, marker, width, height]);
+  }, [map, interactions, originY, originX, width, height]);
 
   // Package local, position, and origin into objects
   useEffect(() => {
-    setLocal({ x: localX, y: localY });
-  }, [localX, localY]);
-
-  useEffect(() => {
-    setPosition({ x: posX, y: posY });
-  }, [posX, posY]);
-
-  useEffect(() => {
     setOrigin({ x: originX, y: originY });
   }, [originX, originY]);
+
+  useEffect(() => {
+    setLocal({ x: localX, y: localY });
+    setPosition({ x: posX, y: posY });
+  }, [localX, localY, posX, posY]);
 
   return {
     layers: {
