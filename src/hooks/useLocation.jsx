@@ -4,7 +4,11 @@ import usePosition from './usePosition';
 import useWorld from './useWorld';
 import { parseInteraction, TYPES } from '../interactions';
 
-export default function useLocation({ world, x, y, width, height, possesses, keyMap={} }) {
+export default function useLocation({
+  battle, world, x, y,
+  width, height, possesses,
+  keyMap={},
+}) {
   const { map, size, walls, interactions, zones } = useWorld({ world });
   const { marker, zone, bump, x: posX, y: posY } = usePosition({
     defaultX: x, defaultY: y,
@@ -16,6 +20,9 @@ export default function useLocation({ world, x, y, width, height, possesses, key
   const [solid, setSolid] = useState([]);
   const [passable, setPassable] = useState([]);
   const [objects, setObjects] = useState([]);
+  const [foreground, setForeground] = useState([]);
+  const [background1, setBackground1] = useState([]);
+  const [background2, setBackground2] = useState([]);
   const [hydratedInteractions, setHydratedInteractions] = useState({});
 
   const [position, setPosition] = useState({ x: posX, y: posY });
@@ -69,6 +76,32 @@ export default function useLocation({ world, x, y, width, height, possesses, key
     setPassable(area.map((row) => row.map((cell) => walls[cell] ? ' ' : cell)));
   }, [area]);
 
+  useEffect(() => {
+    const backdrops = map.slice(posY - 2, posY + 1).map((row) => {
+      return row.slice(originX, originX + width);
+    });
+
+    // From the foreground working backwards, add walls that are not obscured
+    // by a more foreground layer already processed.
+    const layers = [];
+    backdrops.reverse().forEach((row) => {
+      const line = Array.from({ length: row.length }, () => ' ');
+      row.forEach((cell, index) => {
+        if (walls[cell]) {
+          const layer = layers.find((line) => walls[line[index]]);
+          if (!layer || hydratedInteractions[layer[index]]?.short) {
+            line[index] = cell;
+          }
+        }
+      });
+      // const upperLine = line.map((cell) => walls[cell]?.short ? '' : cell);
+      layers.push(line);
+    });
+    setForeground(layers[0]);
+    setBackground1(layers[1]);
+    setBackground2(layers[2]);
+  }, [map, hydratedInteractions, originX, posY, width]);
+
   // Set 'objects' layer from interactions
   useEffect(() => {
     const objects = Array.from({ length: height }, () => ' '.repeat(width).split(''));
@@ -97,6 +130,9 @@ export default function useLocation({ world, x, y, width, height, possesses, key
       solid,
       passable,
       objects,
+      foreground,
+      background1,
+      background2,
     },
     size,
     walls,
