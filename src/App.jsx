@@ -98,12 +98,22 @@ export default function App({
 
   // Respond to 'Fight' event
   useEffect(() => {
-    const fightHandler = ({ detail }) => {
-      setBattle(detail);
+    const fightHandler = ({ detail: battle }) => {
+      setBattle(battle);
       setInteraction(null);
     };
     window.addEventListener('Fight', fightHandler);
     return () => window.removeEventListener('Fight', fightHandler);
+  }, []);
+
+  // Respond to 'Sheathe' event
+  useEffect(() => {
+    const sheatheHandler = () => {
+      setBattle(null);
+      setInteraction(null);
+    };
+    window.addEventListener('Sheathe', sheatheHandler);
+    return () => window.removeEventListener('Sheathe', sheatheHandler);
   }, []);
 
   // Set up world
@@ -111,9 +121,10 @@ export default function App({
     setAmbientMenu([{
       title: startWorld.replace(/\.txt$/, '').toUpperCase(),
       items: [
+        battle && {name: 'Sheathe', event: 'Sheathe'},
         {name: 'Shout', event: 'Ambient'},
         {name: 'Hide', event: 'Ambient'},
-      ],
+      ].filter(Boolean),
     }]);
 
     // Respond to 'destination' event from world double bump
@@ -124,7 +135,7 @@ export default function App({
     };
     window.addEventListener('destination', destinationHandler);
     return () => window.removeEventListener('destination', destinationHandler);
-  }, [startWorld]);
+  }, [startWorld, battle]);
 
   return (
     <>
@@ -167,6 +178,7 @@ export default function App({
           keyMap={KEYMAP_STATS}
         />
         <DisplayWorld
+          battle={battle}
           target={interaction}
 
           possesses={handlers.current.possesses}
