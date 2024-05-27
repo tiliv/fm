@@ -142,6 +142,27 @@ export default function DisplayWorld({
     const buffers = [];
 
     if (battle) {
+      const spacers = Array.from({ length: parseInt(height / 2) }, () => Array.from({ length: width }, () => ' '));
+      const strips = [
+        (layers.foreground || []).join(''),
+        (layers.background1 || []).join(''),
+        (layers.background2 || []).join(''),
+      ];
+      const y = position.y + 1;
+      const prefix = `^(${y}|${y-1}|${y-2}),`;
+      const see = Object.entries(interactions).filter(([k]) => k.match(prefix));
+      see.forEach(([coord, data]) => {
+        const [r, c] = coord.split(',').map(Number);
+        const x = (c - 1) % width;
+        const layer = Math.abs(r - position.y - 1);
+        strips[layer] = strips[layer].slice(0, x) + data.sprite + strips[layer].slice(x + 1);
+      });
+      buffers.push(
+        { fg: '#5553', buffer: [...spacers, strips[2]] },
+        { fg: '#5558', buffer: [...spacers, strips[1]] },
+        { fg: '#555', buffer: [...spacers, strips[0]] },
+        { fg: '#000', buffer: [...spacers, ' '.repeat(local.x) + marker] },
+      );
     } else {
       buffers.push(...[
         { fg: '#555', buffer: layers.solid },
