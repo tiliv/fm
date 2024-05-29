@@ -58,7 +58,7 @@ export default function useInteraction({
     }
     setInteraction(foundInteraction);
     setInteractionBuffer(buffer);
-  }, [bump]);
+  }, [bump, interactions]);
 
   return {
     interaction,
