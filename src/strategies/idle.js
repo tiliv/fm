@@ -1,3 +1,3 @@
-export function move({ speed, r, c, y, x }) {
-  return [0, 0];
+export function move({ speed, r, c, y, x, tick, directions }) {
+  return directions[tick % directions.length];
 }
