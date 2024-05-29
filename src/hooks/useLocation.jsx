@@ -18,6 +18,7 @@ export default function useLocation({
   const [background1, setBackground1] = useState([]);
   const [background2, setBackground2] = useState([]);
   const [hydratedInteractions, setHydratedInteractions] = useState({});
+  const [areaTick, setAreaTick] = useState(0);
 
   const { map, size, walls, interactions, zones } = useWorld({ world });
   const { marker, zone, bump, x: posX, y: posY } = usePosition({
@@ -105,6 +106,10 @@ export default function useLocation({
     setBackground2(layers[2]);
   }, [map, hydratedInteractions, originX, posY, width]);
 
+  useEffect(() => {
+    setAreaTick((tick) => tick + 1);
+  }, [localX, localY]);
+
   // Set 'objects' layer from interactions
   useEffect(() => {
     const objects = Array.from({ length: height }, () => ' '.repeat(width).split(''));
@@ -120,6 +125,7 @@ export default function useLocation({
 
   // Package local, position, and origin into objects
   useEffect(() => {
+    setAreaTick(0);
     setOrigin({ x: originX, y: originY });
   }, [originX, originY]);
 
