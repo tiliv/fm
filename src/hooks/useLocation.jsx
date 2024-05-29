@@ -139,7 +139,7 @@ export default function useLocation({
           const [strategy] = strategies.slice(-hp - 1, -hp);
           const { move } = Strategies[strategy];
           const [dr, dc] = move({ speed, x: posX, y: posY, r, c });
-          console.log(interaction.sprite, strategy, { hp }, [r, c], [dr, dc]);
+          // console.log(interaction.sprite, strategy, { hp }, [r, c], [dr, dc]);
 
           const newLocation = [r + dr, c + dc].join(',');
           return [newLocation, interaction];
