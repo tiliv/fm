@@ -95,10 +95,6 @@ export default function DisplayWorld({
         const br = ((y - startY + offset[0]) % size[0] + size[0]) % size[0];
         const bc = ((x - startX + offset[1]) % size[1] + size[1]) % size[1];
         const row = buffer[br % buffer.length];
-        if (row === undefined) {
-          console.log({ br, bc, size, y, startY, offset });
-          return '?';
-        }
         return row[bc % maxWidth] || ' ';
       })
     );
