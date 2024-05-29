@@ -26,8 +26,8 @@ export default function useInventory(subject, {
   startEquipment=EMPTY_EQUIPMENT,
 }={}) {
   const [hp, setHp] = useState(100);
-  const [strength, setStrength] = useState(10);
-  const [defense, setDefense] = useState(5);
+  const [strength, setStrength] = useState(0);
+  const [defense, setDefense] = useState(0);
   const [speed, setSpeed] = useState(5);
   const [gold, setGold] = useState(startGold);
   const [inventory, setInventory] = useState(startInventory);
@@ -205,16 +205,27 @@ function useDrop({ subject, setInventory }) {
 }
 
 
-function useEquip({ subject, setEquipment }) {
+function useEquip({ subject, inventory, setEquipment, setStrength, setDefense }) {
   // Respond to 'Equip' event
   useEffect(() => {
     const eventName = `Equip.${subject}`;
     const handler = function({ detail: { kind, id } }) {
-      setEquipment((equipment) => ({ ...equipment, [kind]: id }));
+      const {
+        stats: { A=0, D=0 }={},
+      } = inventory[kind].find(({ id: itemId }) => itemId === id) || {};
+      setEquipment((equipment) => {
+        const {
+          stats: { A: priorA=0, D: priorD=0 }={},
+        } = inventory[kind].find(({ id: itemId }) => itemId === equipment[kind]) || {};
+        const newEquipment = { ...equipment, [kind]: id };
+        setStrength((strength) => strength + A - priorA);
+        setDefense((defense) => defense + D - priorD);
+        return newEquipment;
+      });
     };
     window.addEventListener(eventName, handler);
     return () => window.removeEventListener(eventName, handler);
-  }, [subject]);
+  }, [subject, inventory]);
 
   const equip = useCallback(function(kind, id) {
     const event = new CustomEvent(`Equip.${subject}`, { detail: { kind, id } });
