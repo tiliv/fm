@@ -23,35 +23,35 @@ export default function useInteraction({
     let foundInteraction = null;
     if (bump) {
       const [by, bx] = bump;
+      if (!inViewport(y, x, bump, h, w)) return;
+
       const lbx = bx % w;
       const lby = by % h;
 
-      if (inViewport(y, x, bump, h, w)) {
-        let interaction = interactions[`${by + 1},${bx + 1}`];
-        buffer[lby][lbx] = interaction ? marker : emptyMarker;
-        if (interaction) {
-          foundInteraction = interaction;
-        } else {
-          const sprite = layers.solid[lby][lbx];
-          if (interactions[sprite].short) {
-            // Reach one space farther to see if something is on the other side.
-            const xDiff = bx - x;
-            const yDiff = by - y;
-            if (inViewport(y, x, [by + yDiff, bx + xDiff], h, w)) {
-              interaction = interactions[`${by + yDiff + 1},${bx + xDiff + 1}`];
-              if (interaction) {
-                foundInteraction = interaction;
-                buffer[lby + yDiff][lbx + xDiff] = marker;
-              }
+      let interaction = interactions[`${by + 1},${bx + 1}`];
+      buffer[lby][lbx] = interaction ? marker : emptyMarker;
+      if (interaction) {
+        foundInteraction = interaction;
+      } else {
+        const sprite = layers.solid[lby][lbx];
+        if (interactions[sprite].short) {
+          // Reach one space farther to see if something is on the other side.
+          const xDiff = bx - x;
+          const yDiff = by - y;
+          if (inViewport(y, x, [by + yDiff, bx + xDiff], h, w)) {
+            interaction = interactions[`${by + yDiff + 1},${bx + xDiff + 1}`];
+            if (interaction) {
+              foundInteraction = interaction;
+              buffer[lby + yDiff][lbx + xDiff] = marker;
             }
           }
+        }
 
-          if (!foundInteraction) {
-            foundInteraction = {
-              sprite,
-              coordinates: [by, bx],
-              ...interactions[sprite],
-            }
+        if (!foundInteraction) {
+          foundInteraction = {
+            sprite,
+            coordinates: [by, bx],
+            ...interactions[sprite],
           }
         }
       }
