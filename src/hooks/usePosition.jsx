@@ -41,8 +41,7 @@ export default function usePosition({
   // Player movement & bump detection
   useEffect(() => {
     const keydown = (e) => {
-      let newX = x;
-      let newY = y;
+      let [newY, newX] = [y, x];
       switch (e.key) {
         case keyMap.up: newY--; break;
         case keyMap.down: newY++; break;
@@ -104,14 +103,12 @@ export default function usePosition({
       // find the range that includes the random number
       const [,,nextZone] = ranges.find(([min, max]) => value >= min && value <= max) || [];
       if (nextZone) {
-        setZone(
-          zones.find(({ dataFile }) => dataFile === nextZone)
-        );
+        setZone(zones.find(({ dataFile }) => dataFile === nextZone));
       }
     }
   });
 
-  // Respond to interaction events
+  // Respond to movement-based interaction events
   useEffect(() => {
     if (!bump) return;
     const climb = function() {
