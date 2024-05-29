@@ -15,7 +15,7 @@ const SPRITE_SPEC = RegExp(`^${Sprite}:${Label}${OptionalAttributes}$`);
 const ZONE_SPEC = RegExp(`^${DataFile}@${Directions}:${Boxes}${OptionalAttributes}$`);
 const WORLD_SPEC = RegExp(`^${RowCol}=${NewRowCol}:${Label}/${DataFile}$`);
 const DOOR_SPEC  = RegExp(`^${RowCol}=${NewRowCol}:${Label}${OptionalAttributes}$`);
-const NPC_SPEC   = RegExp(`^${RowCol}:${Label}/${DataFile}$`);
+const NPC_SPEC   = RegExp(`^${RowCol}:${Label}/${DataFile}${OptionalAttributes}$`);
 const OBJ_SPEC   = RegExp(`^${RowCol}:${Label}${OptionalInventory}${OptionalAttributes}$`);
 
 const TYPE_SPECS = {
