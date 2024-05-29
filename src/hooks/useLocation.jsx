@@ -74,8 +74,10 @@ export default function useLocation({
   // Set 'solid' and 'passable' layers based on walls table
   useEffect(() => {
     setSolid(area.map((row) => row.map((cell) => walls[cell] ? cell : '')));
-    setPassable(area.map((row) => row.map((cell) => walls[cell] ? '' : cell)));
-  }, [area]);
+    setPassable(area.map((row, r) => row.map((cell, c) => walls[cell] ? '' : (
+      interactions[`${originY + r + 1},${originX + c + 1}`] ? '' : cell
+    ))));
+  }, [area, interactions]);
 
   useEffect(() => {
     const backdrops = map.slice(posY - 2, posY + 1).map((row) => {
