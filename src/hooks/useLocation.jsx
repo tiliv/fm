@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import usePosition from './usePosition';
 import useWorld from './useWorld';
 import { parseInteraction, TYPES } from '../interactions';
+import { parseDirectionsList } from '../utils';
 import * as Strategies from '../strategies';
 
 export default function useLocation({
@@ -139,14 +140,25 @@ export default function useLocation({
         Object.entries(interactions).map(([location, interaction]) => {
           if (!interaction.Fight) return [location, interaction];
           const [r, c] = location.split(',').map(Number);
-          const { Fight: {
-            stats: { hp, speed },
-            strategies,
-          }} = interaction;
+          const {
+            attributes,
+            Fight: {
+              stats: { hp, speed },
+              strategies,
+            },
+          } = interaction;
 
           const [strategy] = strategies.slice(-hp - 1, -hp);
+          const { [strategy]: directions } = attributes;
           const { move } = Strategies[strategy];
-          const [dr, dc] = move({ speed, x: posX, y: posY, r, c });
+          const [dr, dc] = move({
+            x: posX, y: posY,
+            r, c,
+            speed,
+            tick: areaTick,
+            directions: directions ? parseDirectionsList(directions) : [0, 0],
+            attributes: interaction.attributes,
+          });
           // console.log(interaction.sprite, strategy, { hp }, [r, c], [dr, dc]);
 
           const newLocation = [r + dr, c + dc].join(',');
