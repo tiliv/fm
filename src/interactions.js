@@ -1,5 +1,5 @@
 import * as Actions from './actions';
-import { renderTemplate } from './utils';
+import { renderTemplate, parseDirectionsList } from './utils';
 
 const Sprite = /(?<sprite>.)/.source;
 const Boxes = /(?<boxes>(\[\d+,\d+,\d+,\d+\];?)*)/.source;
@@ -55,13 +55,7 @@ export function classifyObjectSpec(line) {
           if (!box) return null;
           return box.slice(1, -1).split(',').map(Number);
         }).filter(Boolean);
-        settings.directions = settings.directions.split(/(?<=\d)\b/).map((s) => {
-          const [dir, amount] = [s[0], Number(s.slice(1))];
-          if (dir === '<') return [0, -amount];
-          if (dir === '>') return [0, amount];
-          if (dir === '^') return [-amount, 0];
-          if (dir === 'v') return [amount, 0];
-        });
+        settings.directions = parseDirectionsList(settings.directions);
       }
 
       if (settings.row !== undefined) {

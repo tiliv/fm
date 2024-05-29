@@ -161,3 +161,13 @@ export function groupEquipment(source, omit={}, extra={}) {
 
   return groups;
 }
+
+export function parseDirectionsList(directions) {
+  return directions.split(/(?<=\d)(?=[<>^v])/).map((s) => {
+    const [dir, amount] = [s[0], Number(s.slice(1))];
+    if (dir === '<') return [0, -amount];
+    if (dir === '>') return [0, amount];
+    if (dir === '^') return [-amount, 0];
+    if (dir === 'v') return [amount, 0];
+  });
+}
