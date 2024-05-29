@@ -105,15 +105,15 @@ export default function useLocation({
   // Set 'objects' layer from interactions
   useEffect(() => {
     const objects = Array.from({ length: height }, () => ' '.repeat(width).split(''));
-    Object.entries(interactions).forEach(([location]) => {
+    Object.entries(hydratedInteractions).forEach(([location, interaction]) => {
       let [ly, lx] = location.split(',').map(Number);
       ly--; lx--;
       if (lx >= originX && lx < originX + width && ly >= originY && ly < originY + height) {
-        objects[ly - originY][lx - originX] = map[ly][lx];
+        objects[ly - originY][lx - originX] = interaction.sprite;
       }
     });
     setObjects(objects);
-  }, [map, interactions, originY, originX, width, height]);
+  }, [map, hydratedInteractions, originY, originX, width, height]);
 
   // Package local, position, and origin into objects
   useEffect(() => {
