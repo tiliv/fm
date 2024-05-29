@@ -70,7 +70,7 @@ export default function usePosition({
 
     window.addEventListener('keydown', keydown);
     return () => window.removeEventListener('keydown', keydown);
-  }, [map, walls, zones, x, y, bump, keyMap]);
+  }, [map, walls, zones, x, y, bump, keyMap, interactions]);
 
   // Detect current zone
   useEffect(() => {

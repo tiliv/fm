@@ -10,13 +10,6 @@ export default function useLocation({
   width, height, possesses,
   keyMap={},
 }) {
-  const { map, size, walls, interactions, zones } = useWorld({ world });
-  const { marker, zone, bump, x: posX, y: posY } = usePosition({
-    defaultX: x, defaultY: y,
-    map, walls, interactions, zones, possesses,
-    keyMap,
-  });
-
   const [area, setArea] = useState([]);
   const [solid, setSolid] = useState([]);
   const [passable, setPassable] = useState([]);
@@ -25,6 +18,13 @@ export default function useLocation({
   const [background1, setBackground1] = useState([]);
   const [background2, setBackground2] = useState([]);
   const [hydratedInteractions, setHydratedInteractions] = useState({});
+
+  const { map, size, walls, interactions, zones } = useWorld({ world });
+  const { marker, zone, bump, x: posX, y: posY } = usePosition({
+    defaultX: x, defaultY: y,
+    map, walls, interactions: hydratedInteractions, zones, possesses,
+    keyMap,
+  });
 
   const [position, setPosition] = useState({ x: posX, y: posY });
   const [local, setLocal] = useState({ x: 0, y: 0 });
