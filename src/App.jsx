@@ -122,6 +122,7 @@ export default function App({
       title: startWorld.replace(/\.txt$/, '').toUpperCase(),
       items: [
         battle && {name: 'Sheathe', event: 'Sheathe'},
+        {name: 'Wait', event: 'Wait'},
         {name: 'Shout', event: 'Ambient'},
         {name: 'Hide', event: 'Ambient'},
       ].filter(Boolean),

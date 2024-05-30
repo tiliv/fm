@@ -164,6 +164,17 @@ export default function useLocation({
     setAreaTick((tick) => tick + 1);
     tickArea();
   }, [localX, localY, posX, posY]);
+
+  // Respond to 'Wait' event
+  useEffect(() => {
+    const waitHandler = () => {
+      setAreaTick((tick) => tick + 1);
+      tickArea();
+    };
+    window.addEventListener('Wait', waitHandler);
+    return () => window.removeEventListener('Wait', waitHandler);
+  }, [tickArea]);
+
   return {
     layers: {
       solid,
