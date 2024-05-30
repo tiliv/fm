@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import usePosition from './usePosition';
 import useWorld from './useWorld';
@@ -107,10 +107,6 @@ export default function useLocation({
     setBackground2(layers[2]);
   }, [map, hydratedInteractions, originX, posY, width]);
 
-  useEffect(() => {
-    setAreaTick((tick) => tick + 1);
-  }, [localX, localY]);
-
   // Set 'objects' layer from interactions
   useEffect(() => {
     const objects = Array.from({ length: height }, () => ' '.repeat(width).split(''));
@@ -133,8 +129,12 @@ export default function useLocation({
   useEffect(() => {
     setLocal({ x: localX, y: localY });
     setPosition({ x: posX, y: posY });
+    setAreaTick((tick) => tick + 1);
+    tickArea();
+  }, [localX, localY, posX, posY]);
 
-    // Apply movement strategies of objects per coordinate change
+  const tickArea = useCallback(() => {
+    // Apply movement strategies for objects with a Fight action
     setHydratedInteractions((interactions) => {
       return Object.fromEntries(
         Object.entries(interactions).map(([location, interaction]) => {
@@ -163,7 +163,7 @@ export default function useLocation({
         })
       );
     });
-  }, [localX, localY, posX, posY]);
+  }, [areaTick, posX, posY]);
 
   return {
     layers: {
