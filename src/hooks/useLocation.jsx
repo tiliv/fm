@@ -142,10 +142,7 @@ export default function useLocation({
           const [r, c] = location.split(',').map(Number);
           const {
             attributes,
-            Fight: {
-              stats: { hp, speed },
-              strategies,
-            },
+            Fight: { stats: { hp, speed }, strategies },
           } = interaction;
 
           const [strategy] = strategies.slice(-hp - 1, -hp);
