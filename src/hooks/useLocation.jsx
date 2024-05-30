@@ -126,13 +126,6 @@ export default function useLocation({
     setOrigin({ x: originX, y: originY });
   }, [originX, originY]);
 
-  useEffect(() => {
-    setLocal({ x: localX, y: localY });
-    setPosition({ x: posX, y: posY });
-    setAreaTick((tick) => tick + 1);
-    tickArea();
-  }, [localX, localY, posX, posY]);
-
   const tickArea = useCallback(() => {
     // Apply movement strategies for objects with a Fight action
     setHydratedInteractions((interactions) => {
@@ -152,7 +145,7 @@ export default function useLocation({
             x: posX, y: posY,
             r, c,
             speed,
-            tick: areaTick,
+            tick: areaTick - 1,
             directions: directions ? parseDirectionsList(directions) : [0, 0],
             attributes: interaction.attributes,
           });
@@ -165,6 +158,12 @@ export default function useLocation({
     });
   }, [areaTick, posX, posY]);
 
+  useEffect(() => {
+    setLocal({ x: localX, y: localY });
+    setPosition({ x: posX, y: posY });
+    setAreaTick((tick) => tick + 1);
+    tickArea();
+  }, [localX, localY, posX, posY]);
   return {
     layers: {
       solid,
