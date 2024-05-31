@@ -150,8 +150,8 @@ export default function useLocation({
             attributes: interaction.attributes,
           });
           // console.log(interaction.sprite, strategy, { hp }, [r, c], [dr, dc]);
-
-          const newLocation = [r + dr, c + dc].join(',');
+          interaction.coordinates = [r + dr, c + dc];
+          const newLocation = interaction.coordinates.join(',');
           return [newLocation, interaction];
         })
       );
