@@ -56,7 +56,7 @@ export default function useInventory(subject, {
 
   const buy = useBuy({ subject, setGold, addLog });
   const sell = useSell({ subject, setGold, addLog });
-  const equip = useEquip({ subject, setEquipment });
+  const equip = useEquip({ subject, inventory, setEquipment, setStrength, setDefense });
   const acquire = useAcquire({ subject, setInventory, addLog });
   const drop = useDrop({ subject, setInventory });
 
