@@ -210,13 +210,14 @@ function useEquip({ subject, inventory, setEquipment, setStrength, setDefense })
   useEffect(() => {
     const eventName = `Equip.${subject}`;
     const handler = function({ detail: { kind, id } }) {
+      const type = kind.startsWith('ring') ? 'ring' : kind;
       const {
         stats: { A=0, D=0 }={},
-      } = inventory[kind].find(({ id: itemId }) => itemId === id) || {};
+      } = inventory[type].find(({ id: itemId }) => itemId === id) || {};
       setEquipment((equipment) => {
         const {
           stats: { A: priorA=0, D: priorD=0 }={},
-        } = inventory[kind].find(({ id: itemId }) => itemId === equipment[kind]) || {};
+        } = inventory[type].find(({ id: itemId }) => itemId === equipment[kind]) || {};
         const newEquipment = { ...equipment, [kind]: id };
         setStrength((strength) => strength + A - priorA);
         setDefense((defense) => defense + D - priorD);
