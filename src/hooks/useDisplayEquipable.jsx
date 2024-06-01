@@ -47,7 +47,7 @@ export default function useDisplayEquipable(enabled, {
             return;
           }
           const currentItem = items.findIndex(
-            ({ id }) => id === equipment[mapKind(slotOrder[selectedSlot])]
+            ({ id }) => id === equipment[slotOrder[selectedSlot]]
           );
           setScrollOffset(currentItem + 1);  // +1 because empty '--' is always prepended
           break;
