@@ -101,11 +101,14 @@ export default function useDisplayEquipable(enabled, {
     }
 
     const buffer = Array.from({ length: height - 4 }, () => Array(width).fill(''));
-    Object.entries(slots).forEach(([kind, [label, [row, col], statType=null]]) => {
-      const item = inventory[kind]?.find(({ id }) => id === equipment[kind]) || {};
-      const { stats: { [statType?statType[0]:null]: stat=null }={} } = item;
-      const statValue = statType === null ? '' : stat === null ? '-' : minifyNumbers(stat);
-      const display = `${label}${statValue}`;
+    Object.entries(slots).forEach(([kind, [label, [row, col], w=0]]) => {
+      const kindList = inventory[mapKind(kind)];
+      const item = kindList?.find(({ id }) => id === equipment[kind]) || {};
+      const stats = item.stats || {};
+      const statType = STAT_NAMES[Object.keys(stats)[0]] || null;
+      const { [statType?.[0]]: stat=null } = stats;
+      const statValue = statType === null ? ' ' : stat === null ? '-' : minifyNumbers(stat);
+      const display = label.padEnd(w, ' ').replace(/ $/, statValue);
       buffer[row].splice(col, display.length, ...display.split(''));
     });
 
@@ -122,12 +125,12 @@ export default function useDisplayEquipable(enabled, {
     const buffer = Array.from({ length: height - 4 }, () => Array(width).fill(''));
     slotOrder.forEach((kind, i) => {
       if (i !== selectedSlot) return;
-      const [label, [row, col], statType=null] = slots[kind];
+      const [label, [row, col], w=0] = slots[kind];
 
       // Copy the layoutBuffer at the same [row, col].  This one will be displayed
       // above it, appearing to invert the colors.
-      const w = label.length + (statType ? 1 : 0);
-      buffer[row].splice(col, w, ...layoutBuffer[4 + row].slice(col, col + w));
+      const _w = w || label.length;
+      buffer[row].splice(col, _w, ...layoutBuffer[4 + row].slice(col, col + _w));
       sprites[kind]?.buffer.forEach((line, y) => {
         line.forEach((char, x) => {
           if (char !== ' ') {
@@ -181,7 +184,7 @@ export default function useDisplayEquipable(enabled, {
       const name = slotChoice[0].toUpperCase() + slotChoice.slice(1);
       const kindList = inventory[mapKind(slotChoice)];
       const stats = kindList[scrollOffset - 1]?.stats || {};
-      const statType = STAT_NAMES[slots[slotChoice][2] || Object.keys(stats)[0]];
+      const statType = STAT_NAMES[Object.keys(stats)[0]];
       const statAbbr = statType ? statType[0] : null;
       const itemInfo = statType
         ? `${statType} ${minifyNumbers(stats[statAbbr] || 0)}`
