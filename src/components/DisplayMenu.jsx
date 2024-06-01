@@ -278,23 +278,24 @@ export default function DisplayMenu({
       setInfo(null);
       return;
     }
-    const { price, item: { kind, rarity, stats }={} } = options[selected] || {};
+    const { price, info=[], item: { kind, rarity, stats }={} } = options[selected] || {};
     const { A, D } = stats || {};
-    const info = [];
+    // copy info to _info
+    const _info = info.map(bit => bit);
     const index = selected % _viewportHeight;
     if (sprites[index]) {
-      info.push([RARITY_COLORS[rarity], `➧${sprites[index]}`]);
+      _info.push([RARITY_COLORS[rarity], `➧${sprites[index]}`]);
     }
     if (A !== undefined) {
-      info.push([null, `Atk ${minifyNumbers(A)}`]);
+      _info.push([null, `Atk ${minifyNumbers(A)}`]);
     } else if (D !== undefined) {
-      info.push([null, `Def ${minifyNumbers(D)}`]);
+      _info.push([null, `Def ${minifyNumbers(D)}`]);
     }
     if (price !== undefined) {
-      info.push([(gold + price >= 0 ? null : 'red'), `G ${Math.abs(price)}`]);
+      _info.push([(gold + price >= 0 ? null : 'red'), `G ${Math.abs(price)}`]);
     }
 
-    if (!info.length) {
+    if (!_info.length) {
       setInfo(null);
       return;
     }
@@ -304,7 +305,7 @@ export default function DisplayMenu({
         [],
       ]}],
       ...(
-        info.filter(([color]) => color !== null).map(([color]) => [
+        _info.filter(([color]) => color !== null).map(([color]) => [
           color,
           { bg: '#333', fg: color, buffer: [
             ...(' '.repeat(height - 2).split(' ')),
@@ -314,7 +315,7 @@ export default function DisplayMenu({
       ),
     ];
 
-    info.forEach(([color, text]) => {
+    _info.forEach(([color, text]) => {
       layers.forEach(([thisColor, layer]) => {
         const { buffer } = layer;
         const insert = color === thisColor ? text.split('').concat(['']) : Array(text.length + 1).fill('');
