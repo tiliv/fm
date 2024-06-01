@@ -12,6 +12,13 @@ export const EQUIPMENT = {
 export const EQUIPMENT_ORDER = Object.keys(EQUIPMENT);
 
 
+export const STAT_NAMES = {
+  A: 'Atk',
+  D: 'Def',
+  S: 'Spd',
+}
+
+
 export const RARITY_COLORS = [
   '#888',
   '#c7c7c7',

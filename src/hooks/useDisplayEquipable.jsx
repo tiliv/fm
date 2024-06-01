@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { minifyNumbers, bufferizeList } from '../utils';
+import { minifyNumbers, bufferizeList, STAT_NAMES } from '../utils';
 
 const MAP_KIND_SAME = (kind) => kind;
 
@@ -179,11 +179,12 @@ export default function useDisplayEquipable(enabled, {
       ].filter(Boolean));
     } else {
       const name = slotChoice[0].toUpperCase() + slotChoice.slice(1);
-      const statType = slots[slotChoice][2];  // possibly null
-      const statAbbr = statType ? statType[0] : null;
       const kindList = inventory[mapKind(slotChoice)];
+      const stats = kindList[scrollOffset - 1]?.stats || {};
+      const statType = STAT_NAMES[slots[slotChoice][2] || Object.keys(stats)[0]];
+      const statAbbr = statType ? statType[0] : null;
       const itemInfo = statType
-        ? `${statType} ${minifyNumbers(kindList[scrollOffset - 1]?.stats?.[statAbbr] || 0)}`
+        ? `${statType} ${minifyNumbers(stats[statAbbr] || 0)}`
         : '     '
         ;
       setBuffers([
