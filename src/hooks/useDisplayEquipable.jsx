@@ -154,8 +154,7 @@ export default function useDisplayEquipable(enabled, {
       if (id === equipment[slotChoice]) {
         label = `*${label.slice(1)}`;
       }
-      label = label.padEnd(width, ' ');
-      return label;
+      return label.padEnd(width, ' ');
     });
     const buffer = bufferizeList(5, [''].concat(list, ['']), width, height, scrollOffset);
     setScrollBuffer(buffer);
