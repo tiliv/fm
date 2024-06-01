@@ -151,7 +151,7 @@ export default function useDisplayEquipable(enabled, {
       { id: null, name: '--' }
     ].concat(inventory[mapKind(slotChoice)] || []).map(({ id, name }) => {
       let label = `  ${name}`;
-      if (id === equipment[slotChoice]) {
+      if (id === equipment[slotChoice] || !id && !equipment[slotChoice]) {
         label = `*${label.slice(1)}`;
       }
       return label.padEnd(width, ' ');
