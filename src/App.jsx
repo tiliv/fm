@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import DisplayStats from './components/DisplayStats';
 import DisplayWorld from './components/DisplayWorld';
@@ -7,6 +7,7 @@ import Analysis from './components/Analysis';
 import useAnalyzer from './hooks/useAnalyzer';
 import useInventory from './hooks/useInventory';
 import useSave from './hooks/useSave';
+import useEvent from './hooks/useEvent';
 
 const START_WORLD = 'Terra Montans.txt'
 const [START_Y, START_X] = [20, 39];
@@ -77,44 +78,9 @@ export default function App({
     startY: [startY, setStartY],
   });
 
-  // Respond to 'interaction' event from world by saving it for other displays
-  useEffect(() => {
-    const interactionHandler = ({ detail: interaction }) => {
-      if (!interaction) {
-        setInteraction(null);
-        return;
-      }
-      const { start=null, ...startInteraction } = interaction;
-      if (start) {
-        Object.assign(startInteraction, {
-          [start]: { ...startInteraction[start], start: true },
-        });
-      }
-      setInteraction(startInteraction);
-    };
-    window.addEventListener('interaction', interactionHandler);
-    return () => window.removeEventListener('interaction', interactionHandler);
-  }, []);
-
-  // Respond to 'Fight' event
-  useEffect(() => {
-    const fightHandler = ({ detail: battle }) => {
-      setBattle(battle);
-      setInteraction(null);
-    };
-    window.addEventListener('Fight', fightHandler);
-    return () => window.removeEventListener('Fight', fightHandler);
-  }, []);
-
-  // Respond to 'Sheathe' event
-  useEffect(() => {
-    const sheatheHandler = () => {
-      setBattle(null);
-      setInteraction(null);
-    };
-    window.addEventListener('Sheathe', sheatheHandler);
-    return () => window.removeEventListener('Sheathe', sheatheHandler);
-  }, []);
+  useEventInteraction({ setInteraction });
+  useEventFight({ setBattle, setInteraction });
+  useEventDestination({ startWorld, setStartWorld, setStartY, setStartX });
 
   // Set up world
   useEffect(() => {
@@ -127,16 +93,7 @@ export default function App({
         {name: 'Hide', event: 'Ambient'},
       ].filter(Boolean),
     }]);
-
-    // Respond to 'destination' event from world double bump
-    const destinationHandler = ({ detail: { destination: [r, c], dataFile }}) => {
-      setStartWorld(dataFile || startWorld);
-      setStartY(r - 1);
-      setStartX(c - 1);
-    };
-    window.addEventListener('destination', destinationHandler);
-    return () => window.removeEventListener('destination', destinationHandler);
-  }, [startWorld, battle]);
+  }, [startWorld]);
 
   return (
     <>
@@ -231,4 +188,45 @@ export default function App({
       </div> */}
     </>
   )
+}
+
+
+function useEventInteraction({ setInteraction }) {
+  const interactionHandler = useCallback(({ detail: interaction }) => {
+    if (!interaction) {
+      setInteraction(null);
+      return;
+    }
+    const { start=null, ...startInteraction } = interaction;
+    if (start) {
+      Object.assign(startInteraction, {
+        [start]: { ...startInteraction[start], start: true },
+      });
+    }
+    setInteraction(startInteraction);
+  }, []);
+  useEvent('interaction', interactionHandler);
+}
+
+function useEventFight({ setBattle, setInteraction }) {
+  const fightHandler = useCallback(({ detail: battle }) => {
+    setBattle(battle);
+    setInteraction(null);
+  }, []);
+  useEvent('Fight', fightHandler);
+
+  const sheatheHandler = useCallback(() => {
+    setBattle(null);
+    setInteraction(null);
+  }, []);
+  useEvent('Sheathe', sheatheHandler);
+}
+
+function useEventDestination({ startWorld, setStartWorld, setStartY, setStartX }) {
+  const destinationHandler = useCallback(({ detail: { destination: [r, c], dataFile }}) => {
+    setStartWorld(dataFile || startWorld);
+    setStartY(r - 1);
+    setStartX(c - 1);
+  }, [startWorld]);
+  useEvent('destination', destinationHandler);
 }
