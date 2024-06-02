@@ -108,7 +108,8 @@ function amendNPC(target, {}) {
   target.name = target.dataFile.replace(/\.txt$/, '');
   target.name = target.name[0].toUpperCase() + target.name.slice(1);
 
-  // Convert ?-prefixed items to hidden items
+  // Convert ?-prefixed items to hidden items. These tend to be reactions
+  // rather than pickable entries.
   Object.keys(target).forEach((rawName) => {
     if (rawName.startsWith('?')) {
       const adjustedName = rawName.replace(/^\?/, '');
@@ -122,6 +123,7 @@ function amendNPC(target, {}) {
     }
   });
 
+  // Process known Actions and merge results to the action data.
   Object.entries(target).forEach(([key, value]) => {
     if (Actions[key] === undefined) {
       return;
