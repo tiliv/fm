@@ -141,7 +141,7 @@ export default function App({
   return (
     <>
       <h1>FM</h1>
-      <p>
+      {/* <p>
         <label style={{ margin: '0 0 0 1em' }} htmlFor="magnification">Zoom: </label>
         <input id="magnification"
           type="number"
@@ -163,7 +163,7 @@ export default function App({
           onChange={(e) => setHeight(parseInt(e.target.value))}
           style={{width: 50}}
         />
-      </p>
+      </p> */}
 
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
         <DisplayStats
