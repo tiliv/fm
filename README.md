@@ -1,2 +1,80 @@
-# fm
-A nostalgic romp through TI-83 Plus UI and a classifier model for open-ended gameplay
+# Freedom Of Movement
+A nostalgic romp through TI-83 Plus UI and a classifier model for open-ended gameplay.
+
+The in-memory classifier model is loaded but not currently receiving queries.  Before it can be enabled for any use, the classifier labels need to be honed in order to raise the model's clarity on intended effects:
+
+- Positive/Negative effects brought on by weather, state of equipment, time of day
+- NPC mood reactions to player actions
+- (TBD)
+
+The current font is not a full clone of the TI-83 Plus, but it is easy to load and has most of the glyphs that enable this concept.
+
+NPCs can offer a "Save" option and some flavor text, which uses localstorage on the character's name (Hero by default, but will appear `null` until saved).
+
+Your most recent save will load automatically.  To Load a save, you must talk with a Bard specifically, so good luck with that intentional game design.
+
+## About
+
+This is a pure React javascript application that loads static text files as the starting state and then presumes your game state overrides the default data.  Interactions in the world issue DOM events scoped to the targets, and the React components carry out the operation and let reactivity update the game map.  There is no state architecture beyond useState(), as a proof that the size of the code doesn't have to double just to track state information.
+
+The main map files are basically text art, with a table of special coordinates and sprite names.  Using these hints, the game parses the flat map into solid, passable, and interactable layers, and then draws it like a TI-83 Plus with ASM-style greyscale might.  Because of this conceit, the coordinate system from top to bottom is in row-column format.  As a happy accident, this means your text editor's cursor position is always the actual coordinate you're editing, making interactive tiles easy to identify.
+
+Future goals:
+
+- Magic skills cost HP
+- No max HP, but the quality of the bed you use determines your HP when you wake up. (This already works, but isn't widely deployed.)
+- Do better with the fight mode.  Right now it's a flattened horizontal view of the same space but there aren't attack options, and fighting a moving enemy is like chasing a caribou through a shopping mall.
+- Chests that contain items
+- Magic targeting.  Magic is enabled by rings, which you can wear plenty of, but there are no spells yet.
+- Story
+- MULTIPLAYER???  DO I HAVE YOUR ATTENTION?  Let me know.
+
+## Game
+There are 3 displays, and all are active at all times, and have their own select/cancel mechanisms:
+
+1. Status area (wasd, spacebar, escape)
+2. World area (arrows, bumping into things selects, moving away implicitly deselects)
+3. Menu area (jk, paging, enter, backspace)
+
+<img width="1153" alt="Three displays: status, world, menu" src="https://github.com/user-attachments/assets/9d1119cc-a57d-4654-b30a-b5903e03b725">
+
+This means that in the middle of Buying or Selling via the menu screen with an NPC you bumped on the world screen, you can browse your equipment or recent logs in the status screen without interrupting anything else going on.
+
+## Visuals
+
+Scrollable sub-menus help you make selections.
+
+![equipment-demo](https://github.com/user-attachments/assets/b8c5f93d-fbed-4221-99c4-0de3373f475c)
+
+The overlays in the game provide a kind of weather system with offset-based tiled animation and random chance to change to something else.  Overlays can also provide interior ambience.
+
+| Interior zone | Global zones changing | Big |
+| -- | -- | -- |
+| ![interior (1)](https://github.com/user-attachments/assets/ca355e12-c90c-408c-b0bf-e5fd2756fc39) | ![exterior (1)](https://github.com/user-attachments/assets/23494421-096a-4a53-ae0f-e7ec8868ac08) | ![big (1)](https://github.com/user-attachments/assets/beeaedbe-1bc7-4389-a587-df9a7defb242) |
+
+
+For whatever reason, I let you change the viewport dimensions. It'll probably break map design eventually.
+
+The game is presently dumping its text and calculated values below the game panels as a demonstration of the static data system:
+
+<img width="2320" alt="image" src="https://github.com/user-attachments/assets/5b6655a5-8b12-4e6f-ac21-64eb5c6e0915">
+
+## Static Format
+
+Still tweaking things but the working examples are the templates I expand.
+
+- [public/equipment/{kind}/{templateName}.txt](https://github.com/tiliv/fm/tree/main/public/equipment)
+  - Equipment templates only supply a weapon class and sprite.  Templates have no rarity, power, or value assigned until they are referenced in an inventory list that relates that information.
+- [public/interactions/{npcClass}/{npcId}.txt](https://github.com/tiliv/fm/tree/main/public/interactions)
+  - Interactions are usually NPCs, but in the game core, fancy coordinates with events attached become interactions too.  Interaction tiles become full text files here to get the full set of actions, like Buy/Sell, which have custom formats that don't fit in the #key=value schema available to pure map tiles.  For example, the `Fight` block allows for current hp thresholds to activate different movement strategies, `Buy` determines an inventory list, and `Sell` determines which categories of items you can sell to that NPC.
+  - Note that there is currently no net loss of currency when you buy an item and sell it back (if you can sell it back, that is).
+- [public/overlays/{overlayId}.txt](https://github.com/tiliv/fm/tree/main/public/overlays)
+  - Overlays can be referenced in world files, either as a global default, or at specific [r1, c1, r2, c2] rectangles, and with an offset animation sequence that loops forever.  The text files are just the full overlay art to be tiled and scrolled over the world display.  The world file supplies the colors and animation.
+- [public/world/{worldId}.txt](https://github.com/tiliv/fm/tree/main/public/world)
+  - Worlds use a YAML-like multi-doc marker to separate the map art from the coordinate definitions.
+  - Overlays are designated with their animation loop (if any), applicable area (or else implicitly global), color, and probability of triggering a different overlay as a replacement.  When overlay zones overlap, the most specific one should be last (i.e., global first, smallest last)
+  - Note that NPCs are baked into the static image and then selected by their coordinate.
+  - Objects on the map can have idle animations, which includes setting idle animation patterns on NPCs that still have their own separate text file for hp threshold behavior once the mundane "idle" state likely ends from taking damage.
+  - Objects can have custom actions, which trigger events named after them.  Nothing responds to most events yet (but the classifier model will help soon!), but the "Climb" (`Climb.player`) event was added to prove that only a coordinate and an event name + text is required to create dynamic interactivity.
+  - Doors declare a second coordinate.  If a door has a `key` attribute, you need to be wearing that key as an equipped "ring" to bypass the lockout.
+  - World Doors are just doors that also provide a new map id, meaning that the destination coordinate it gives should be in the row-column space of that new map.
