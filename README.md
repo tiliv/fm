@@ -1,5 +1,5 @@
 # Freedom Of Movement
-A nostalgic romp through TI-83 Plus UI and a classifier model for open-ended gameplay.
+A nostalgic romp through TI-83 Plus UI and a classifier model for open-ended gameplay.  Play via localstorage on [https://tiliv.github.io/fm/](https://tiliv.github.io/fm/).
 
 The in-memory classifier model is loaded but not currently receiving queries.  Before it can be enabled for any use, the classifier labels need to be honed in order to raise the model's clarity on intended effects:
 
@@ -11,30 +11,37 @@ The current font is not a full clone of the TI-83 Plus, but it is easy to load a
 
 NPCs can offer a "Save" option and some flavor text, which uses localstorage on the character's name (Hero by default, but will appear `null` until saved).
 
-Your most recent save will load automatically.  To Load a save, you must talk with a Bard specifically, so good luck with that intentional game design.
+Your most recent save will load automatically.  To Load some other save, you must talk with a Bard specifically, so good luck with that intentional game design.
 
 ## About
 
-This is a pure React javascript application that loads static text files as the starting state and then presumes your game state overrides the default data.  Interactions in the world issue DOM events scoped to the targets, and the React components carry out the operation and let reactivity update the game map.  There is no state architecture beyond useState(), as a proof that the size of the code doesn't have to double just to track state information.
+This is a pure React javascript application that loads static text files as the starting state and then presumes your game state overrides the default data.  Interactions in the world issue DOM events scoped to the targets, and the React components carry out the operation and let reactivity update the game map.  There is no state architecture beyond `useState()`, somewhat as a proof that state management is about designing to your task, and may not require selector/mutation bloat to express itself in the clearest way.  We're trusting naive DOM events here to bus our data, but hackability is the proximate cause of what lies below the fold.  If you can throw events from the console, you might be able to make the game do stuff, and I hope that's fun to experience.
 
-The main map files are basically text art, with a table of special coordinates and sprite names.  Using these hints, the game parses the flat map into solid, passable, and interactable layers, and then draws it like a TI-83 Plus with ASM-style greyscale might.  Because of this conceit, the coordinate system from top to bottom is in row-column format.  As a happy accident, this means your text editor's cursor position is always the actual coordinate you're editing, making interactive tiles easy to identify.
+The main map files are basically text art, with a table of special coordinates and sprite names.  Using these hints, the game parses the flat map into solid, passable, and interactable layers, and then draws it like a TI-83 Plus with ASM-style greyscale might.  Because of this conceit, the coordinate system from top to bottom is in row-column format.  As a happy accident, this means your text editor's cursor position is always the actual coordinate you're editing, making interactive tiles easy to reference in the world files.
 
 Future goals:
 
+- The display buffer code was ["write-only"](https://7c0h.com/blog/new/write_only_code.html), suited to no one's brain but mine at the time, and not much longer.  I'm happy with my ideas but they must be re-expressed with tests, tasteful typing, and more comments that matter.
+- Learn why [@welldone-software/why-did-you-render](https://github.com/welldone-software/why-did-you-render) got hard to use with my vite config
+- Memoize components
+- Maps and Story
 - Magic skills cost HP
-- No max HP, but the quality of the bed you use determines your HP when you wake up. (This already works, but isn't widely deployed.)
-- Do better with the fight mode.  Right now it's a flattened horizontal view of the same space but there aren't attack options, and fighting a moving enemy is like chasing a caribou through a shopping mall.
+- No max HP, but the quality of the bed you use determines your HP when you wake up (This already works, but isn't widely deployed)
+- Do better with the fight mode.  Right now it's a flattened eye-level view of the same space with contextual background, but there aren't attack options, and fighting a moving enemy is like chasing a caribou through a shopping mall.
+- Add spells and targeting.  Magic is enabled by rings, which you can wear plenty of, but there are no spells yet
+- Make the map visualizer editable locally, so that it becomes its own map builder
 - Chests that contain items
-- Magic targeting.  Magic is enabled by rings, which you can wear plenty of, but there are no spells yet.
-- Story
 - MULTIPLAYER???  DO I HAVE YOUR ATTENTION?  Let me know.
+- It's not lost on me that for as many buttons as there are to push, it might map to a controller without hassle.
+- I 'unno the first thing about talking to a TI calculator on modern hardware anymore, but it would be funny if I could push these game screens to the device and you use the calc hardware for the OG tactile experience.  The calculator has enough buttons on offer that it can switch between active screens.
 
 ## Game
 There are 3 displays, and all are active at all times, and have their own select/cancel mechanisms:
 
 1. Status area (wasd, spacebar, escape)
 2. World area (arrows, bumping into things selects, moving away implicitly deselects)
-3. Menu area (jk, paging, enter, backspace)
+3. Menu area (jk, numbers, paging, enter, backspace)
+4. (The bottom of this graphic features the inert message bar that will be re-enabled for communication with the classifier model soon.  If you want to picture what it's for, imagine the old Ultima games and you'll be on the right track.)
 
 <img width="1153" alt="Three displays: status, world, menu" src="https://github.com/user-attachments/assets/9d1119cc-a57d-4654-b30a-b5903e03b725">
 
@@ -70,14 +77,22 @@ Still tweaking things but the working examples are the templates I expand.
   - Equipment templates only supply a weapon class and sprite.  Templates have no rarity, power, or value assigned until they are referenced in an inventory list that relates that information.
 - [public/interactions/{npcClass}/{npcId}.txt](https://github.com/tiliv/fm/tree/main/public/interactions)
   - Interactions are usually NPCs, but in the game core, fancy coordinates with events attached become interactions too.  Interaction tiles become full text files here to get the full set of actions, like Buy/Sell, which have custom formats that don't fit in the #key=value schema available to pure map tiles.  For example, the `Fight` block allows for current hp thresholds to activate different movement strategies, `Buy` determines an inventory list, and `Sell` determines which categories of items you can sell to that NPC.
-  - Note that there is currently no net loss of currency when you buy an item and sell it back (if you can sell it back, that is).
+  - There is currently no net loss of currency when you buy an item and sell it back (if you can sell it back, that is).
+  - Action block names that are prefixed by `?` incidate a reactive event, i.e., they catch YOUR event with that name and hijack the response.  This may put you into a conversation state with someone you have not bumped against for typical interactions.
 - [public/overlays/{overlayId}.txt](https://github.com/tiliv/fm/tree/main/public/overlays)
   - Overlays can be referenced in world files, either as a global default, or at specific [r1, c1, r2, c2] rectangles, and with an offset animation sequence that loops forever.  The text files are just the full overlay art to be tiled and scrolled over the world display.  The world file supplies the colors and animation.
 - [public/world/{worldId}.txt](https://github.com/tiliv/fm/tree/main/public/world)
   - Worlds use a YAML-like multi-doc marker to separate the map art from the coordinate definitions.
   - Overlays are designated with their animation loop (if any), applicable area (or else implicitly global), color, and probability of triggering a different overlay as a replacement.  When overlay zones overlap, the most specific one should be last (i.e., global first, smallest last)
-  - Note that NPCs are baked into the static image and then selected by their coordinate.
-  - Objects on the map can have idle animations, which includes setting idle animation patterns on NPCs that still have their own separate text file for hp threshold behavior once the mundane "idle" state likely ends from taking damage.
-  - Objects can have custom actions, which trigger events named after them.  Nothing responds to most events yet (but the classifier model will help soon!), but the "Climb" (`Climb.player`) event was added to prove that only a coordinate and an event name + text is required to create dynamic interactivity.
+  - NPCs are baked into the static map art, and then that coordinate is used to associate an NPC data file containing its menu actions.
+  - Objects can have idle animations, including specific movements for various ai states the NPC can be in.
+  - Objects can have custom actions defined inline without (or in addition to) a text file.  All (most) menu actions dispatch an event named after them, with their menu data as context.  Nothing responds to most events yet (but the classifier model will help soon!), but the "Climb" (`Climb.player`) event was added to prove that only a coordinate and event name + message text are required to create dynamic interactivity.
+  - Objects with names prefixed by `~` are considered "short", allowing them to act as pass-through tiles for talking to npcs across the other side.  In addition, you can climb short tiles.
   - Doors declare a second coordinate.  If a door has a `key` attribute, you need to be wearing that key as an equipped "ring" to bypass the lockout.
   - World Doors are just doors that also provide a new map id, meaning that the destination coordinate it gives should be in the row-column space of that new map.
+  
+## Who?
+
+I'm Autumn, and I don't know why I do anything but I know when I'm having fun.
+
+Hire me to write better code than this with you.  My address is all over these commits.
