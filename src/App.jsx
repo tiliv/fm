@@ -51,7 +51,7 @@ export default function App({
   startWidth=VIEWPORT_WIDTH,
   startHeight=VIEWPORT_HEIGHT,
 }) {
-  const [input, setInput] = useState('I love walking my dog.');
+  const [input, setInput] = useState('');
   // const { ready, analyze, blocks } = useAnalyzer();
 
   const [magnification, setMagnification] = useState(startMagnification);
