@@ -15,7 +15,7 @@ Your most recent save will load automatically.  To Load a save, you must talk wi
 
 ## About
 
-This is a pure React javascript application that loads static text files as the starting state and then presumes your game state overrides the default data.  Interactions in the world issue DOM events scoped to the targets, and the React components carry out the operation and let reactivity update the game map.  There is no state architecture beyond useState(), as a proof that the size of the code doesn't have to double just to track state information.
+This is a pure React javascript application that loads static text files as the starting state and then presumes your game state overrides the default data.  Interactions in the world issue DOM events scoped to the targets, and the React components carry out the operation and let reactivity update the game map.  There is no state architecture beyond useState(), as a proof that the size of the code doesn't HAVE to double to write all the mutation bloat.  We're trusting naive DOM events here to bus our data, but hackability is kind of the point.  If you can throw events from the console, you might be able to make the game do stuff, and I hope that's fun to experience.
 
 The main map files are basically text art, with a table of special coordinates and sprite names.  Using these hints, the game parses the flat map into solid, passable, and interactable layers, and then draws it like a TI-83 Plus with ASM-style greyscale might.  Because of this conceit, the coordinate system from top to bottom is in row-column format.  As a happy accident, this means your text editor's cursor position is always the actual coordinate you're editing, making interactive tiles easy to identify.
 
@@ -70,14 +70,17 @@ Still tweaking things but the working examples are the templates I expand.
   - Equipment templates only supply a weapon class and sprite.  Templates have no rarity, power, or value assigned until they are referenced in an inventory list that relates that information.
 - [public/interactions/{npcClass}/{npcId}.txt](https://github.com/tiliv/fm/tree/main/public/interactions)
   - Interactions are usually NPCs, but in the game core, fancy coordinates with events attached become interactions too.  Interaction tiles become full text files here to get the full set of actions, like Buy/Sell, which have custom formats that don't fit in the #key=value schema available to pure map tiles.  For example, the `Fight` block allows for current hp thresholds to activate different movement strategies, `Buy` determines an inventory list, and `Sell` determines which categories of items you can sell to that NPC.
-  - Note that there is currently no net loss of currency when you buy an item and sell it back (if you can sell it back, that is).
+  - There is currently no net loss of currency when you buy an item and sell it back (if you can sell it back, that is).
+  - Action block names prefixed by `?` incidate a reactive event, i.e., they catch YOUR event with that name and hijack the response.  This may put you into a conversation state with someone you have not bumped against for typical interactions.
 - [public/overlays/{overlayId}.txt](https://github.com/tiliv/fm/tree/main/public/overlays)
   - Overlays can be referenced in world files, either as a global default, or at specific [r1, c1, r2, c2] rectangles, and with an offset animation sequence that loops forever.  The text files are just the full overlay art to be tiled and scrolled over the world display.  The world file supplies the colors and animation.
 - [public/world/{worldId}.txt](https://github.com/tiliv/fm/tree/main/public/world)
   - Worlds use a YAML-like multi-doc marker to separate the map art from the coordinate definitions.
   - Overlays are designated with their animation loop (if any), applicable area (or else implicitly global), color, and probability of triggering a different overlay as a replacement.  When overlay zones overlap, the most specific one should be last (i.e., global first, smallest last)
-  - Note that NPCs are baked into the static image and then selected by their coordinate.
-  - Objects on the map can have idle animations, which includes setting idle animation patterns on NPCs that still have their own separate text file for hp threshold behavior once the mundane "idle" state likely ends from taking damage.
-  - Objects can have custom actions, which trigger events named after them.  Nothing responds to most events yet (but the classifier model will help soon!), but the "Climb" (`Climb.player`) event was added to prove that only a coordinate and an event name + text is required to create dynamic interactivity.
+  - NPCs are baked into the static map art, and then that coordinate is used to associate an NPC data file with its menu actions.
+  - Objects can have idle animations, including specific movements for various ai states the NPC can be in.
+  - Objects can have custom actions defined inline without (or in addition to) a text file.  All (most) menu actions dispatch an event named after them, with their menu data as context.  Nothing responds to most events yet (but the classifier model will help soon!), but the "Climb" (`Climb.player`) event was added to prove that only a coordinate and event name + message text are required to create dynamic interactivity.
+  - Objects with names prefixed with `~` are considered "short", allowing them to act as pass-through tiles for talking to npcs across the other side.  In addition, you can climb short tiles.
   - Doors declare a second coordinate.  If a door has a `key` attribute, you need to be wearing that key as an equipped "ring" to bypass the lockout.
   - World Doors are just doors that also provide a new map id, meaning that the destination coordinate it gives should be in the row-column space of that new map.
+  
