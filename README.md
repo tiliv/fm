@@ -87,7 +87,7 @@ Still tweaking things but the working examples are the templates I expand.
   - NPCs are baked into the static map art, and then that coordinate is used to associate an NPC data file containing its menu actions.
   - Objects can have idle animations, including specific movements for various ai states the NPC can be in.
   - Objects can have custom actions defined inline without (or in addition to) a text file.  All (most) menu actions dispatch an event named after them, with their menu data as context.  Nothing responds to most events yet (but the classifier model will help soon!), but the "Climb" (`Climb.player`) event was added to prove that only a coordinate and event name + message text are required to create dynamic interactivity.
-  - Objects with names prefixed with `~` are considered "short", allowing them to act as pass-through tiles for talking to npcs across the other side.  In addition, you can climb short tiles.
+  - Objects with names prefixed by `~` are considered "short", allowing them to act as pass-through tiles for talking to npcs across the other side.  In addition, you can climb short tiles.
   - Doors declare a second coordinate.  If a door has a `key` attribute, you need to be wearing that key as an equipped "ring" to bypass the lockout.
   - World Doors are just doors that also provide a new map id, meaning that the destination coordinate it gives should be in the row-column space of that new map.
   
