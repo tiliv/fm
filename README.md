@@ -1,5 +1,5 @@
 # Freedom Of Movement
-A nostalgic romp through TI-83 Plus UI and a classifier model for open-ended gameplay.
+A nostalgic romp through TI-83 Plus UI and a classifier model for open-ended gameplay.  Play via localstorage [https://tiliv.github.io/fm/](https://tiliv.github.io/fm/)
 
 The in-memory classifier model is loaded but not currently receiving queries.  Before it can be enabled for any use, the classifier labels need to be honed in order to raise the model's clarity on intended effects:
 
