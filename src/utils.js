@@ -116,7 +116,7 @@ export async function loadSprite(kind, item, { offsetLeft=0, width, height }, ..
         if (!icon) {
           icon = sprites.join('').trim()[0];
         }
-    });
+      });
       // console.log('loadSprite', kind, template, icon);
       const data = {
         ...item, template, rarity, name, buffer, icon,
@@ -125,6 +125,7 @@ export async function loadSprite(kind, item, { offsetLeft=0, width, height }, ..
         const [stat, value] = line.split(':');
         data.stats[stat] = parseInt(value, 10);
       });
+      window.dispatchEvent(new CustomEvent(`_item`, { detail: { on: item.kind, data, text } }));
       return data;
     });
 }

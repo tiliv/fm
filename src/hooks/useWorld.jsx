@@ -13,6 +13,7 @@ export default function useWorld({ world }) {
     fetch(`world/${world}`)
       .then((res) => res.text())
       .then((text) => {
+        window.dispatchEvent(new CustomEvent('world', { detail: text }));
         const [loadedMap, objects] = text.trim().split('---\n');
         const rows = loadedMap.trim().split('\n');
         setMap(rows.map((row) => row.split('')));
@@ -51,6 +52,7 @@ export default function useWorld({ world }) {
         await Promise.all(boxGroups.map(async (data) => {
           const { boxes, dataFile } = data;
           const overlay = await fetch(`overlays/${dataFile}`).then((res) => res.text());
+          window.dispatchEvent(new CustomEvent('_overlay', { detail: { dataFile, overlay, ...data } }));
           data.buffer = overlay.replace(/\n+$/, '').split('\n');
           const maxWidth = Math.max(...data.buffer.map((row) => row.length));
           if (!boxes.length) {

@@ -65,7 +65,10 @@ export default function useLocation({
             .then((res) => res.text())
             .catch((err) => `Err\n${err}`);
         }
+
+
         const hydrated = parseInteraction(interaction, text, context);
+        window.dispatchEvent(new CustomEvent('_interaction', { detail: { key, text, hydrated } }));
         return [key, hydrated];
       })
     ).then((entries) => {

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
+import Visualizer from './Visualizer';
 import DisplayStats from './components/DisplayStats';
 import DisplayWorld from './components/DisplayWorld';
 import DisplayMenu from './components/DisplayMenu';
@@ -98,7 +99,7 @@ export default function App({
   return (
     <>
       <h1>FM</h1>
-      {/* <p>
+      <p>
         <label style={{ margin: '0 0 0 1em' }} htmlFor="magnification">Zoom: </label>
         <input id="magnification"
           type="number"
@@ -120,9 +121,9 @@ export default function App({
           onChange={(e) => setHeight(parseInt(e.target.value))}
           style={{width: 50}}
         />
-      </p> */}
+      </p>
 
-      <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
+      <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
         <DisplayStats
           {...stats.current}
           inventory={inventory}
@@ -186,6 +187,7 @@ export default function App({
           ))
         )}
       </div> */}
+      <Visualizer startWorld={startWorld} />
     </>
   )
 }
