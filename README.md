@@ -42,9 +42,12 @@ This means that in the middle of Buying or Selling via the menu screen with an N
 
 ## Visuals
 
-Scrollable sub-menus help you make selections.
+Scrollable sub-menus help you make selections, while the menu system obstinately embraces TI calculator menu design language.
 
-![equipment-demo](https://github.com/user-attachments/assets/b8c5f93d-fbed-4221-99c4-0de3373f475c)
+| Status Demo | Menu Demo |
+| -- | -- |
+| ![equipment-demo](https://github.com/user-attachments/assets/b8c5f93d-fbed-4221-99c4-0de3373f475c) | ![menu-demo](https://github.com/user-attachments/assets/1464b969-f020-42a8-80e6-a0fb7c821d72) |
+
 
 The overlays in the game provide a kind of weather system with offset-based tiled animation and random chance to change to something else.  Overlays can also provide interior ambience.
 
