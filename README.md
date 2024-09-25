@@ -11,7 +11,7 @@ The current font is not a full clone of the TI-83 Plus, but it is easy to load a
 
 NPCs can offer a "Save" option and some flavor text, which uses localstorage on the character's name (Hero by default, but will appear `null` until saved).
 
-Your most recent save will load automatically.  To Load a save, you must talk with a Bard specifically, so good luck with that intentional game design.
+Your most recent save will load automatically.  To Load some other save, you must talk with a Bard specifically, so good luck with that intentional game design.
 
 ## About
 
