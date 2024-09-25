@@ -40,7 +40,7 @@ There are 3 displays, and all are active at all times, and have their own select
 
 1. Status area (wasd, spacebar, escape)
 2. World area (arrows, bumping into things selects, moving away implicitly deselects)
-3. Menu area (jk, paging, enter, backspace)
+3. Menu area (jk, numbers, paging, enter, backspace)
 4. (The bottom of this graphic features the inert message bar that will be re-enabled for communication with the classifier model soon.  If you want to picture what it's for, imagine the old Ultima games and you'll be on the right track.)
 
 <img width="1153" alt="Three displays: status, world, menu" src="https://github.com/user-attachments/assets/9d1119cc-a57d-4654-b30a-b5903e03b725">
