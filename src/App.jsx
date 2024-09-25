@@ -187,7 +187,7 @@ export default function App({
           ))
         )}
       </div> */}
-      <Visualizer startWorld={startWorld} />
+      <Visualizer startWorld={startWorld} width={width} height={height} />
     </>
   )
 }

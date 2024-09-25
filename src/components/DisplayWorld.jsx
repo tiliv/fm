@@ -105,6 +105,10 @@ export default function DisplayWorld({
     });
   }, [zone, origin, size, animation]);
 
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('origin', { detail: origin }));
+  }, [origin])
+
   // Find responders to ambient events
   useEffect(() => {
     const ambientHandler = ({ detail: { name }}) => {

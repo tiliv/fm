@@ -2,11 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 
 import useEvent from './hooks/useEvent';
 
-export default function Visualizer({ startWorld }) {
+export default function Visualizer({ startWorld, width, height }) {
   const [rawWorld, setRawWorld] = useState(null);
   const [rawInteractions, setRawInteractions] = useState({});
   const [rawOverlays, setRawOverlays] = useState({});
   const [rawItems, setRawItems] = useState({});
+  const [origin, setOrigin] = useState(null);
   const [fontDemo, setFontDemo] = useState(null);
 
   useEffect(() => {
@@ -15,6 +16,20 @@ export default function Visualizer({ startWorld }) {
     setRawOverlays({});
     setRawItems({});
   }, [startWorld]);
+
+  useEffect(() => {
+    setRawInteractions((interactions) => Object.fromEntries(
+      Object.entries(interactions).filter(
+        ([key, { type, coordinate }]) => type !== 'npc' && (
+          !coordinate || (
+            origin[0] <= coordinate[0]
+            && coordinate[0] < origin[0] + height
+            && origin[1] <= coordinate[1]
+            && coordinate[1] < origin[1] + width
+          ))  // fixme: doesn't get doors because it's baked in the key string
+      ))
+    );
+  }, [origin]);
 
   useEffect(() => {
     fetch(`world/debug.txt`)
@@ -26,6 +41,7 @@ export default function Visualizer({ startWorld }) {
   useEventInteractions({ setRawInteractions });
   useEventOverlays({ setRawOverlays });
   useEventItems({ setRawItems });
+  useEventOrigin({ setOrigin });
 
   return (
     <div id="visualizer">
@@ -184,4 +200,11 @@ function useEventItems({ setRawItems }) {
     setRawItems((items) => ({ ...items, [on]: { text, ...data } }))
   }, []);
   useEvent('_item', itemHandler);
+}
+
+function useEventOrigin({ setOrigin }) {
+  const originHandler = useCallback(({ detail: origin }) => {
+    setOrigin(origin)
+  }, []);
+  useEvent('origin', originHandler);
 }
