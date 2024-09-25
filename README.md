@@ -26,7 +26,7 @@ Future goals:
 - Memoize components
 - Magic skills cost HP
 - No max HP, but the quality of the bed you use determines your HP when you wake up (This already works, but isn't widely deployed)
-- Do better with the fight mode.  Right now it's a flattened horizontal view of the same space but there aren't attack options, and fighting a moving enemy is like chasing a caribou through a shopping mall.
+- Do better with the fight mode.  Right now it's a flattened eye-level view of the same space with contextual background, but there aren't attack options, and fighting a moving enemy is like chasing a caribou through a shopping mall.
 - Add spells and targeting.  Magic is enabled by rings, which you can wear plenty of, but there are no spells yet
 - Make the map visualizer editable locally, so that it becomes its own map builder
 - Chests that contain items
