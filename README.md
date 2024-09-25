@@ -15,12 +15,14 @@ Your most recent save will load automatically.  To Load some other save, you mus
 
 ## About
 
-This is a pure React javascript application that loads static text files as the starting state and then presumes your game state overrides the default data.  Interactions in the world issue DOM events scoped to the targets, and the React components carry out the operation and let reactivity update the game map.  There is no state architecture beyond useState(), as a proof that the size of the code doesn't HAVE to double to write all the mutation bloat.  We're trusting naive DOM events here to bus our data, but hackability is kind of the point.  If you can throw events from the console, you might be able to make the game do stuff, and I hope that's fun to experience.
+This is a pure React javascript application that loads static text files as the starting state and then presumes your game state overrides the default data.  Interactions in the world issue DOM events scoped to the targets, and the React components carry out the operation and let reactivity update the game map.  There is no state architecture beyond `useState()`, somewhat as a proof that state management is about designing to your task, and may not require selector/mutation bloat to express itself in the clearest way.  We're trusting naive DOM events here to bus our data, but hackability is kind of the point.  If you can throw events from the console, you might be able to make the game do stuff, and I hope that's fun to experience.
 
 The main map files are basically text art, with a table of special coordinates and sprite names.  Using these hints, the game parses the flat map into solid, passable, and interactable layers, and then draws it like a TI-83 Plus with ASM-style greyscale might.  Because of this conceit, the coordinate system from top to bottom is in row-column format.  As a happy accident, this means your text editor's cursor position is always the actual coordinate you're editing, making interactive tiles easy to reference in the world files.
 
 Future goals:
 
+- This code was [https://7c0h.com/blog/new/write_only_code.html]("write-only"), suited to no one's brain but mine at the time, and not much longer.  I'm happy with my ideas but they must be re-expressed with tests, tasteful typing, and more comments that matter.
+- Learn why [https://github.com/welldone-software/why-did-you-render](@welldone-software/why-did-you-render) got hard to use with my vite config
 - Memoize components
 - Magic skills cost HP
 - No max HP, but the quality of the bed you use determines your HP when you wake up (This already works, but isn't widely deployed)
@@ -30,6 +32,8 @@ Future goals:
 - Chests that contain items
 - Story
 - MULTIPLAYER???  DO I HAVE YOUR ATTENTION?  Let me know.
+- It's not lost on me that for as many buttons as there are to push, it might map to a controller without hassle.
+- I 'unno the first thing about talking to a TI calculator on modern hardware anymore, but it would be funny if I could push these game screens to the device and you use the calc hardware for the OG tactile experience.  The calculator has enough buttons on offer that it can switch between active screens.
 
 ## Game
 There are 3 displays, and all are active at all times, and have their own select/cancel mechanisms:
@@ -37,6 +41,7 @@ There are 3 displays, and all are active at all times, and have their own select
 1. Status area (wasd, spacebar, escape)
 2. World area (arrows, bumping into things selects, moving away implicitly deselects)
 3. Menu area (jk, paging, enter, backspace)
+4. (The bottom of this graphic features the inert message bar that will be re-enabled for communication with the classifier model soon.  If you want to picture what it's for, imagine the old Ultima games and you'll be on the right track.)
 
 <img width="1153" alt="Three displays: status, world, menu" src="https://github.com/user-attachments/assets/9d1119cc-a57d-4654-b30a-b5903e03b725">
 
