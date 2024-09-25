@@ -51,7 +51,7 @@ export default function App({
   startWidth=VIEWPORT_WIDTH,
   startHeight=VIEWPORT_HEIGHT,
 }) {
-  // const [input, setInput] = useState('I love walking my dog.');
+  const [input, setInput] = useState('I love walking my dog.');
   // const { ready, analyze, blocks } = useAnalyzer();
 
   const [magnification, setMagnification] = useState(startMagnification);
@@ -105,6 +105,7 @@ export default function App({
           type="number"
           value={magnification}
           onChange={(e) => setMagnification(Number(e.target.value))}
+          onKeyDown={(e) => e.stopPropagation()}
           style={{width: 50}}
         />
         <label style={{ margin: '0 0 0 1em' }} htmlFor="width">Width: </label>
@@ -112,6 +113,7 @@ export default function App({
           type="number"
           value={width}
           onChange={(e) => setWidth(parseInt(e.target.value))}
+          onKeyDown={(e) => e.stopPropagation()}
           style={{width: 50}}
         />
         <label style={{ margin: '0 0 0 1em' }} htmlFor="height">Height: </label>
@@ -119,64 +121,75 @@ export default function App({
           type="number"
           value={height}
           onChange={(e) => setHeight(parseInt(e.target.value))}
+          onKeyDown={(e) => e.stopPropagation()}
           style={{width: 50}}
         />
       </p>
 
-      <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-        <DisplayStats
-          {...stats.current}
-          inventory={inventory}
-          equipment={equipment}
-          equip={handlers.current.equip}
-          log={log}
+      <div style={{display: 'flex', flexDirection: 'column', alignItems: 'stretch', maxWidth: 'fit-content', margin: 'auto'}}>
+        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
+          <DisplayStats
+            {...stats.current}
+            inventory={inventory}
+            equipment={equipment}
+            equip={handlers.current.equip}
+            log={log}
 
-          width={width}
-          height={height}
-          magnification={magnification}
-          keyMap={KEYMAP_STATS}
-        />
-        <DisplayWorld
-          battle={battle}
-          target={interaction}
+            width={width}
+            height={height}
+            magnification={magnification}
+            keyMap={KEYMAP_STATS}
+          />
+          <DisplayWorld
+            battle={battle}
+            target={interaction}
 
-          possesses={handlers.current.possesses}
+            possesses={handlers.current.possesses}
 
-          startWorld={startWorld}
-          startX={startX}
-          startY={startY}
-          width={width}
-          height={height}
-          magnification={magnification}
-          keyMap={KEYMAP_WORLD}
-        />
-        <DisplayMenu
-          target={interaction}
-          gold={stats.current.gold}
-          ambientMenu={ambientMenu}
+            startWorld={startWorld}
+            startX={startX}
+            startY={startY}
+            width={width}
+            height={height}
+            magnification={magnification}
+            keyMap={KEYMAP_WORLD}
+          />
+          <DisplayMenu
+            target={interaction}
+            gold={stats.current.gold}
+            ambientMenu={ambientMenu}
 
-          inventory={inventory}
-          equipment={equipment}
-          acquire={handlers.current.acquire}
+            inventory={inventory}
+            equipment={equipment}
+            acquire={handlers.current.acquire}
 
-          width={width}
-          height={height}
-          magnification={magnification}
-          keyMap={KEYMAP_MENU}
-        />
+            width={width}
+            height={height}
+            magnification={magnification}
+            keyMap={KEYMAP_MENU}
+          />
+        </div>
+        <div style={{display: 'flex', flexDirection: 'row'}}>
+          <input
+            className="ti large"
+            style={{flex: 1}}
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              e.stopPropagation();
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                // analyze(e, input);
+                e.target.blur();
+              }
+            }}
+            />
+          <button
+            className="ti inverted large"
+            onClick={(e) => null/* analyze(e, input) */}
+          >Analyze</button>
+        </div>
       </div>
-      {/* <div style={{display: 'flex', flexDirection: 'row', alignItems: 'stretch'}}>
-        <input
-          className="ti large"
-          style={{flexGrow: 1}}
-          value={input}
-          onChange={e => setInput(e.target.value)}
-        />
-        <button
-          className="ti inverted large"
-          onClick={(e) => analyze(e, input)}
-        >Analyze</button>
-      </div> */}
 
       {/* <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around'}}>
         {ready && (
