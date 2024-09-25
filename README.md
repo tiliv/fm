@@ -21,8 +21,8 @@ The main map files are basically text art, with a table of special coordinates a
 
 Future goals:
 
-- This code was [https://7c0h.com/blog/new/write_only_code.html]("write-only"), suited to no one's brain but mine at the time, and not much longer.  I'm happy with my ideas but they must be re-expressed with tests, tasteful typing, and more comments that matter.
-- Learn why [https://github.com/welldone-software/why-did-you-render](@welldone-software/why-did-you-render) got hard to use with my vite config
+- This code was ["write-only"](https://7c0h.com/blog/new/write_only_code.html), suited to no one's brain but mine at the time, and not much longer.  I'm happy with my ideas but they must be re-expressed with tests, tasteful typing, and more comments that matter.
+- Learn why [@welldone-software/why-did-you-render](https://github.com/welldone-software/why-did-you-render) got hard to use with my vite config
 - Memoize components
 - Magic skills cost HP
 - No max HP, but the quality of the bed you use determines your HP when you wake up (This already works, but isn't widely deployed)
