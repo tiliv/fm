@@ -22,10 +22,11 @@ The main map files are basically text art, with a table of special coordinates a
 Future goals:
 
 - Magic skills cost HP
-- No max HP, but the quality of the bed you use determines your HP when you wake up. (This already works, but isn't widely deployed.)
+- No max HP, but the quality of the bed you use determines your HP when you wake up (This already works, but isn't widely deployed)
 - Do better with the fight mode.  Right now it's a flattened horizontal view of the same space but there aren't attack options, and fighting a moving enemy is like chasing a caribou through a shopping mall.
+- Add spells and targeting.  Magic is enabled by rings, which you can wear plenty of, but there are no spells yet
+- Make the map visualizer editable locally, so that it becomes its own map builder
 - Chests that contain items
-- Magic targeting.  Magic is enabled by rings, which you can wear plenty of, but there are no spells yet.
 - Story
 - MULTIPLAYER???  DO I HAVE YOUR ATTENTION?  Let me know.
 
