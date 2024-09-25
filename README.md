@@ -24,13 +24,13 @@ Future goals:
 - The display buffer code was ["write-only"](https://7c0h.com/blog/new/write_only_code.html), suited to no one's brain but mine at the time, and not much longer.  I'm happy with my ideas but they must be re-expressed with tests, tasteful typing, and more comments that matter.
 - Learn why [@welldone-software/why-did-you-render](https://github.com/welldone-software/why-did-you-render) got hard to use with my vite config
 - Memoize components
+- Maps and Story
 - Magic skills cost HP
 - No max HP, but the quality of the bed you use determines your HP when you wake up (This already works, but isn't widely deployed)
 - Do better with the fight mode.  Right now it's a flattened eye-level view of the same space with contextual background, but there aren't attack options, and fighting a moving enemy is like chasing a caribou through a shopping mall.
 - Add spells and targeting.  Magic is enabled by rings, which you can wear plenty of, but there are no spells yet
 - Make the map visualizer editable locally, so that it becomes its own map builder
 - Chests that contain items
-- Story
 - MULTIPLAYER???  DO I HAVE YOUR ATTENTION?  Let me know.
 - It's not lost on me that for as many buttons as there are to push, it might map to a controller without hassle.
 - I 'unno the first thing about talking to a TI calculator on modern hardware anymore, but it would be funny if I could push these game screens to the device and you use the calc hardware for the OG tactile experience.  The calculator has enough buttons on offer that it can switch between active screens.
