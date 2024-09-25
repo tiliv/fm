@@ -53,17 +53,17 @@ export default function Visualizer({ startWorld }) {
                     : 'GLOBAL'
                 }</pre>
                 <pre className="ti" style={{ whiteSpace: 'pre-line', backgroundColor: '#aaa' }}><span style={{ backgroundColor: `#${bg}`, color: `#${fg}` }}>#{fg} on {bg || 'transparent'}</span></pre>
-                {Object.keys(rolls).length > 0 && <pre className="ti" style={{ whiteSpace: 'pre-line', backgroundColor: '#aaa' }}>
+                {Object.keys(rolls).length > 0 && <pre className="ti" style={{ whiteSpace: 'pre-wrap', backgroundColor: '#aaa' }}>
                   Roll &gt;= {
                     Object.entries(rolls).map(([key, value]) => `${key.replace('-', '/')}\n → ${value}`).join('\n')
                   }</pre>}
-                {directions && <pre className="ti" style={{ whiteSpace: 'pre-line', backgroundColor: '#aaa' }}>{directions.map(
+                {directions && <pre className="ti" style={{ whiteSpace: 'pre-wrap', backgroundColor: '#aaa' }}>{directions.map(
                   ([dy, dx]) => (
                     `${Math.abs(dy) || ''}${{[-1]: 'down', 1: 'up', 0:'(hold)'}[dy/(Math.abs(dy)||1)]}`
                     +` + ${Math.abs(dx) || ''}${{[-1]: 'right', 1: 'left', 0:'(hold)'}[dx/(Math.abs(dx)||1)]}`
                   )
                 ).join('\n')}</pre>}
-                <pre className="ti" style={{ whiteSpace: 'pre-wrap'/* , backgroundColor: `#${bg}`, color: `#${fg}` */ }}>{overlay}</pre>
+                <pre className="ti" style={{ whiteSpace: 'pre'/* , backgroundColor: `#${bg}`, color: `#${fg}` */ }}>{overlay}</pre>
               </code>
             </div>
           ))}
@@ -101,11 +101,11 @@ export default function Visualizer({ startWorld }) {
                 display: 'block',
                 margin: 'auto',
               }}>
-                <pre className="ti" style={{ whiteSpace: 'pre-line', backgroundColor: '#aaa' }}>
+                <pre className="ti" style={{ whiteSpace: 'pre-wrap', backgroundColor: '#aaa' }}>
                   {/* {rest && `${JSON.stringify(rest, null, 2)}\n`} */}
                   "{label}"{short ? ` (short)` : ''}
                   {'\n'}Data: {JSON.stringify(Object.fromEntries(
-                    Object.entries(attributes).filter(([k]) => /![A-Z]/.test(k))
+                    Object.entries(attributes).filter(([k]) => !/[A-Z]/.test(k))
                   ), null, 2)}
                   {'\n' + Object.entries(rest).filter(([k]) => /[A-Z]/.test(k)).map(([evt, data]) => (
                     (type != 'npc' || data.event) ? `${evt} ${
