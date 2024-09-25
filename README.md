@@ -84,7 +84,7 @@ Still tweaking things but the working examples are the templates I expand.
 - [public/world/{worldId}.txt](https://github.com/tiliv/fm/tree/main/public/world)
   - Worlds use a YAML-like multi-doc marker to separate the map art from the coordinate definitions.
   - Overlays are designated with their animation loop (if any), applicable area (or else implicitly global), color, and probability of triggering a different overlay as a replacement.  When overlay zones overlap, the most specific one should be last (i.e., global first, smallest last)
-  - NPCs are baked into the static map art, and then that coordinate is used to associate an NPC data file with its menu actions.
+  - NPCs are baked into the static map art, and then that coordinate is used to associate an NPC data file containing its menu actions.
   - Objects can have idle animations, including specific movements for various ai states the NPC can be in.
   - Objects can have custom actions defined inline without (or in addition to) a text file.  All (most) menu actions dispatch an event named after them, with their menu data as context.  Nothing responds to most events yet (but the classifier model will help soon!), but the "Climb" (`Climb.player`) event was added to prove that only a coordinate and event name + message text are required to create dynamic interactivity.
   - Objects with names prefixed with `~` are considered "short", allowing them to act as pass-through tiles for talking to npcs across the other side.  In addition, you can climb short tiles.
