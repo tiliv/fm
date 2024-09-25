@@ -38,12 +38,12 @@ export default function Visualizer({ startWorld }) {
             overlay, directions, boxes, attributes: { fg, bg, ...rolls }, ...rest
           }]) => (
             <div key={key}>
-              <h4 className="ti inverted large">overlays/{key}</h4>
+              <h4 className="ti inverted large">{key}</h4>
               <code id="map" className="ti" style={{
                 display: 'block',
                 margin: 'auto',
               }}>
-                <pre className="ti" style={{ backgroundColor: '#aaa' }}>{
+                <pre className="ti" style={{ whiteSpace: 'pre-line', backgroundColor: '#aaa' }}>{
                   boxes.length > 0
                     ? boxes.map(
                       box => rawWorld.split('\n').slice(box[0] - 1, box[2]).map(
@@ -52,12 +52,12 @@ export default function Visualizer({ startWorld }) {
                     )
                     : 'GLOBAL'
                 }</pre>
-                <pre className="ti" style={{ backgroundColor: '#aaa' }}><span style={{ backgroundColor: `#${bg}`, color: `#${fg}` }}>#{fg} on {bg || 'transparent'}</span></pre>
-                {Object.keys(rolls).length > 0 && <pre className="ti" style={{ backgroundColor: '#aaa' }}>
+                <pre className="ti" style={{ whiteSpace: 'pre-line', backgroundColor: '#aaa' }}><span style={{ backgroundColor: `#${bg}`, color: `#${fg}` }}>#{fg} on {bg || 'transparent'}</span></pre>
+                {Object.keys(rolls).length > 0 && <pre className="ti" style={{ whiteSpace: 'pre-line', backgroundColor: '#aaa' }}>
                   Roll &gt;= {
-                    Object.entries(rolls).map(([key, value]) => `${key.replace('-', ' in ')}: ${value}`).join('\n')
+                    Object.entries(rolls).map(([key, value]) => `${key.replace('-', '/')}\n → ${value}`).join('\n')
                   }</pre>}
-                {directions && <pre className="ti" style={{ backgroundColor: '#aaa' }}>{directions.map(
+                {directions && <pre className="ti" style={{ whiteSpace: 'pre-line', backgroundColor: '#aaa' }}>{directions.map(
                   ([dy, dx]) => (
                     `${Math.abs(dy) || ''}${{[-1]: 'down', 1: 'up', 0:'(hold)'}[dy/(Math.abs(dy)||1)]}`
                     +` + ${Math.abs(dx) || ''}${{[-1]: 'right', 1: 'left', 0:'(hold)'}[dx/(Math.abs(dx)||1)]}`
@@ -101,7 +101,7 @@ export default function Visualizer({ startWorld }) {
                 display: 'block',
                 margin: 'auto',
               }}>
-                <pre className="ti" style={{ backgroundColor: '#aaa' }}>
+                <pre className="ti" style={{ whiteSpace: 'pre-line', backgroundColor: '#aaa' }}>
                   {/* {rest && `${JSON.stringify(rest, null, 2)}\n`} */}
                   "{label}"{short ? ` (short)` : ''}
                   {'\n'}Data: {JSON.stringify(Object.fromEntries(
@@ -138,9 +138,9 @@ export default function Visualizer({ startWorld }) {
               name, template, kind, sprite, text, icon, rarity, ...rest
             }]) => (
               <div key={slot}>
-                <h4 className="ti inverted large">equipment/{kind}/{template}.txt</h4>
+                <h4 className="ti inverted large">{kind}/{template}.txt</h4>
                 <code>
-                  <pre className="ti" style={{ backgroundColor: '#aaa' }}>
+                  <pre className="ti" style={{ whiteSpace: 'pre-line', backgroundColor: '#aaa' }}>
                     {icon || '-'} {name === "--" ? "(none)" : `"${name}" @rarity=${rarity}`}
                     {/* {JSON.stringify(rest, null, 2)} */}
                   </pre>
