@@ -15,9 +15,13 @@ Your most recent save will load automatically.  To Load some other save, you mus
 
 ## About
 
-This is a pure React javascript application that loads static text files as the starting state and then presumes your game state overrides the default data.  Interactions in the world issue DOM events scoped to the targets, and the React components carry out the operation and let reactivity update the game map.  There is no state architecture beyond `useState()`, somewhat as a proof that state management is about designing to your task, and may not require selector/mutation bloat to express itself in the clearest way.  We're trusting naive DOM events here to bus our data, but hackability is the proximate cause of what lies below the fold.  If you can throw events from the console, you might be able to make the game do stuff, and I hope that's fun to experience.
+This is a pure React javascript application that loads static text files as the starting state and then presumes your game state overrides the default data.  Interactions in the world issue DOM events scoped to the targets, and the React components carry out the operation and let reactivity update the game map.
 
-The main map files are basically text art, with a table of special coordinates and sprite names.  Using these hints, the game parses the flat map into solid, passable, and interactable layers, and then draws it like a TI-83 Plus with ASM-style greyscale might.  Because of this conceit, the coordinate system from top to bottom is in row-column format.  As a happy accident, this means your text editor's cursor position is always the actual coordinate you're editing, making interactive tiles easy to reference in the world files.
+There is no state architecture beyond `useState()`, somewhat as a proof that state management is about designing to your task, and may not require selector/mutation bloat to express itself in the clearest way.  We're also trusting naïve DOM events here to bus our data, but hackability is the proximate cause of what lies below the fold.  If you can throw events from the console, you might be able to make the game do stuff, and I hope that's fun to experience.
+
+The main map files are basically text art, with a table of special coordinates and sprite names.  Using these hints, the game parses the flat map into solid, passable, and interactable layers, and then draws it like a TI-83 Plus with ASM-style greyscale might.
+
+Because of this conceit, the coordinate system from top to bottom is in a 1-based row/column format.  Following, as a happy accident, this means your text editor's cursor position is the actual coordinate, which makes the use of coordinates in sprite data less traumatic.
 
 Future goals:
 
