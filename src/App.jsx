@@ -200,6 +200,7 @@ export default function App({
           ))
         )}
       </div> */}
+      <label><input type="checkbox" onchange="document.getElementById('visualizer').hidden =! this.checked" />Visualizer</label>
       <Visualizer startWorld={startWorld} width={width} height={height} />
     </>
   )
