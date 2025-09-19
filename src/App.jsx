@@ -169,7 +169,7 @@ export default function App({
             keyMap={KEYMAP_MENU}
           />
         </div>
-        <div style={{display: 'flex', flexDirection: 'row'}}>
+        <div hidden style={{display: 'flex', flexDirection: 'row'}}>
           <input
             className="ti large"
             style={{flex: 1}}
@@ -183,7 +183,7 @@ export default function App({
                 e.target.blur();
               }
             }}
-            />
+          />
           <button
             className="ti inverted large"
             onClick={(e) => null/* analyze(e, input) */}
