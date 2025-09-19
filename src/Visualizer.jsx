@@ -44,7 +44,7 @@ export default function Visualizer({ startWorld, width, height }) {
   useEventOrigin({ setOrigin });
 
   return (
-    <div id="visualizer">
+    <div id="visualizer" hidden>
       <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'stretch'}}>
         <div>
 
