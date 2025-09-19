@@ -203,7 +203,7 @@ export default function App({
       <label><input
         type="checkbox"
         id="visualizer-toggle"
-        onChange={document.getElementById('visualizer').hidden =! this.checked}
+        onChange={e => document.getElementById('visualizer').hidden =! e.target.checked}
       />Visualizer</label>
       <Visualizer startWorld={startWorld} width={width} height={height} />
     </>
