@@ -11,7 +11,7 @@ import useSave from './hooks/useSave';
 import useEvent from './hooks/useEvent';
 
 const START_WORLD = 'Terra Montans.txt'
-const [START_Y, START_X] = [20, 39];
+const [START_Y, START_X] = [20, 22];
 const START_LOG = [
   "You've never been this tired before.",
   'You wake up in a small room, the walls are made of stone and the floor is dirt.',
