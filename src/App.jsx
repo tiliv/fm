@@ -98,7 +98,7 @@ export default function App({
 
   return (
     <>
-      <h1>FM</h1>
+      <h1>Make games with text files.</h1>
       <p>
         <label style={{ margin: '0 0 0 1em' }} htmlFor="magnification">Zoom: </label>
         <input id="magnification"
