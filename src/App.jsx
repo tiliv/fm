@@ -206,8 +206,7 @@ export default function App({
         onChange={e => document.getElementById('visualizer').hidden =! e.target.checked}
       />Visualizer</label>
       <div>
-        <a href="https://github.com/tiliv/fm">GitHub</a>
-        • <a href="https://ko-fi.com/discoverywritten#">Donate</a>
+        <a href="https://github.com/tiliv/fm">GitHub</a> • <a href="https://ko-fi.com/discoverywritten#">Donate</a>
       </div>
       <Visualizer startWorld={startWorld} width={width} height={height} />
     </>
