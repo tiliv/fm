@@ -169,7 +169,8 @@ export default function App({
             keyMap={KEYMAP_MENU}
           />
         </div>
-        <div style={{display: 'hidden', flexDirection: 'row'}}>
+        <div hidden>
+        {/* <div style={{display: 'flex', flexDirection: 'row'}}> */}
           <input
             className="ti large"
             style={{flex: 1}}
