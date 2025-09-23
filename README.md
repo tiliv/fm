@@ -1,4 +1,7 @@
 # Freedom Of Movement
+
+Write games with save/load with just some text files.
+
 A nostalgic romp through TI-83 Plus UI and a classifier model for open-ended gameplay.  Play via localstorage on [https://fm.discoverywritten.com](https://fm.discoverywritten.com).
 
 The in-memory classifier model is loaded but not currently receiving queries.  Before it can be enabled for any use, the classifier labels need to be honed in order to raise the model's clarity on intended effects:
