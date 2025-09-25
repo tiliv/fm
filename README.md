@@ -4,10 +4,6 @@ Write games with save/load with just some text files.
 
 A nostalgic romp through TI-83 Plus UI and a classifier model binding for open-ended gameplay.  Play via localstorage on [https://fm.discoverywritten.com](https://fm.discoverywritten.com).
 
-NPCs can offer a "Save" option and some flavor text, which uses localstorage on the character's name (Hero by default, but will appear `null` until saved).
-
-Your most recent save will load automatically.  To Load some other save, you must talk with a Bard specifically, so good luck with that intentional game design.
-
 ## About
 
 This is a pure React javascript application that loads static text files as the starting state and then presumes your game state overrides the default data.  Interactions in the world issue DOM events scoped to the targets, and the React components carry out the operation and let reactivity update the game map.
@@ -27,6 +23,10 @@ There are 3 displays, and all are active at all times, and have their own select
 2. World area (arrows, bumping into things selects, moving away implicitly deselects)
 3. Menu area (jk, numbers, paging, enter, backspace)
 4. (The bottom of this graphic features the inert message bar that will be re-enabled for communication with the classifier model soon.  If you want to picture what it's for, imagine the old Ultima games and you'll be on the right track.)
+
+NPCs can offer a "Save" option and some flavor text, which uses localstorage on the character's name (Hero by default, but will appear `null` until saved).
+
+Your most recent save will load automatically.  To Load some other save, you must talk with a Bard specifically, so good luck with that intentional game design.
 
 <img width="1153" alt="Three displays: status, world, menu" src="https://github.com/user-attachments/assets/9d1119cc-a57d-4654-b30a-b5903e03b725">
 
