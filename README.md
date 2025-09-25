@@ -14,9 +14,9 @@ The main map files are basically text art, with a table of special coordinates a
 
 Following, as a happy accident, this means your text editor's cursor position is the actual coordinate, which makes the use of coordinates in sprite data less traumatic.
 
+## Game
 The current font is not a full clone of the TI-83 Plus, but it is easy to load and has most of the glyphs that enable this concept.
 
-## Game
 There are 3 displays, and all are active at all times, and have their own select/cancel mechanisms:
 
 1. Status area (wasd, spacebar, escape)
