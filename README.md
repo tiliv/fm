@@ -20,33 +20,6 @@ Following, as a happy accident, this means your text editor's cursor position is
 
 The current font is not a full clone of the TI-83 Plus, but it is easy to load and has most of the glyphs that enable this concept.
 
-### Future goals
-
-The in-memory classifier model is loaded but not currently receiving queries.  Before it can be enabled for any use, the classifier labels need to be honed in order to raise the model's clarity on intended effects:
-
-- Positive/Negative effects brought on by weather, state of equipment, time of day
-- NPC mood reactions to player actions
-- Wear or unwear things as asked, including recent items, and quality/value comparisons for resolving decisions
-- Offer hypothetical insights about targets that the game doesn't even track, to allow the player to invent the rules of success during play
-- Drive additional player choices based on NPC description info, etc
-- (TBD)
-
-React application:
-
-- The display buffer code was ["write-only"](https://7c0h.com/blog/new/write_only_code.html), suited to no one's brain but mine at the time, and not much longer.  I'm happy with my ideas but they must be re-expressed with tests, tasteful typing, and more comments that matter.
-- Learn why [@welldone-software/why-did-you-render](https://github.com/welldone-software/why-did-you-render) got hard to use with my vite config
-- Memoize components
-- Maps and Story
-- Magic skills cost HP
-- No max HP, but the quality of the bed you use determines your HP when you wake up (This already works, but isn't widely deployed)
-- Do better with the fight mode.  Right now it's a flattened eye-level view of the same space with contextual background, but there aren't attack options, and fighting a moving enemy is like chasing a caribou through a shopping mall.
-- Add spells and targeting.  Magic is enabled by rings, which you can wear plenty of, but there are no spells yet
-- Make the map visualizer editable locally, so that it becomes its own map builder
-- Chests that contain items
-- MULTIPLAYER???  DO I HAVE YOUR ATTENTION?  Let me know.
-- It's not lost on me that for as many buttons as there are to push, it might map to a controller without hassle.
-- I 'unno the first thing about talking to a TI calculator on modern hardware anymore, but it would be funny if I could push these game screens to the device and you use the calc hardware for the OG tactile experience.  The calculator has enough buttons on offer that it can switch between active screens.
-
 ## Game
 There are 3 displays, and all are active at all times, and have their own select/cancel mechanisms:
 
@@ -81,7 +54,34 @@ The game is presently dumping its text and calculated values below the game pane
 
 <img width="2320" alt="image" src="https://github.com/user-attachments/assets/5b6655a5-8b12-4e6f-ac21-64eb5c6e0915">
 
-## Static Format
+### Future goals
+
+The in-memory classifier model is loaded but not currently receiving queries.  Before it can be enabled for any use, the classifier labels need to be honed in order to raise the model's clarity on intended effects:
+
+- Positive/Negative effects brought on by weather, state of equipment, time of day
+- NPC mood reactions to player actions
+- Wear or unwear things as asked, including recent items, and quality/value comparisons for resolving decisions
+- Offer hypothetical insights about targets that the game doesn't even track, to allow the player to invent the rules of success during play
+- Drive additional player choices based on NPC description info, etc
+- (TBD)
+
+React application:
+
+- The display buffer code was ["write-only"](https://7c0h.com/blog/new/write_only_code.html), suited to no one's brain but mine at the time, and not much longer.  I'm happy with my ideas but they must be re-expressed with tests, tasteful typing, and more comments that matter.
+- Learn why [@welldone-software/why-did-you-render](https://github.com/welldone-software/why-did-you-render) got hard to use with my vite config
+- Memoize components
+- Maps and Story
+- Magic skills cost HP
+- No max HP, but the quality of the bed you use determines your HP when you wake up (This already works, but isn't widely deployed)
+- Do better with the fight mode.  Right now it's a flattened eye-level view of the same space with contextual background, but there aren't attack options, and fighting a moving enemy is like chasing a caribou through a shopping mall.
+- Add spells and targeting.  Magic is enabled by rings, which you can wear plenty of, but there are no spells yet
+- Make the map visualizer editable locally, so that it becomes its own map builder
+- Chests that contain items
+- MULTIPLAYER???  DO I HAVE YOUR ATTENTION?  Let me know.
+- It's not lost on me that for as many buttons as there are to push, it might map to a controller without hassle.
+- I 'unno the first thing about talking to a TI calculator on modern hardware anymore, but it would be funny if I could push these game screens to the device and you use the calc hardware for the OG tactile experience.  The calculator has enough buttons on offer that it can switch between active screens.
+
+### Static Format
 
 Still tweaking things but the working examples are the templates I expand.
 
