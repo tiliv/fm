@@ -8,6 +8,8 @@ The in-memory classifier model is loaded but not currently receiving queries.  B
 
 - Positive/Negative effects brought on by weather, state of equipment, time of day
 - NPC mood reactions to player actions
+- Wear or unwear things as asked, including recent items, and quality/value comparisons for resolving decisions
+- Offer hypothetical insights about targets that the game doesn't even track, to allow the player to invent the rules of success during play
 - (TBD)
 
 The current font is not a full clone of the TI-83 Plus, but it is easy to load and has most of the glyphs that enable this concept.
