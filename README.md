@@ -2,7 +2,25 @@
 
 Write games with save/load with just some text files.
 
-A nostalgic romp through TI-83 Plus UI and a classifier model for open-ended gameplay.  Play via localstorage on [https://fm.discoverywritten.com](https://fm.discoverywritten.com).
+A nostalgic romp through TI-83 Plus UI and a classifier model binding for open-ended gameplay.  Play via localstorage on [https://fm.discoverywritten.com](https://fm.discoverywritten.com).
+
+NPCs can offer a "Save" option and some flavor text, which uses localstorage on the character's name (Hero by default, but will appear `null` until saved).
+
+Your most recent save will load automatically.  To Load some other save, you must talk with a Bard specifically, so good luck with that intentional game design.
+
+## About
+
+This is a pure React javascript application that loads static text files as the starting state and then presumes your game state overrides the default data.  Interactions in the world issue DOM events scoped to the targets, and the React components carry out the operation and let reactivity update the game map.
+
+There is no state architecture beyond `useState()` and localstorage, somewhat as a proof that state management is about designing to your task, and may not require selector/mutation bloat to express itself in the clearest way.  We're also trusting naïve DOM events here to bus our data, but hackability is the proximate cause of what lies below the fold.  If you can throw events from the console, you might be able to make the game do stuff, and I hope that's fun to experience.
+
+The main map files are basically text art, with a table of special coordinates and sprite names.  Using these hints, the game parses the flat map into solid, passable, and interactable layers, and then draws it like a TI-83 Plus with ASM-style greyscale might. Because of this conceit, the coordinate system from top to bottom is in a 1-based row/column format.
+
+Following, as a happy accident, this means your text editor's cursor position is the actual coordinate, which makes the use of coordinates in sprite data less traumatic.
+
+The current font is not a full clone of the TI-83 Plus, but it is easy to load and has most of the glyphs that enable this concept.
+
+### Future goals
 
 The in-memory classifier model is loaded but not currently receiving queries.  Before it can be enabled for any use, the classifier labels need to be honed in order to raise the model's clarity on intended effects:
 
@@ -13,23 +31,7 @@ The in-memory classifier model is loaded but not currently receiving queries.  B
 - Drive additional player choices based on NPC description info, etc
 - (TBD)
 
-The current font is not a full clone of the TI-83 Plus, but it is easy to load and has most of the glyphs that enable this concept.
-
-NPCs can offer a "Save" option and some flavor text, which uses localstorage on the character's name (Hero by default, but will appear `null` until saved).
-
-Your most recent save will load automatically.  To Load some other save, you must talk with a Bard specifically, so good luck with that intentional game design.
-
-## About
-
-This is a pure React javascript application that loads static text files as the starting state and then presumes your game state overrides the default data.  Interactions in the world issue DOM events scoped to the targets, and the React components carry out the operation and let reactivity update the game map.
-
-There is no state architecture beyond `useState()`, somewhat as a proof that state management is about designing to your task, and may not require selector/mutation bloat to express itself in the clearest way.  We're also trusting naïve DOM events here to bus our data, but hackability is the proximate cause of what lies below the fold.  If you can throw events from the console, you might be able to make the game do stuff, and I hope that's fun to experience.
-
-The main map files are basically text art, with a table of special coordinates and sprite names.  Using these hints, the game parses the flat map into solid, passable, and interactable layers, and then draws it like a TI-83 Plus with ASM-style greyscale might.
-
-Because of this conceit, the coordinate system from top to bottom is in a 1-based row/column format.  Following, as a happy accident, this means your text editor's cursor position is the actual coordinate, which makes the use of coordinates in sprite data less traumatic.
-
-Future goals:
+React application:
 
 - The display buffer code was ["write-only"](https://7c0h.com/blog/new/write_only_code.html), suited to no one's brain but mine at the time, and not much longer.  I'm happy with my ideas but they must be re-expressed with tests, tasteful typing, and more comments that matter.
 - Learn why [@welldone-software/why-did-you-render](https://github.com/welldone-software/why-did-you-render) got hard to use with my vite config
